@@ -1,6 +1,7 @@
 {
     "extension": ".ts",
     "exclude": [
+        "src/**/*.spec.ts"
     ],
     "check-coverage": true,
     "branches": 80,
