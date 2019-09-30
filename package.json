@@ -1,0 +1,27 @@
+{
+  "name": "balance",
+  "version": "1.0.0",
+  "description": "Banking balance microservice",
+  "author": "Herr Doktor",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aseprano/balance/issues"
+  },
+  "homepage": "https://github.com/aseprano/balance#readme",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/jasmine": "^3.4.1",
+    "jasmine": "^3.5.0",
+    "jasmine-ts": "^0.3.0",
+    "ts-mockito": "^2.5.0",
+    "typescript": "^3.6.3"
+  },
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/aseprano/balance.git"
+  }
+}
