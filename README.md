@@ -1,1 +1,1 @@
-![Version](https://img.shields.io/github/package-json/v/aseprano/balance) ![Build](https://img.shields.io/travis/aseprano/balance)
+![Version](https://img.shields.io/github/package-json/v/aseprano/balance) ![Build](https://img.shields.io/travis/aseprano/balance) ![Code coverage](https://img.shields.io/coveralls/github/aseprano/balance)
