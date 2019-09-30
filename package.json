@@ -18,7 +18,8 @@
     "typescript": "^3.6.3"
   },
   "scripts": {
-    "test": "test"
+    "test": "test",
+    "build": "tsc -p ."
   },
   "repository": {
     "type": "git",
