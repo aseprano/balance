@@ -4,3 +4,5 @@ node_js:
 brnches:
   only:
      - master
+after_success:
+  - npm run coverage
