@@ -12,6 +12,7 @@
   "dependencies": {},
   "devDependencies": {
     "@types/jasmine": "^3.4.1",
+    "coveralls": "^3.0.6",
     "jasmine": "^3.5.0",
     "jasmine-ts": "^0.3.0",
     "nyc": "^14.1.1",
