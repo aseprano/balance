@@ -7,8 +7,6 @@ export interface EventStore {
 
     appendToStream(streamId: string, events: Event[], expectedVersion: number): Promise<void>;
 
-    readStream(streamId: string, from: number, to?: number): Promise<EventStream>;
-
-    readEntireStream(streamId: string): Promise<EventStream>;
+    readStream(streamId: string): Promise<EventStream>;
 
 }
