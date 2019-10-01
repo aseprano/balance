@@ -4,10 +4,8 @@ export type EventPayload = {
 
 export interface Event {
 
-    name(): string;
+    getName(): string;
 
-    firedAt(): number;
-
-    payload(): EventPayload;
+    getPayload(): EventPayload;
 
 }
