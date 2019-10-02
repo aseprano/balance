@@ -1,7 +1,8 @@
 import { Money } from "../values/Money";
 import { AccountID } from "../values/AccountID";
+import { Entity } from "./Entity";
 
-export interface BankAccount {
+export interface BankAccount extends Entity {
 
     getId(): AccountID;
     
