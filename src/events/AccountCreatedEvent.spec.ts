@@ -1,4 +1,4 @@
-import { AccountCreatedEvent } from "../events/AccountCreatedEvent";
+import { AccountCreatedEvent } from "./AccountCreatedEvent";
 import { AccountID } from "../values/AccountID";
 
 describe('AccountCreatedEvent', () => {
