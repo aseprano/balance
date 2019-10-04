@@ -7,10 +7,13 @@ export class BankAccountFactory {
 
     constructor(private idGenerator: Provider<AccountID>) {}
 
+    private generateAccountId(): AccountID {
+        return this.idGenerator();
+    }
+
     createInitialized(): BankAccount {
-        const newAccountId = this.idGenerator();
         const newAccount = new BankAccountImpl();
-        newAccount.initialize(newAccountId);
+        newAccount.initialize(this.generateAccountId());
         return newAccount;
     }
 
