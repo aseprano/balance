@@ -24,8 +24,8 @@
     "build": "tsc -p .",
     "build:live": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
     "test": "jasmine-ts",
-    "test:live": "nodemon --watch 'src/**/*.spec.ts' --exec 'jasmine-ts \"src/**/*.spec.ts\"'",
-    "coverage": "nyc npm run test report --reporter=text-lcov | coveralls",
+    "test:live": "nodemon --ext ts --exec 'jasmine-ts'",
+    "coverage": "nyc npm test report --reporter=text-lcov | coveralls",
     "start": "ts-node src/index.ts"
   },
   "repository": {
