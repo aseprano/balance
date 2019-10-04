@@ -11,10 +11,6 @@ export class BankAccountImpl extends AbstractEntity implements BankAccount {
     private accountId?: AccountID;
     private balances: Map<string, number> = new Map();
 
-    private parseMoney(amount: number, currency: string): Money {
-        return new Money(amount, currency);
-    }
-
     private applyAccountCreatedEvent(event: Event) {
         this.accountId = new AccountID(event.getPayload()['id']);
     }
