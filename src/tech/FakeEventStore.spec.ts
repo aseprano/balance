@@ -67,5 +67,12 @@ describe('FakeEventStore', () => {
             new CustomEvent('ThirdEvent')
         ]);
     });
+
+    it('fails when reading a non existing stream', (done) => {
+        const fakeStore = new FakeEventStore();
+
+        fakeStore.readStream('foo-123')
+            .catch(() => done());
+    });
     
 })
