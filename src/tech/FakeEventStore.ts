@@ -5,10 +5,6 @@ import { Event } from "./Event";
 export class FakeEventStore implements EventStore {
     private streams: Map<string, EventStream> = new Map();
 
-    public setEvents(streamId: string, stream: EventStream) {
-        this.streams.set(streamId, stream);
-    }
-
     private streamExists(streamId: string): boolean {
         return this.streams.has(streamId);
     }

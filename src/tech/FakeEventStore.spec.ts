@@ -26,6 +26,14 @@ describe('FakeEventStore', () => {
         ]);
     });
 
+    it('does not create a stream with an already existing id', async (done) => {
+        const fakeStore = new FakeEventStore();
+        await fakeStore.createStream('foo-123', []);
+
+        fakeStore.createStream('foo-123', [])
+            .catch(() => done());
+    });
+
     it('does not append events to a non-existing stream', (done) => {
         const fakeStore = new FakeEventStore();
         fakeStore.appendToStream('foo-123', [], 1)
