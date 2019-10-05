@@ -100,4 +100,13 @@ describe('BankAccountImpl', () => {
         expect(account.commitEvents()).toEqual([]);
     });
 
+    it('clears the uncommitted events when commitEvents() is invoked', () => {
+        const account = new BankAccountImpl();
+        account.initialize(testId);
+        account.credit(new Money(100, 'EUR'));
+
+        account.commitEvents();
+        expect(account.commitEvents()).toEqual([]);
+    });
+
 });
