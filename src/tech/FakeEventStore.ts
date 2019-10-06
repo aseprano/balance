@@ -2,6 +2,8 @@ import { EventStore } from "./EventStore";
 import { EventStream } from "./EventStream";
 import { Event } from "./Event";
 import { StreamNotFoundException } from "./exceptions/StreamNotFoundException";
+import { StreamAlreadyExistingException } from "./exceptions/StreamAlreadyExistingException";
+import { StreamConcurrencyException } from "./exceptions/StreamConcurrencyException";
 
 export class FakeEventStore implements EventStore {
     private streams: Map<string, EventStream> = new Map();
@@ -17,7 +19,7 @@ export class FakeEventStore implements EventStore {
     createStream(streamId: string, events: Event[]): Promise<void> {
         return new Promise((resolve, reject) => {
             if (this.streamExists(streamId)) {
-                reject(new Error('Stream already exists'));
+                reject(new StreamAlreadyExistingException());
             } else {
                 this.streams.set(streamId, {
                     version: 1,
@@ -32,12 +34,12 @@ export class FakeEventStore implements EventStore {
     appendToStream(streamId: string, events: Event[], expectedVersion: number): Promise<void> {
         return new Promise((resolve, reject) => {
             if (!this.streamExists(streamId)) {
-                reject(new Error('Stream not found'));
+                reject(new StreamNotFoundException('Stream not found'));
             } else {
                 const currentStream = this.streams.get(streamId)!;
 
                 if (currentStream.version !== expectedVersion) {
-                    reject(new Error('Wrong stream version'));
+                    reject(new StreamConcurrencyException('Wrong stream version'));
                 }
     
                 currentStream.events.push(...events);

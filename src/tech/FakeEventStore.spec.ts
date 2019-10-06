@@ -2,6 +2,8 @@ import { FakeEventStore } from "./FakeEventStore";
 import { EventStream } from "./EventStream";
 import { CustomEvent } from "./CustomEvent";
 import { StreamNotFoundException } from "./exceptions/StreamNotFoundException";
+import { StreamAlreadyExistingException } from "./exceptions/StreamAlreadyExistingException";
+import { StreamConcurrencyException } from "./exceptions/StreamConcurrencyException";
 
 describe('FakeEventStore', () => {
 
@@ -32,20 +34,29 @@ describe('FakeEventStore', () => {
         await fakeStore.createStream('foo-123', []);
 
         fakeStore.createStream('foo-123', [])
-            .catch(() => done());
+            .catch((error) => {
+                expect(error instanceof StreamAlreadyExistingException).toBeTruthy();
+                done();
+            });
     });
 
     it('does not append events to a non-existing stream', (done) => {
         const fakeStore = new FakeEventStore();
         fakeStore.appendToStream('foo-123', [], 1)
-            .catch(() => done());
+            .catch((error) => {
+                expect(error instanceof StreamNotFoundException).toBeTruthy();
+                done();
+            });
     });
 
     it('does not append events to a stream if the expected version does not match', (done) => {
         const fakeStore = new FakeEventStore();
         fakeStore.createStream('foo-123', []); // version set to 1
         fakeStore.appendToStream('foo-123', [], 7)
-            .catch(() => done());
+            .catch((error) => {
+                expect(error instanceof StreamConcurrencyException).toBeTruthy();
+                done();
+            });
     });
 
     it('appends events to an existing stream and increases the version', async () => {
