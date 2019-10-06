@@ -1,6 +1,7 @@
 import { FakeEventStore } from "./FakeEventStore";
 import { EventStream } from "./EventStream";
 import { CustomEvent } from "./CustomEvent";
+import { StreamNotFoundException } from "./exceptions/StreamNotFoundException";
 
 describe('FakeEventStore', () => {
 
@@ -72,7 +73,10 @@ describe('FakeEventStore', () => {
         const fakeStore = new FakeEventStore();
 
         fakeStore.readStream('foo-123')
-            .catch(() => done());
+            .catch((error) => {
+                expect(error instanceof StreamNotFoundException).toBeTruthy();
+                done();
+            });
     });
 
     it('can set a stream by invoking setStream()', async () => {

@@ -1,6 +1,7 @@
 import { EventStore } from "./EventStore";
 import { EventStream } from "./EventStream";
 import { Event } from "./Event";
+import { StreamNotFoundException } from "./exceptions/StreamNotFoundException";
 
 export class FakeEventStore implements EventStore {
     private streams: Map<string, EventStream> = new Map();
@@ -50,7 +51,7 @@ export class FakeEventStore implements EventStore {
     readStream(streamId: string): Promise<EventStream> {
         return new Promise((resolve, reject) => {
             if (!this.streamExists(streamId)) {
-                reject(new Error('Stream not found'));
+                reject(new StreamNotFoundException(`Stream not found: ${streamId}`));
             }
 
             resolve(this.streams.get(streamId));
