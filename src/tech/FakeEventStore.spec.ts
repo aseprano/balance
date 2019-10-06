@@ -74,5 +74,20 @@ describe('FakeEventStore', () => {
         fakeStore.readStream('foo-123')
             .catch(() => done());
     });
+
+    it('can set a stream by invoking setStream()', async () => {
+        const fakeStore = new FakeEventStore();
+        const fakeStream = {
+            version: 7,
+            events: [
+                new CustomEvent('my-custom-event-1', { age: 38, name: 'Goofy' }),
+            ]
+        } as EventStream;
+
+        fakeStore.setStream('fake-stream', fakeStream);
+
+        const stream = await fakeStore.readStream('fake-stream');
+        expect(stream).toEqual(fakeStream);
+    });
     
 })

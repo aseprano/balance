@@ -57,4 +57,8 @@ export class FakeEventStore implements EventStore {
         });
     }
 
+    setStream(streamId: string, stream: EventStream) {
+        this.streams.set(streamId, stream);
+    }
+
 }
