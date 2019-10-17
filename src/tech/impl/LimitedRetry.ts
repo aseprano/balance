@@ -1,17 +1,18 @@
 import { RetryPolicy } from "../RetryPolicy";
+import { Predicate } from "../../Predicate";
 
 export class LimitedRetry<T> implements RetryPolicy<T> {
 
     constructor(
         private maxAttempts: number,
-        private errorTester: (t: any) => boolean
+        private errorTester: Predicate<Error>
     ) {
         if (maxAttempts < 1) {
             throw new Error('Invalid max number of retries');
         }
     }
 
-    private shouldRetryError(error: any): boolean {
+    private shouldRetryError(error: Error): boolean {
         return this.errorTester(error);
     }
 
