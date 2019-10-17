@@ -1,27 +1,27 @@
-import { LimitedRetry } from "./LimitedRetry";
+import { LimitedRetryPolicy } from "./LimitedRetryPolicy";
 
 function RetryAlways(): boolean {
     return true;
 }
 
-describe('LimitedRetry', () => {
+describe('LimitedRetryPolicy', () => {
 
     it('cannot be built with a 0 limit', () => {
         expect(() => {
-            new LimitedRetry(0, RetryAlways);
+            new LimitedRetryPolicy(0, RetryAlways);
         }).toThrow();
     });
 
     it('cannot be built with a negative limit', () => {
         expect(() => {
-            new LimitedRetry(-1, RetryAlways);
+            new LimitedRetryPolicy(-1, RetryAlways);
         }).toThrow();
     });
 
     it('returns the value of f() if no error is thrown', (done) => {
         const f: () => Promise<number> = () => Promise.resolve(10);
 
-        const retry = new LimitedRetry<number>(3, RetryAlways);
+        const retry = new LimitedRetryPolicy<number>(3, RetryAlways);
 
         retry.applyTo(f)
             .then(v => {
@@ -38,7 +38,7 @@ describe('LimitedRetry', () => {
             return Promise.reject(new Error('some generic error'));
         }
 
-        const retry = new LimitedRetry(5, RetryAlways);
+        const retry = new LimitedRetryPolicy(5, RetryAlways);
 
         retry.applyTo(f)
             .catch(error => {
@@ -59,7 +59,7 @@ describe('LimitedRetry', () => {
                 }
             });
 
-        const retry = new LimitedRetry<number>(5, RetryAlways);
+        const retry = new LimitedRetryPolicy<number>(5, RetryAlways);
 
         retry.applyTo(f)
             .then(v => {
@@ -72,7 +72,7 @@ describe('LimitedRetry', () => {
     it('will not retry if the errorcheck returns false', (done) => {
         let attemptsCount = 0;
 
-        const policy = new LimitedRetry(
+        const policy = new LimitedRetryPolicy(
             5,
             (error) => error instanceof RangeError, // retry only if error is RangeError
         );

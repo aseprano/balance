@@ -1,7 +1,7 @@
 import { RetryPolicy } from "../RetryPolicy";
 import { Predicate } from "../../Predicate";
 
-export class LimitedRetry<T> implements RetryPolicy<T> {
+export class LimitedRetryPolicy<T> implements RetryPolicy<T> {
 
     constructor(
         private maxAttempts: number,
