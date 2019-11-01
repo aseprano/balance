@@ -6,6 +6,7 @@ import { Event } from "../../tech/Event";
 import { AccountCreatedEvent } from "../../events/AccountCreatedEvent";
 import { AccountDebitedEvent } from "../../events/AccountDebitedEvent";
 import { AccountCreditedEvent } from "../../events/AccountCreditedEvent";
+import { InsufficientFundsException } from "../../exceptions/InsufficientFundsException";
 
 export class BankAccountImpl extends AbstractEntity implements BankAccount {
     private accountId?: AccountID;
@@ -59,7 +60,7 @@ export class BankAccountImpl extends AbstractEntity implements BankAccount {
     
     debit(amount: Money): void {
         if (!this.hasEnoughBalance(amount)) {
-            throw new Error('Insufficient funds');
+            throw new InsufficientFundsException();
         }
 
         this.appendUncommittedEvent(new AccountDebitedEvent(this.getId(), amount));

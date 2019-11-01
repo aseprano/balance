@@ -23,7 +23,7 @@ describe('LimitedRetryPolicy', () => {
 
         const retry = new LimitedRetryPolicy<number>(3, RetryAlways);
 
-        retry.applyTo(f)
+        retry.retry(f)
             .then(v => {
                 expect(v).toBe(10);
                 done();
@@ -40,7 +40,7 @@ describe('LimitedRetryPolicy', () => {
 
         const retry = new LimitedRetryPolicy(5, RetryAlways);
 
-        retry.applyTo(f)
+        retry.retry(f)
             .catch(error => {
                 expect(numberOfInvocations).toBe(5);
                 expect(error.message).toBe('some generic error');
@@ -61,7 +61,7 @@ describe('LimitedRetryPolicy', () => {
 
         const retry = new LimitedRetryPolicy<number>(5, RetryAlways);
 
-        retry.applyTo(f)
+        retry.retry(f)
             .then(v => {
                 expect(v).toBe(10);
                 expect(numberOfInvocations).toBe(1);
@@ -77,7 +77,7 @@ describe('LimitedRetryPolicy', () => {
             (error) => error instanceof RangeError, // retry only if error is RangeError
         );
 
-        policy.applyTo(() => {
+        policy.retry(() => {
             attemptsCount++;
             return Promise.reject(new Error('Dummy Error'));
         }).catch(e => {
