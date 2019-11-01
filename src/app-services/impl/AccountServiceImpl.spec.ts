@@ -119,4 +119,94 @@ describe('AccountServiceImpl', () => {
             });
     });
 
+    it('persists the debited account to the repository', async (done) => {
+        let accountDebited = false;
+
+        const fakeAccount = createAccountWithId(new AccountID('12312312312'));
+        when(fakeAccount.debit(anything()))
+            .thenCall(() => {
+                accountDebited = true;
+            });
+
+        const fakeRepo = mock(BankAccountsRepositoryImpl);
+
+        when(fakeRepo.getById(anything()))
+            .thenResolve(instance(fakeAccount));
+        
+        when(fakeRepo.update(instance(fakeAccount)))
+            .thenCall(() => {
+                expect(accountDebited).toEqual(true);
+                done();
+                return Promise.resolve();
+            });
+
+        const service = new AccountServiceImpl(
+            instance(fakeRepo),
+            createFactoryThatReturns(instance(fakeAccount)),
+            noRetryPolicy
+        );
+
+        service.debit(new Money(0.01, 'EUR'), new AccountID('12312312312'));
+    });
+
+    it('credits and updates the account', async () => {
+        const amountToCredit = new Money(112.00, 'EUR');
+        const accountId = new AccountID('12312312312');
+        
+        let accountCredited = false;
+        let accountUpdated = false;
+
+        const fakeAccount = createAccountWithId(accountId);
+        when(fakeAccount.credit(amountToCredit))
+            .thenCall(() => {
+                accountCredited = true;
+            });
+        
+        const fakeRepo = mock(BankAccountsRepositoryImpl);
+        when(fakeRepo.getById(accountId))
+            .thenResolve(instance(fakeAccount));
+
+        when(fakeRepo.update(instance(fakeAccount)))
+            .thenCall(() => {
+                accountUpdated = true;
+                return Promise.resolve();
+            });
+
+        const service = new AccountServiceImpl(
+            instance(fakeRepo),
+            createFactoryThatReturns(instance(fakeAccount)),
+            noRetryPolicy
+        );
+
+        await service.credit(amountToCredit, accountId);
+        expect(accountCredited).toEqual(true);
+        expect(accountUpdated).toEqual(true);
+    });
+
+    it('credits the account through the retry policy', async () => {
+        let policyInvoked = false;
+
+        const fakeAccount = createAccountWithId(new AccountID('12312312312'));
+        when(fakeAccount.credit(anything()))
+            .thenReturn();
+
+        const fakeRepo = mock(BankAccountsRepositoryImpl);
+        when(fakeRepo.getById(anything()))
+            .thenResolve(instance(fakeAccount));
+
+        const service = new AccountServiceImpl(
+            instance(fakeRepo),
+            createFactoryThatReturns(instance(fakeAccount)),
+            new (class FakePolicy implements RetryPolicy<any> {
+                retry(f: () => Promise<any>): Promise<any> {
+                    policyInvoked = true;
+                    return f();
+                }
+            })()
+        );
+
+        await service.credit(new Money(3.14, 'EUR'), new AccountID('12312312312'));
+        expect(policyInvoked).toEqual(true);
+    });
+
 });
