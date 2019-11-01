@@ -10,6 +10,7 @@ import { BankAccount } from "../../entities/BankAccount";
 import { Money } from "../../values/Money";
 import { InsufficientFundsException } from "../../exceptions/InsufficientFundsException";
 import { BankAccountNotFoundException } from "../../exceptions/BankAccountNotFoundException";
+import { RetryPolicy } from "../../tech/RetryPolicy";
 
 describe('AccountServiceImpl', () => {
     const noRetryPolicy = new NoRetryPolicy<any>();
@@ -90,6 +91,32 @@ describe('AccountServiceImpl', () => {
 
         await expectAsync(service.debit(new Money(0.01, 'EUR'), new AccountID('12312312312')))
             .toBeRejected();
+    });
+
+    it('debits the account through the retryPolicy', (done) => {
+        const fakeAccount = createAccountWithInsufficientFunds(new AccountID('12312312312'));
+
+        const fakeRepo = mock(BankAccountsRepositoryImpl);
+        when(fakeRepo.getById(anything())).thenResolve(instance(fakeAccount));
+
+        let policyInvoked = false;
+
+        const service = new AccountServiceImpl(
+            instance(fakeRepo),
+            createFactoryThatReturns(instance(fakeAccount)),
+            new (class FakePolicy implements RetryPolicy<any> {
+                retry(f: () => Promise<any>): Promise<any> {
+                    policyInvoked = true;
+                    return f();
+                }
+            })()
+        );
+
+        service.debit(new Money(0.01, 'EUR'), new AccountID('12312312312'))
+            .catch(() => {
+                expect(policyInvoked).toEqual(true);
+                done();
+            });
     });
 
 });
