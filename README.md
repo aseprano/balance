@@ -1,1 +1,1 @@
-![Version](https://img.shields.io/github/package-json/v/aseprano/balance) ![Build](https://img.shields.io/travis/aseprano/balance) [![Coverage Status](https://img.shields.io/coveralls/github/aseprano/balance/master)](https://coveralls.io/repos/github/aseprano/balance/badge.svg?branch=master)
+![Version](https://img.shields.io/github/package-json/v/aseprano/balance) ![Build](https://img.shields.io/travis/aseprano/balance) [![Coverage Status](https://img.shields.io/coveralls/github/aseprano/balance/master)](https://coveralls.io/github/aseprano/balance?branch=master)
