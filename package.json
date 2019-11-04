@@ -9,9 +9,13 @@
   },
   "homepage": "https://github.com/aseprano/balance#readme",
   "main": "index.js",
-  "dependencies": {},
+  "dependencies": {
+    "@types/node": "^12.12.5",
+    "event-store-client": "^1.1.0"
+  },
   "devDependencies": {
     "@types/jasmine": "^3.4.1",
+    "@types/uuid": "^3.4.6",
     "coveralls": "^3.0.6",
     "jasmine": "^3.5.0",
     "jasmine-ts": "^0.3.0",
