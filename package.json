@@ -11,7 +11,8 @@
   "main": "index.js",
   "dependencies": {
     "@types/node": "^12.12.5",
-    "event-store-client": "^1.1.0"
+    "event-store-client": "^1.1.0",
+    "uuidv4": "^5.0.1"
   },
   "devDependencies": {
     "@types/jasmine": "^3.4.1",
