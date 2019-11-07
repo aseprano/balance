@@ -113,7 +113,7 @@ export class EventStoreImpl implements EventStore {
             numberOfEventsRead = events.length;
             stream.events.push(...events);
             stream.version += numberOfEventsRead;
-        } while (numberOfEventsRead !== chunkSize);
+        } while (numberOfEventsRead !== 0 && numberOfEventsRead !== chunkSize);
 
         return Promise.resolve(stream);
     }
