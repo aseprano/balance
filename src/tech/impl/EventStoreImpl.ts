@@ -15,7 +15,7 @@ export class EventStoreImpl implements EventStore {
         private credentials: ICredentials,
         private eventIdGenerator: Provider<v4>
     ) {
-
+        
     }
 
     private newEventId(): string {
@@ -102,14 +102,14 @@ export class EventStoreImpl implements EventStore {
     async readStream(streamId: string): Promise<EventStream> {
         const stream: EventStream = {
             events: [],
-            version: 0
+            version: -1
         };
 
         const chunkSize = 100;
         let numberOfEventsRead = 0;
 
         do {
-            const events = await this.readEvents(streamId, stream.version, stream.version + chunkSize);
+            const events = await this.readEvents(streamId, stream.version + 1, stream.version + 1 + chunkSize);
             numberOfEventsRead = events.length;
             stream.events.push(...events);
             stream.version += numberOfEventsRead;
