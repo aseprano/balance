@@ -31,7 +31,7 @@ export class AccountServiceImpl implements AccountService {
         return this.doRepeat(async () => {
             const account = await this.accountsRepository.getById(accountId);
             account.credit(amount);
-            this.accountsRepository.update(account);
+            await this.accountsRepository.update(account);
         });
     }
 
@@ -39,7 +39,7 @@ export class AccountServiceImpl implements AccountService {
         return this.doRepeat(async () => {
             const account = await this.accountsRepository.getById(accountId);
             account.debit(amount);
-            this.accountsRepository.update(account);
+            await this.accountsRepository.update(account);
         });
     }
 
