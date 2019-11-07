@@ -1,4 +1,4 @@
-import { mock, instance, when, anything, anyNumber } from "ts-mockito";
+import { mock, instance, when, anything, anyNumber, anyString } from "ts-mockito";
 import { BankAccountsRepositoryImpl } from "./BankAccountsRepositoryImpl";
 import { BankAccountImpl } from "../../entities/impl/BankAccountImpl";
 import { FakeEventStore } from "../../tech/FakeEventStore";
@@ -81,29 +81,32 @@ describe('BankAccountsRepositoryImpl', () => {
         });
     });
 
-    it('adds the uncommitted events to the EventStore when updating an account', async () => {
+    it('adds the uncommitted events to the EventStore when updating an account', (done) => {
         const accountId = new AccountID('12312312312');
 
-        const accountEvents = [
+        const accountUncommittedEvents = [
             new AccountCreditedEvent(accountId, new Money(30, 'USD')),
             new AccountDebitedEvent(accountId, new Money(25, 'USD')),
         ];
 
         const mockedAccount = mock(BankAccountImpl);
         when(mockedAccount.getId()).thenReturn(accountId);
-        when(mockedAccount.commitEvents()).thenReturn(accountEvents);
+        when(mockedAccount.commitEvents()).thenReturn(accountUncommittedEvents);
         when(mockedAccount.getVersion()).thenReturn(3);
 
         const fakeStore = mock(FakeEventStore);
-        when(fakeStore.appendToStream('bank-account-12312312312', accountEvents, 3))
+        when(fakeStore.appendToStream(anyString(), anything(), anyNumber()))
+            .thenReject();
+        when(fakeStore.appendToStream('bank-account-12312312312', accountUncommittedEvents, 3))
             .thenResolve();
 
         const repo = new BankAccountsRepositoryImpl(
-            fakeStore,
+            instance(fakeStore),
             () => new BankAccountImpl()
         );
 
-        await repo.update(instance(mockedAccount));
+        repo.update(instance(mockedAccount))
+            .then(done);
     });
 
     it('throws the DuplicatedBankAccountException when adding an account with an already used id', (done) => {
