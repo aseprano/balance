@@ -33,6 +33,15 @@ describe('AccountServiceImpl', () => {
         return fakeAccount;
     }
 
+    function createAccountWithEnoughFunds(accountId: AccountID): BankAccount {
+        const fakeAccount: BankAccount = createAccountWithId(accountId);
+
+        when(fakeAccount.debit(anything()))
+            .thenResolve();
+
+        return fakeAccount;
+    }
+
     function createFactoryThatReturns(bankAccount: BankAccount): BankAccountFactory {
         const fakeFactory = mock(BankAccountFactory);
 
@@ -119,6 +128,39 @@ describe('AccountServiceImpl', () => {
             });
     });
 
+    it('debits the account if the balance is enough', (done) => {
+        const fakeAccount = createAccountWithEnoughFunds(new AccountID('12312312312'));
+
+        let updateInvoked = false;
+
+        const fakeRepo = mock(BankAccountsRepositoryImpl);
+
+        when(fakeRepo.getById(anything()))
+            .thenResolve(instance(fakeAccount));
+
+        when(fakeRepo.update(anything()))
+            .thenCall(() => {
+                return new Promise<void>((resolve, reject) => {
+                    setTimeout(() => {
+                        updateInvoked = true;
+                        resolve();
+                    }, 1000);
+                });
+            });
+
+        const service = new AccountServiceImpl(
+            instance(fakeRepo),
+            createFactoryThatReturns(instance(fakeAccount)),
+            noRetryPolicy
+        );
+
+        service.debit(new Money(0.01, 'EUR'), new AccountID('12312312312'))
+            .then(() => {
+                expect(updateInvoked).toEqual(true);
+                done();
+            });
+    });
+
     it('persists the debited account to the repository', async (done) => {
         let accountDebited = false;
 
@@ -167,10 +209,12 @@ describe('AccountServiceImpl', () => {
             .thenResolve(instance(fakeAccount));
 
         when(fakeRepo.update(instance(fakeAccount)))
-            .thenCall(() => {
-                accountUpdated = true;
-                return Promise.resolve();
-            });
+            .thenReturn(new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    accountUpdated = true;
+                    resolve();
+                }, 1000);
+            }));
 
         const service = new AccountServiceImpl(
             instance(fakeRepo),

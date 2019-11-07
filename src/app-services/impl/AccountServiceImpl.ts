@@ -13,7 +13,7 @@ export class AccountServiceImpl implements AccountService {
         private retryPolicy: RetryPolicy<any>
     ) { }
 
-    private doRepeat(f: () => Promise<any>) {
+    private doRepeat(f: () => Promise<any>): Promise<any> {
         return this.retryPolicy.retry(f);
     }
 
@@ -31,7 +31,7 @@ export class AccountServiceImpl implements AccountService {
         return this.doRepeat(async () => {
             const account = await this.accountsRepository.getById(accountId);
             account.credit(amount);
-            await this.accountsRepository.update(account);
+            return this.accountsRepository.update(account);
         });
     }
 
@@ -39,7 +39,7 @@ export class AccountServiceImpl implements AccountService {
         return this.doRepeat(async () => {
             const account = await this.accountsRepository.getById(accountId);
             account.debit(amount);
-            await this.accountsRepository.update(account);
+            return this.accountsRepository.update(account);
         });
     }
 
