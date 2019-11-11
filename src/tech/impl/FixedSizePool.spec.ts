@@ -1,5 +1,5 @@
 import { FixedSizePool } from "./FixedSizePool";
-import { Resource } from "../Pool";
+import { Resource } from "../../Pool";
 
 class FakeResource implements Resource {
 
