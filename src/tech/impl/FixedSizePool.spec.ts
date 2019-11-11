@@ -1,18 +1,33 @@
 import { FixedSizePool } from "./FixedSizePool";
+import { Resource } from "../Pool";
+
+class FakeResource implements Resource {
+
+    constructor(private valid: boolean = true, private id: number = 0) { }
+
+    isValid(): boolean {
+        return this.valid;
+    }
+
+    getId(): number {
+        return this.id;
+    }
+
+}
 
 describe('FixedSizePool', () => {
 
     it('cannot have zero or negative size', () => {
-        expect(() => new FixedSizePool(0, () => null)).toThrow();
-        expect(() => new FixedSizePool(-1, () => null)).toThrow();
+        expect(() => new FixedSizePool(0, () => new FakeResource())).toThrow();
+        expect(() => new FixedSizePool(-1, () => new FakeResource())).toThrow();
     });
 
     it('allocates all the resources in the constructor', () => {
         let numberOfAllocations = 0;
         
-        const pool = new FixedSizePool<Object>(5, () => {
+        const pool = new FixedSizePool<FakeResource>(5, () => {
             numberOfAllocations++;
-            return new Object();
+            return new FakeResource();
         });
 
         expect(numberOfAllocations).toEqual(5);
@@ -23,15 +38,13 @@ describe('FixedSizePool', () => {
         let resourceId = 0;
 
         const pool = new FixedSizePool(3, () => {
-            return {
-                id: resourceId++
-            };
+            return new FakeResource(true, resourceId++);
         });
 
         const resourcesObtained = [
-            (await pool.get())['id'],
-            (await pool.get())['id'],
-            (await pool.get())['id']
+            (await pool.get()).getId(),
+            (await pool.get()).getId(),
+            (await pool.get()).getId()
         ];
 
         expect(resourcesObtained).toEqual([0, 1, 2]);
@@ -41,9 +54,7 @@ describe('FixedSizePool', () => {
         let resourceId = 0;
 
         const pool = new FixedSizePool(3, () => {
-            return {
-                id: resourceId++
-            }
+            return new FakeResource(true, resourceId++);
         });
 
         const resources = [
@@ -54,7 +65,7 @@ describe('FixedSizePool', () => {
 
         pool.get()
             .then((res) => {
-                expect(res['id']).toEqual(1);
+                expect(res.getId()).toEqual(1);
                 done();
             });
 
@@ -63,7 +74,7 @@ describe('FixedSizePool', () => {
 
     it('returns the same size even when resources are in use', async () => {
         const pool = new FixedSizePool(3, () => {
-            return {foo: 'bar'}
+            return new FakeResource();
         });
         
         expect(pool.size()).toEqual(3);

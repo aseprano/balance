@@ -1,7 +1,7 @@
-import { Pool } from "../Pool";
+import { Pool, Resource } from "../Pool";
 import { Consumer } from "../Conumer";
 
-export abstract class AbstractPool<T> implements Pool<T> {
+export abstract class AbstractPool<T extends Resource> implements Pool<T> {
     private resources: T[] = [];
     private waitingQueue: Consumer<T>[] = [];
     private resourcesInUse = 0;
@@ -58,7 +58,7 @@ export abstract class AbstractPool<T> implements Pool<T> {
     dispose(resource: T): void {
         this.resourcesInUse--;
 
-        if (this.canDispose(resource)) {
+        if (resource.isValid() && this.canDispose(resource)) {
             this.makeResourceAvailable(resource);
         }
     }

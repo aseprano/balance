@@ -1,7 +1,11 @@
-export interface Pool<T> {
+export interface Resource {
+    isValid(): boolean;
+}
+
+export interface Pool<T extends Resource> {
 
     get(): Promise<T>;
 
-    dispose(item: T): void;
+    dispose(resource: T): void;
 
 }

@@ -1,10 +1,11 @@
 import { AbstractPool } from "./AbstractPool";
 import { Provider } from "../../Provider";
+import { Resource } from "../Pool";
 
 /**
  * A pool that reuses a fixed number of resources
  */
-export class FixedSizePool<T> extends AbstractPool<T> {
+export class FixedSizePool<T extends Resource> extends AbstractPool<T> {
 
     constructor(
         private poolSize: number,
