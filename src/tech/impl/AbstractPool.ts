@@ -16,8 +16,24 @@ export abstract class AbstractPool<T extends Resource> implements Pool<T> {
         return this.waitingQueue.shift();
     }
 
+    private tryBuildNewResource() {
+        const newResource = this.newResourceAsked();
+
+        if (newResource !== undefined) {
+            this.makeResourceAvailable(newResource);
+        }
+    }
+
     private consumeOneResource(): T|undefined {
-        return this.resources.shift();
+        do {
+            const resource = this.resources.shift();
+
+            if (resource !== undefined && resource.isValid()) {
+                return resource;
+            } else {
+                this.tryBuildNewResource();
+            }
+        } while (this.resources.length);
     }
 
     private disposeResource(resource: T): void {
@@ -60,6 +76,8 @@ export abstract class AbstractPool<T extends Resource> implements Pool<T> {
 
         if (resource.isValid() && this.canDispose(resource)) {
             this.makeResourceAvailable(resource);
+        } else {
+            this.tryBuildNewResource();
         }
     }
 

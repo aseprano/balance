@@ -12,24 +12,28 @@ import { StreamConcurrencyException } from "../tech/exceptions/StreamConcurrency
 import { BankAccountImpl } from "../entities/impl/BankAccountImpl";
 import { BankAccount } from "../entities/BankAccount";
 import { Provider } from "../Provider";
+import { FixedSizePool } from "../tech/impl/FixedSizePool";
+import { EventStoreConnectionProxy } from "../tech/impl/EventStoreConnectionProxy";
 const uuid = require('uuidv4').default;
 
 module.exports = (container: ServiceContainer) => {
     container.declare(
         'EventStore',
         () => {
-            const connection = new Connection({
-                host: 'localhost',
-                port: 1113
+            const connectionsPool = new FixedSizePool(5, () => {
+                return new EventStoreConnectionProxy({
+                    host: 'localhost',
+                    port: 1113,
+                });
             });
 
             return new EventStoreImpl(
-                connection,
+                connectionsPool,
                 {
                     username: 'admin',
                     password: 'changeit'
                 },
-                uuid
+                () => uuid()
             );
         }
     ).declare(

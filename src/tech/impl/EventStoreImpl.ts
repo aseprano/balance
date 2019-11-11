@@ -1,17 +1,19 @@
 /// <reference path='../../../node_modules/event-store-client/event-store-client.d.ts'/>
 
 import { EventStore } from "../EventStore";
+import { EventStoreConnectionProxy } from "./EventStoreConnectionProxy";
 import { EventStream } from "../EventStream";
 import { Event } from "../Event";
-import { Connection, ICredentials, ExpectedVersion, OperationResult, ReadStreamResult } from "event-store-client";
+import { ICredentials, ExpectedVersion, OperationResult, ReadStreamResult, Connection } from "event-store-client";
 import { Provider } from "../../Provider";
 import { v4 } from "uuid/interfaces";
 import { CustomEvent } from "../CustomEvent";
+import { Pool } from "../Pool";
 
 export class EventStoreImpl implements EventStore {
 
     constructor(
-        private connection: Connection,
+        private connections: Pool<EventStoreConnectionProxy>,
         private credentials: ICredentials,
         private eventIdGenerator: Provider<v4>
     ) {
@@ -22,11 +24,25 @@ export class EventStoreImpl implements EventStore {
         return this.eventIdGenerator().toString();
     }
 
-    private async readEvents(streamId: string, fromEventNumber: number, toEventNumber: number): Promise<Event[]> {
-        return new Promise((resolve, reject) => {
-            const events: Event[] = [];
+    private getConnection(): Promise<EventStoreConnectionProxy> {
+        return this.connections.get();
+    }
 
-            this.connection.readStreamEventsForward(
+    private async connectAndPerformAction(f: (conn: Connection, resolve: any, reject: any) => void): Promise<any> {
+        const conn = await this.getConnection();
+
+        return new Promise((resolve, reject) => {
+            return f(conn.getConnection(), resolve, reject);
+        }).finally(() => {
+            this.connections.dispose(conn);
+        });
+    }
+
+    private async readEvents(streamId: string, fromEventNumber: number, toEventNumber: number): Promise<Event[]> {
+        return this.connectAndPerformAction((conn: Connection, resolve: any, reject: any) => {
+            const events: Event[] = [];
+    
+            conn.readStreamEventsForward(
                 streamId,
                 fromEventNumber,
                 toEventNumber,
@@ -43,13 +59,13 @@ export class EventStoreImpl implements EventStore {
                         reject(completed.error)
                     }
                 }
-            )
-        })
+            );
+    });
     }
     
     async createStream(streamId: string, events: Event[]): Promise<void> {
-        return new Promise((resolve, reject) => {
-            this.connection.writeEvents(
+        return this.connectAndPerformAction((conn,resolve,reject) => {
+            conn.writeEvents(
                 streamId,
                 ExpectedVersion.NoStream,
                 false,
@@ -74,8 +90,8 @@ export class EventStoreImpl implements EventStore {
     }
     
     async appendToStream(streamId: string, events: Event[], expectedVersion: number): Promise<void> {
-        return new Promise((resolve, reject) => {
-            this.connection.writeEvents(
+        return this.connectAndPerformAction((conn, resolve, reject) => {
+            conn.writeEvents(
                 streamId,
                 expectedVersion,
                 false,
