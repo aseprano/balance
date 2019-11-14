@@ -6,6 +6,7 @@ import { InvalidAccountIDException } from "../exceptions/InvalidAccountIDExcepti
 import { BankAccountNotFoundException } from "../exceptions/BankAccountNotFoundException";
 import { InsufficientFundsException } from "../exceptions/InsufficientFundsException";
 import { ControllerResult, success, error } from "../tech/ControllerResult";
+import { BadMoneyException } from "../exceptions/BadMoneyException";
 
 export class AccountController {
 
@@ -28,6 +29,8 @@ export class AccountController {
         } catch(e) {
             if (e instanceof InvalidAccountIDException) {
                 return error(400, 'Invalid account id', 1001);
+            } else if (e instanceof BadMoneyException) {
+                return error(400, 'Invalid amount', 1004);
             } else if (e instanceof BankAccountNotFoundException) {
                 return error(404, 'Account not found', 1002);
             } else if (e instanceof InsufficientFundsException) {
@@ -46,9 +49,11 @@ export class AccountController {
             return success();
         } catch(e) {
             if (e instanceof InvalidAccountIDException) {
-                return error(400, 'Invalid account id');
+                return error(400, 'Invalid account id', 1001);
+            } else if (e instanceof BadMoneyException) {
+                return error(400, 'Invalid amount', 1003);
             } else if (e instanceof BankAccountNotFoundException) {
-                return error(404, 'Account not found');
+                return error(404, 'Account not found', 1002);
             } else {
                 throw e;
             }

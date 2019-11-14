@@ -1,8 +1,10 @@
+import { BadMoneyException } from "../exceptions/BadMoneyException";
+
 export class Money {
 
     constructor(private amount: number, private currency: string) {
-        if (amount < 0) {
-            throw new Error('Invalid Money value');
+        if (amount === undefined || amount < 0 || currency === undefined) {
+            throw new BadMoneyException('Invalid Money value');
         }
     }
 

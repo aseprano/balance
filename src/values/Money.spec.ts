@@ -15,9 +15,13 @@ describe('Money', () => {
     });
 
     it('cannot be negative', () => {
-        expect(() => {
-            new Money(-1, 'EUR');
-        }).toThrow();
+        expect(() => new Money(-1, 'EUR')).toThrow();
+    });
+
+    it('cannot have undefined values', () => {
+        expect(() => new Money(undefined!, undefined!)).toThrow();
+        expect(() => new Money(undefined!, 'EUR')).toThrow();
+        expect(() => new Money(0, undefined!)).toThrow();
     });
 
     it('preserves the currency case', () => {
