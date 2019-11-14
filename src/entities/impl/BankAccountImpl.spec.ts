@@ -28,17 +28,15 @@ describe('BankAccountImpl', () => {
             version: 10,
             events: [
                 new AccountCreatedEvent(testId),
-                new AccountCreditedEvent(testId, new Money(1000, 'EUR')),
-                new AccountCreditedEvent(testId, new Money(750, 'USD')),
-                new AccountDebitedEvent(testId, new Money(200, 'EUR')),
-                new AccountDebitedEvent(testId, new Money(0.8, 'USD')),
+                new AccountCreditedEvent(testId, new Money(10, 'EUR')),
+                new AccountDebitedEvent(testId,  new Money(3.14, 'EUR')),
+                new AccountDebitedEvent(testId,  new Money(5.87, 'EUR')),
             ]
         });
 
         expect(account.getId()).toEqual(testId);
-        expect(account.getBalance('EUR')).toBeCloseTo(800, 0);
-        expect(account.getBalance('USD')).toBeCloseTo(749.2, 0);
         expect(account.getVersion()).toEqual(10);
+        expect(account.getBalance('EUR')).toEqual(0.99);
     });
 
     it('has a balance of zero after initialization', () => {
@@ -107,6 +105,10 @@ describe('BankAccountImpl', () => {
 
         account.commitEvents();
         expect(account.commitEvents()).toEqual([]);
+    });
+
+    it('cannot goes negative', () => {
+
     });
 
 });

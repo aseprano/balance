@@ -12,6 +12,11 @@ export class BankAccountImpl extends AbstractEntity implements BankAccount {
     private accountId?: AccountID;
     private balances: Map<string, number> = new Map();
 
+    private setBalance(balance: number, currency: string) {
+        const roundedBalance = Math.floor(balance * 100) / 100;
+        this.balances.set(currency, roundedBalance);
+    }
+
     private applyAccountCreatedEvent(event: Event) {
         this.accountId = new AccountID(event.getPayload()['id']);
     }
@@ -20,14 +25,14 @@ export class BankAccountImpl extends AbstractEntity implements BankAccount {
         const debitCurrency = event.getPayload()['debit']['currency'];
         const currentBalance = this.getBalance(debitCurrency);
         const newBalance = currentBalance - event.getPayload()['debit']['amount'];
-        this.balances.set(debitCurrency, newBalance);
+        this.setBalance(newBalance, debitCurrency);
     }
 
     private applyCreditEvent(event: Event) {
         const creditCurrency = event.getPayload()['credit']['currency'];
         const currentBalance = this.getBalance(creditCurrency);
         const newBalance = currentBalance + event.getPayload()['credit']['amount'];
-        this.balances.set(creditCurrency, newBalance);
+        this.setBalance(newBalance, creditCurrency);
     }
 
     protected applyEvent(event: Event): void {
