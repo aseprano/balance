@@ -1,8 +1,7 @@
-import { Consumer } from "../Conumer";
-import { Event } from "./Event";
+import { EventHandler } from "./EventHandler";
 
 export interface EventBus {
 
-    on(eventName: string, callback: Consumer<Event>): EventBus;
+    on(eventName: string, handler: EventHandler): EventBus;
 
 }
