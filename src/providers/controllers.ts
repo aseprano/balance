@@ -3,8 +3,9 @@ import { AccountController } from "../controllers/AccountController";
 
 module.exports = (container: ServiceContainer) => {
     
-    container.declare('AccountController', (c) => {
-        return new AccountController(c.get('AccountService'));
-    });
+    container.declare(
+        'AccountController',
+        (container) => new AccountController(container.get('AccountService'))
+    );
     
 }
