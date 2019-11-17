@@ -1,6 +1,5 @@
 import { ServiceContainer } from "../tech/ServiceContainer";
 import { EventStoreImpl } from "../tech/impl/EventStoreImpl";
-import { Connection } from "event-store-client";
 import RandomAccountIDProvider from "../domain-services/RandomAccountIDProvider";
 import { BankAccountFactory } from "../factories/BankAccountFactory";
 import { EventStore } from "../tech/EventStore";
@@ -14,6 +13,9 @@ import { BankAccount } from "../entities/BankAccount";
 import { Provider } from "../Provider";
 import { FixedSizePool } from "../tech/impl/FixedSizePool";
 import { EventStoreConnectionProxy } from "../tech/impl/EventStoreConnectionProxy";
+import { MySQL } from "../tech/impl/MySQL";
+import { EventBusImpl } from "../tech/impl/EventBusImpl";
+const QueryBuilder = require('node-querybuilder');
 const uuid = require('uuidv4').default;
 
 module.exports = (container: ServiceContainer) => {
@@ -62,5 +64,24 @@ module.exports = (container: ServiceContainer) => {
 
             return new AccountServiceImpl(repo, accountFactory, retryPolicy);
         }
+    ).declare(
+        'DB',
+        (c: ServiceContainer) => {
+            return new MySQL(
+                new QueryBuilder(
+                    {
+                        host: 'localhost',
+                        user: 'root',
+                        password: 'test',
+                        database: 'balances'
+                    },
+                    'mysql',
+                    'pool'
+                )
+            );
+        }
+    ).declare(
+        'EventBus',
+        () => new EventBusImpl()
     );
 }
