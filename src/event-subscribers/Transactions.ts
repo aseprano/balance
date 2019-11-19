@@ -1,6 +1,5 @@
 import { EventSubscriber } from "../tech/EventSubscriber";
 import { EventBus } from "../tech/EventBus";
-import { Event } from "../tech/Event";
 import { AccountDebitedEvent } from "../events/AccountDebitedEvent";
 import { AccountCreditedEvent } from "../events/AccountCreditedEvent";
 import { DB } from "../tech/DB";
@@ -28,11 +27,13 @@ export class Transactions implements EventSubscriber {
     }
 
     async onAccountDebited(event: IncomingEvent): Promise<void> {
+        const payload: any = event.getPayload();
+
         return this.db.insert('transactions', {
-            account_id: event.getPayload()['id'],
+            account_id: payload['id'],
             type: 'debit',
-            amount: Math.floor(event.getPayload()['amount'] * 100),
-            currency: event.getPayload()['currency'],
+            amount: Math.floor(payload['debit']['amount'] * 100),
+            currency: payload['debit']['currency'],
             date: event.getDateFired()
         });
     }
