@@ -1,10 +1,10 @@
 import { EventSubscriber } from "../tech/EventSubscriber";
 import { EventBus } from "../tech/EventBus";
-import { Event } from "../tech/Event";
 import { AccountCreatedEvent } from "../events/AccountCreatedEvent";
 import { AccountDebitedEvent } from "../events/AccountDebitedEvent";
 import { AccountCreditedEvent } from "../events/AccountCreditedEvent";
 import { DB } from "../tech/DB";
+import { IncomingEvent } from "../tech/impl/IncomingEvent";
 
 export class Balances implements EventSubscriber {
 
@@ -17,7 +17,7 @@ export class Balances implements EventSubscriber {
             .on(AccountCreditedEvent.EventName, (e) => this.onAccountCredited(e));
     }
 
-    async onAccountCreated(event: Event): Promise<void> {
+    async onAccountCreated(event: IncomingEvent): Promise<void> {
         const account_id: string = event.getPayload()['id'];
 
         return this.db.insertIgnore(
@@ -26,7 +26,7 @@ export class Balances implements EventSubscriber {
         );
     }
 
-    async onAccountDebited(event: Event): Promise<void> {
+    async onAccountDebited(event: IncomingEvent): Promise<void> {
         const payload = event.getPayload();
         const account_id: string = payload['id'];
         const amount: number = payload['debit']['amount'] * 100;
@@ -56,7 +56,7 @@ export class Balances implements EventSubscriber {
         });
     }
 
-    async onAccountCredited(event: Event): Promise<void> {
+    async onAccountCredited(event: IncomingEvent): Promise<void> {
         const payload = event.getPayload();
         const account_id: string = payload['id'];
         const amount: number = payload['credit']['amount'] * 100;

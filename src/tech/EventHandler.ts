@@ -1,4 +1,4 @@
-import { Event } from "./Event";
 import { Consumer } from "../Conumer";
+import { IncomingEvent } from "./impl/IncomingEvent";
 
-export type EventHandler = Consumer<Event>;
+export type EventHandler = Consumer<IncomingEvent>;

@@ -1,7 +1,6 @@
 import { CustomEvent } from "./CustomEvent";
-import { Event } from "./Event";
-import { EventHandler } from "./EventHandler";
 import { Function } from "../Function";
+import { IncomingEvent } from "./impl/IncomingEvent";
 const amqp = require('amqplib');
 
 export class RabbitMQEventsListener {
@@ -9,7 +8,7 @@ export class RabbitMQEventsListener {
     constructor(
         connectionOptions: any,
         private queueName: string,
-        private delegate: Function<Event,boolean>
+        private delegate: Function<IncomingEvent,boolean>
     ) {
         this.connectAndWatchQueue(connectionOptions);
     }
@@ -30,18 +29,15 @@ export class RabbitMQEventsListener {
 
                     const json = JSON.parse(eventData);
 
-                    const event = new CustomEvent(
+                    const event = new IncomingEvent(
+                        json['eventId'],
                         json['name'],
+                        json['created'].slice(0, 19),
                         json['payload']
                     );
 
-                    if (this.delegate(event)) {
-                        console.log("*** Event handled, ACK sent");
-                        return ch.ack(data);
-                    } else {
-                        console.log("*** Event not handled, ACK sent");
-                        return ch.ack(data);
-                    }
+                    this.delegate(event);
+                    return ch.ack(data);
                 });
 
                 console.log(`*** Consuming messages from "${this.queueName}"`);

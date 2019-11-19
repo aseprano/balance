@@ -1,10 +1,10 @@
 import { EventBus } from "../EventBus";
-import { Event } from "../Event";
 import { Consumer } from "../../Conumer";
+import { IncomingEvent } from "./IncomingEvent";
 
 interface EventConsumer {
     matchExp: RegExp;
-    consumer: Consumer<Event>;
+    consumer: Consumer<IncomingEvent>;
 }
 
 export class EventBusImpl implements EventBus {
@@ -27,7 +27,7 @@ export class EventBusImpl implements EventBus {
         return new RegExp(`^${matchString}$`);
     }
 
-    on(eventName: string, callback: Consumer<Event>): EventBus {
+    on(eventName: string, callback: Consumer<IncomingEvent>): EventBus {
         if (!this.isValidEventName(eventName)) {
             throw new Error('Invalid event name in subscription: ' + eventName);
         }
@@ -40,7 +40,7 @@ export class EventBusImpl implements EventBus {
         return this;
     }
 
-    handle(incomingEvent: Event): boolean {
+    handle(incomingEvent: IncomingEvent): boolean {
         const subscribers = this.getSubscriptionsForEvent(incomingEvent.getName());
 
         if (!subscribers.length) {
