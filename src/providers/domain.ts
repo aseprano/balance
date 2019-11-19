@@ -80,8 +80,5 @@ module.exports = (container: ServiceContainer) => {
                 )
             );
         }
-    ).declare(
-        'EventBus',
-        () => new EventBusImpl()
     );
 }

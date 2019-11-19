@@ -40,12 +40,18 @@ export class EventBusImpl implements EventBus {
         return this;
     }
 
-    async handle(incomingEvent: Event): Promise<void> {
+    handle(incomingEvent: Event): boolean {
         const subscribers = this.getSubscriptionsForEvent(incomingEvent.getName());
 
-        for (const subscriber of subscribers) {
-            await subscriber.consumer(incomingEvent);
+        if (!subscribers.length) {
+            return false;
         }
+
+        for (const subscriber of subscribers) {
+            subscriber.consumer(incomingEvent);
+        }
+
+        return true;
     }
 
 }

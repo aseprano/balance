@@ -5,6 +5,8 @@ import { Router } from "./tech/Router";
 import { EventSubscriber } from "./tech/EventSubscriber";
 import { EventBus } from "./tech/EventBus";
 import bodyParser from "body-parser";
+import { RabbitMQEventsListener } from "./tech/RabbitMQEventsListener";
+import { EventBusImpl } from "./tech/impl/EventBusImpl";
 
 function createServiceContainer(): ServiceContainer {
     const serviceContainer = new ServiceContainer();
@@ -23,10 +25,11 @@ function createRoutes(express: Express, serviceContainer: ServiceContainer): Rou
     return router;
 }
 
-function createEventSubscriptions(serviceContainer: ServiceContainer) {
-    const eventBus: EventBus = serviceContainer.get('EventBus');
-    const subscribers: EventSubscriber[] = require('./event-subscribers/exports')(eventBus);
+function createEventSubscriptions(serviceContainer: ServiceContainer): EventBusImpl {
+    const eventBus = new EventBusImpl();
+    const subscribers: EventSubscriber[] = require('./event-subscribers/exports')(serviceContainer);
     subscribers.forEach((s) => s.subscribe(eventBus));
+    return eventBus;
 }
 
 const app = express();
@@ -34,7 +37,14 @@ app.use(bodyParser.json());
 
 const serviceContainer = createServiceContainer();
 createRoutes(app, serviceContainer);
-//createEventSubscriptions(serviceContainer);
+
+const eventBus = createEventSubscriptions(serviceContainer);
+
+new RabbitMQEventsListener(
+    "amqp://eventbus:eventbus@localhost:5672/banking",
+    "test",
+    (e) => eventBus.handle(e)
+);
 
 const port = 8000;
 app.listen(port, () => {
