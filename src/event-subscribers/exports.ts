@@ -3,6 +3,7 @@ import { DB } from "../tech/DB";
 import { EventSubscriber } from "../tech/EventSubscriber";
 import { Balances } from "./Balances";
 import { Transactions } from "./Transactions";
+import { MonthlyExpenses } from "./MonthlyExpenses";
 
 module.exports = (serviceContainer: ServiceContainer): EventSubscriber[] => {
     const db: DB = serviceContainer.get('DB');
@@ -10,5 +11,6 @@ module.exports = (serviceContainer: ServiceContainer): EventSubscriber[] => {
     return [
         new Balances(db),
         new Transactions(db),
+        new MonthlyExpenses(db),
     ];
 }
