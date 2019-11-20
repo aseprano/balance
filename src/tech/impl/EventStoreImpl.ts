@@ -45,7 +45,7 @@ export class EventStoreImpl implements EventStore {
             conn.readStreamEventsForward(
                 streamId,
                 fromEventNumber,
-                toEventNumber,
+                toEventNumber - fromEventNumber,
                 false,
                 false,
                 (event) => {
@@ -129,7 +129,7 @@ export class EventStoreImpl implements EventStore {
             numberOfEventsRead = events.length;
             stream.events.push(...events);
             stream.version += numberOfEventsRead;
-        } while (numberOfEventsRead !== 0 && numberOfEventsRead !== chunkSize);
+        } while (numberOfEventsRead !== 0 && numberOfEventsRead === chunkSize);
 
         return Promise.resolve(stream);
     }
