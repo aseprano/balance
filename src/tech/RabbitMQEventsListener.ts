@@ -37,7 +37,7 @@ export class RabbitMQEventsListener {
                     );
 
                     this.delegate(event);
-                    return ch.ack(data);
+                    ch.ack(data);
                 });
 
                 console.log(`*** Consuming messages from "${this.queueName}"`);
