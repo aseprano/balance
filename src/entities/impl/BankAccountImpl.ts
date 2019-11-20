@@ -7,6 +7,7 @@ import { AccountCreatedEvent } from "../../events/AccountCreatedEvent";
 import { AccountDebitedEvent } from "../../events/AccountDebitedEvent";
 import { AccountCreditedEvent } from "../../events/AccountCreditedEvent";
 import { InsufficientFundsException } from "../../exceptions/InsufficientFundsException";
+import { Snapshot } from "../../tech/Snapshot";
 
 export class BankAccountImpl extends AbstractEntity implements BankAccount {
     private accountId?: AccountID;
@@ -77,6 +78,23 @@ export class BankAccountImpl extends AbstractEntity implements BankAccount {
 
     getBalance(currency: string): number {
         return this.balances.get(currency) || 0;
+    }
+
+    getSnapshot(): Snapshot {
+        const balances: any[] = [];
+
+        for (const currency of this.balances.keys()) {
+            balances.push({amount: this.getBalance(currency), currency });
+        }
+
+        return {
+            state: {
+                id: this.getId().asString(),
+                balances
+            },
+
+            lastEventId: this.getVersion(),
+        };
     }
 
 }

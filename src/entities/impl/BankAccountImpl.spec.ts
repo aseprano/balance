@@ -4,6 +4,8 @@ import { AccountCreatedEvent } from "../../events/AccountCreatedEvent";
 import { Money } from "../../values/Money";
 import { AccountCreditedEvent } from "../../events/AccountCreditedEvent";
 import { AccountDebitedEvent } from "../../events/AccountDebitedEvent";
+import { EventStream } from "../../tech/EventStream";
+import { Snapshot } from "../../tech/Snapshot";
 
 describe('BankAccountImpl', () => {
 
@@ -109,6 +111,41 @@ describe('BankAccountImpl', () => {
 
     it('cannot goes negative', () => {
 
+    });
+
+    it('returns the snapshot', () => {
+        const accountId = new AccountID('12312312312');
+
+        const events = [
+            new AccountCreatedEvent(accountId),
+            new AccountCreditedEvent(accountId, new Money(10, 'EUR')),
+            new AccountCreditedEvent(accountId, new Money(3.14, 'EUR')),
+            new AccountDebitedEvent(accountId, new Money(1, 'EUR')),
+            new AccountCreditedEvent(accountId, new Money(11.11, 'USD')),
+            new AccountCreditedEvent(accountId, new Money(1, 'USD')),
+            new AccountDebitedEvent(accountId, new Money(0.5, 'USD')),
+        ];
+
+        const stream: EventStream = {
+            events,
+            version: 3
+        };
+
+        const account = new BankAccountImpl();
+        account.restoreFromEventStream(stream);
+
+        const snapshot = account.getSnapshot();
+        
+        expect(snapshot).toEqual({
+            lastEventId: 3,
+            state: {
+                'id': accountId.asString(),
+                'balances': [
+                    { amount: 12.14, currency: 'EUR' },
+                    { amount: 11.61, currency: 'USD' },
+                ]
+            }
+        } as Snapshot);
     });
 
 });
