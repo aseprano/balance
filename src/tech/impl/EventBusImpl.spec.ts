@@ -1,5 +1,6 @@
 import { EventBusImpl } from "./EventBusImpl";
 import { CustomEvent } from "../CustomEvent";
+import { IncomingEvent } from "./IncomingEvent";
 
 describe('EventBusImpl', () => {
 
@@ -17,7 +18,7 @@ describe('EventBusImpl', () => {
             subscriptionInvoked = true;
         });
 
-        await bus.handle(new CustomEvent('com.darkbyte.foo'));
+        await bus.handle(new IncomingEvent('ev-123', 'com.darkbyte.foo', '12345', {}));
         expect(subscriptionInvoked).toEqual(true);
     });
 
@@ -35,11 +36,11 @@ describe('EventBusImpl', () => {
             });
 
         await Promise.all([
-            eventBus.handle(new CustomEvent('com.darkbyte.e1')),
-            eventBus.handle(new CustomEvent('com.darkbyte.e2.foo')),
-            eventBus.handle(new CustomEvent('com.darkbyte')),
-            eventBus.handle(new CustomEvent('com.foobar.e1')),
-            eventBus.handle(new CustomEvent('com.foobar.e1.foo')),
+            eventBus.handle(new IncomingEvent('ev-123', 'com.darkbyte.e1', '2010-10-01', {})),
+            eventBus.handle(new IncomingEvent('ev-123', 'com.darkbyte.e2.foo', '2010-10-01', {})),
+            eventBus.handle(new IncomingEvent('ev-123', 'com.darkbyte', '2010-10-01', {})),
+            eventBus.handle(new IncomingEvent('ev-123', 'com.foobar.e1', '2010-10-01', {})),
+            eventBus.handle(new IncomingEvent('ev-123', 'com.foobar.e1.foo', '2010-10-01', {})),
         ]);
         
         expect(events1).toEqual(['com.darkbyte.e1', 'com.darkbyte.e2.foo']);
@@ -54,7 +55,7 @@ describe('EventBusImpl', () => {
             subscriptionInvoked = true;
         });
 
-        await bus.handle(new CustomEvent('com.darkbyte.foo2'));
+        await bus.handle(new IncomingEvent('ev-123', 'com.darkbyte.foo2', '2010-10-01', {}));
         expect(subscriptionInvoked).toEqual(false);
     });
 
@@ -68,7 +69,7 @@ describe('EventBusImpl', () => {
             .on('com.darkbyte.foo', () => { s1count++; })
             .on('com.darkbyte.foo', () => { s2count++; });
 
-        await eventBus.handle(new CustomEvent('com.darkbyte.foo'));
+        await eventBus.handle(new IncomingEvent('ev-123', 'com.darkbyte.foo', '2010-10-01', {}));
         expect(s1count).toEqual(1);
         expect(s2count).toEqual(1);
     });
@@ -84,7 +85,7 @@ describe('EventBusImpl', () => {
             subscriber2Invoked = true;
         });
 
-        await eventBus.handle(new CustomEvent('com.darkbyte.foo'));
+        await eventBus.handle(new IncomingEvent('ev-123', 'com.darkbyte.foo', '2010-10-01', {}));
         expect(subscriber1Invoked).toEqual(true);
         expect(subscriber2Invoked).toEqual(false);
     });
