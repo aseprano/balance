@@ -29,7 +29,7 @@ export class Balances implements EventSubscriber {
     async onAccountDebited(event: IncomingEvent): Promise<void> {
         const payload = event.getPayload();
         const account_id: string = payload['id'];
-        const amount: number = payload['debit']['amount'] * 100;
+        const amount: number = Math.floor(payload['debit']['amount'] * 100);
         const currency: string = payload['debit']['currency'];
 
         this.db.update(
@@ -59,7 +59,7 @@ export class Balances implements EventSubscriber {
     async onAccountCredited(event: IncomingEvent): Promise<void> {
         const payload = event.getPayload();
         const account_id: string = payload['id'];
-        const amount: number = payload['credit']['amount'] * 100;
+        const amount: number = Math.floor(payload['credit']['amount'] * 100);
         const currency: string = payload['credit']['currency'];
 
         return this.db.update(
