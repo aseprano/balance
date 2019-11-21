@@ -1,4 +1,4 @@
-import { Pool, Resource } from "../../Pool";
+import { Pool, Resource } from "../Pool";
 import { Consumer } from "../../Conumer";
 
 export abstract class AbstractPool<T extends Resource> implements Pool<T> {

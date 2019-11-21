@@ -1,6 +1,6 @@
 import { AbstractPool } from "./AbstractPool";
 import { Provider } from "../../Provider";
-import { Resource } from "../../Pool";
+import { Resource } from "../Pool";
 
 /**
  * A pool that reuses a fixed number of resources

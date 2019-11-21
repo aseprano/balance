@@ -8,7 +8,7 @@ import { ICredentials, ExpectedVersion, OperationResult, ReadStreamResult, Conne
 import { Provider } from "../../Provider";
 import { v4 } from "uuid/interfaces";
 import { CustomEvent } from "../CustomEvent";
-import { Pool } from "../../Pool";
+import { Pool } from "../Pool";
 
 export class EventStoreImpl implements EventStore {
 

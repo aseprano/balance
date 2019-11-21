@@ -1,1 +1,3 @@
-export type Consumer<T> = (item: T) => void;
+import { Function } from "./Function";
+
+export type Consumer<T> = Function<T,void>;
