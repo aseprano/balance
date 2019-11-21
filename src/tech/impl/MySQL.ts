@@ -47,7 +47,7 @@ export class MySQL implements DB {
         });
     }
 
-    update(table: string, values: any, condition: any): Promise<void> {
+    async update(table: string, values: any, condition: any): Promise<void> {
         return new Promise((resolve, reject) => {
             this.pool.get_connection((conn: any) => {
                 conn.set(values, null, false)
@@ -64,6 +64,25 @@ export class MySQL implements DB {
                             resolve(res);
                         }
                     }
+                );
+            });
+        });
+    }
+
+    async select(columns: string[], source: string, condition: any): Promise<any[]> {
+        return new Promise((resolve, reject) => {
+            this.pool.get_connection((conn: any) => {
+                conn.select(columns)
+                .where(condition)
+                .get(source, (err: any, response: any) => {
+                    conn.release();
+         
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(response);
+                    }
+                }
                 );
             });
         });
