@@ -15,6 +15,9 @@ import { FixedSizePool } from "../tech/impl/FixedSizePool";
 import { EventStoreConnectionProxy } from "../tech/impl/EventStoreConnectionProxy";
 import { MySQL } from "../tech/impl/MySQL";
 import { EventBusImpl } from "../tech/impl/EventBusImpl";
+import { SnapshotRepository } from "../tech/SnapshotRepository";
+import { SnapshotRepositoryImpl } from "../tech/impl/SnapshotRepositoryImpl";
+import { DB } from "../tech/DB";
 const QueryBuilder = require('node-querybuilder');
 const uuid = require('uuidv4').default;
 
@@ -49,13 +52,6 @@ module.exports = (container: ServiceContainer) => {
             return () => new BankAccountImpl();
         }
     ).declare(
-        'BankAccountRepository',
-        (c: ServiceContainer) => {
-            const eventStore: EventStore = c.get('EventStore');
-            const accountProvider: Provider<BankAccount> = container.get('EmptyAccountProvider');
-            return new BankAccountsRepositoryImpl(eventStore, accountProvider);
-        }
-    ).declare(
         'AccountService',
         (c: ServiceContainer) => {
             const accountFactory: BankAccountFactory = c.get('NewAccountFactory');
@@ -80,5 +76,19 @@ module.exports = (container: ServiceContainer) => {
                 )
             );
         }
-    );
+    ).declare(
+        'SnapshotRepository',
+        (c: ServiceContainer) => {
+            const db: DB = c.get('DB');
+            return new SnapshotRepositoryImpl(db, 'snapshots');
+        }
+    ).declare(
+        'BankAccountRepository',
+        (container: ServiceContainer) => {
+            const eventStore: EventStore = container.get('EventStore');
+            const accountProvider: Provider<BankAccount> = container.get('EmptyAccountProvider');
+            const snapshotsRepository: SnapshotRepository = container.get('SnapshotRepository');
+            return new BankAccountsRepositoryImpl(eventStore, accountProvider, snapshotsRepository);
+        }
+    )
 }

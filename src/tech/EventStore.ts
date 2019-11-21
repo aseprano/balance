@@ -28,4 +28,11 @@ export interface EventStore {
      */
     readStream(streamId: string): Promise<EventStream>;
 
+    /**
+     * 
+     * @param streamId 
+     * @throws StreamNotFoundException if the requested stream does not exist
+     */
+    readStreamOffset(streamId: string, fromEventNumber: number): Promise<EventStream>;
+
 }

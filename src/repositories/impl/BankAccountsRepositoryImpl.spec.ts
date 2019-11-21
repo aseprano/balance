@@ -9,17 +9,31 @@ import { Money } from "../../values/Money";
 import { BankAccountNotFoundException } from "../../exceptions/BankAccountNotFoundException";
 import { DuplicatedBankAccountException } from "../../exceptions/DuplicatedBankAccountException";
 import { AccountDebitedEvent } from "../../events/AccountDebitedEvent";
-import { DomainEvent } from "../../events/DomainEvent";
 import { StreamConcurrencyException } from "../../tech/exceptions/StreamConcurrencyException";
+import { SnapshotRepositoryImpl } from "../../tech/impl/SnapshotRepositoryImpl";
+
+function mockSnapshot() {
+    return mock(SnapshotRepositoryImpl);
+}
+
+function createEmptySnapshotRepo() {
+    const mockedRepo = mockSnapshot();
+
+    when(mockedRepo.getById(anyString())).thenResolve(undefined);
+
+    return mockedRepo;
+}
 
 describe('BankAccountsRepositoryImpl', () => {
+    const emptySnapshotRepo = createEmptySnapshotRepo();
 
     it('raises a BankAccountNotFoundException if the relative stream is not found', (done) => {
         const fakeStore = new FakeEventStore(); // create an empty store
-        
+
         const repo = new BankAccountsRepositoryImpl(
             fakeStore,
-            () => new BankAccountImpl()
+            () => new BankAccountImpl(),
+            instance(emptySnapshotRepo),
         );
 
         repo.getById(new AccountID('12312312312'))
@@ -29,8 +43,9 @@ describe('BankAccountsRepositoryImpl', () => {
             });
     });
 
-    it('uses the stream read from the EventStore to the reconstitute the BankAccount', async () => {
+    it('uses the stream read from the EventStore to reconstitute the BankAccount', async () => {
         const fakeAccountId = new AccountID('12312312312');
+
         const accountEventStream = {
             version: 7,
             events: [
@@ -51,10 +66,10 @@ describe('BankAccountsRepositoryImpl', () => {
         spyOn(concreteAccount, 'restoreFromEventStream');
 
         const accountFactory = () => concreteAccount;
-        const repo = new BankAccountsRepositoryImpl(fakeStore, accountFactory);
+        const repo = new BankAccountsRepositoryImpl(fakeStore, accountFactory, instance(emptySnapshotRepo));
         const account = await repo.getById(fakeAccountId);
 
-        expect(account.restoreFromEventStream).toHaveBeenCalledWith(accountEventStream);
+        expect(account.restoreFromEventStream).toHaveBeenCalledWith(accountEventStream, undefined);
     });
 
     it('uses the uncommitted events to create a new stream when a new entity is stored', async () => {
@@ -70,7 +85,7 @@ describe('BankAccountsRepositoryImpl', () => {
         when(mockedAccount.getId()).thenReturn(accountId);
 
         const fakeStore = new FakeEventStore();
-        const repo = new BankAccountsRepositoryImpl(fakeStore, () => new BankAccountImpl());
+        const repo = new BankAccountsRepositoryImpl(fakeStore, () => new BankAccountImpl(), instance(emptySnapshotRepo));
 
         await repo.add(instance(mockedAccount));
 
@@ -102,7 +117,8 @@ describe('BankAccountsRepositoryImpl', () => {
 
         const repo = new BankAccountsRepositoryImpl(
             instance(fakeStore),
-            () => new BankAccountImpl()
+            () => new BankAccountImpl(),
+            instance(emptySnapshotRepo)
         );
 
         repo.update(instance(mockedAccount))
@@ -117,7 +133,11 @@ describe('BankAccountsRepositoryImpl', () => {
             events: []
         });
 
-        const repo = new BankAccountsRepositoryImpl(fakeStore, () => new BankAccountImpl());
+        const repo = new BankAccountsRepositoryImpl(
+            fakeStore,
+            () => new BankAccountImpl(),
+            instance(emptySnapshotRepo)
+        );
 
         const newAccount = mock(BankAccountImpl);
         when(newAccount.getId()).thenReturn(new AccountID(accountId));
@@ -143,7 +163,8 @@ describe('BankAccountsRepositoryImpl', () => {
 
         const repo = new BankAccountsRepositoryImpl(
             instance(eventStore),
-            () => new BankAccountImpl()
+            () => new BankAccountImpl(),
+            instance(emptySnapshotRepo)
         );
 
         repo.update(instance(fakeAccount))
@@ -155,12 +176,13 @@ describe('BankAccountsRepositoryImpl', () => {
 
     it('lets the event store exception arise when something goes wrong while reading the stream', (done) => {
         const eventStore = mock(FakeEventStore);
-        when(eventStore.readStream('bank-account-12312312312'))
+        when(eventStore.readStreamOffset('bank-account-12312312312', 0))
             .thenReject(new RangeError('Dummy error'));
 
         const repo = new BankAccountsRepositoryImpl(
             instance(eventStore),
-            () => new BankAccountImpl()
+            () => new BankAccountImpl(),
+            instance(emptySnapshotRepo)
         );
 
         repo.getById(new AccountID('12312312312'))
@@ -182,7 +204,8 @@ describe('BankAccountsRepositoryImpl', () => {
 
         const repo = new BankAccountsRepositoryImpl(
             instance(eventStore),
-            () => new BankAccountImpl()
+            () => new BankAccountImpl(),
+            instance(emptySnapshotRepo)
         );
 
         repo.update(instance(fakeAccount))
@@ -199,7 +222,8 @@ describe('BankAccountsRepositoryImpl', () => {
 
         const repo = new BankAccountsRepositoryImpl(
             instance(eventStore),
-            () => new BankAccountImpl()
+            () => new BankAccountImpl(),
+            instance(emptySnapshotRepo)
         );
 
         const fakeAccount = mock(BankAccountImpl);

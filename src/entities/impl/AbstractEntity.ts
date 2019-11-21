@@ -13,13 +13,16 @@ export abstract class AbstractEntity implements Entity {
         this.applyEvent(event);
     }
 
-    public restoreFromEventStream(stream: EventStream, snaposhot?: Snapshot): void {
-        if (snaposhot) {
-            this.applySnapshot(snaposhot);
+    public restoreFromEventStream(stream: EventStream, snapshot?: Snapshot): void {
+        if (snapshot) {
+            this.applySnapshot(snapshot);
+            this.currentStreamVersion = snapshot.lastEventId;
         }
         
-        stream.events.forEach(e => this.applyEvent(e));
-        this.currentStreamVersion = stream.version;
+        if (stream.events.length) {
+            stream.events.forEach(e => this.applyEvent(e));
+            this.currentStreamVersion = stream.version;
+        }
     }
 
     public getVersion(): number {

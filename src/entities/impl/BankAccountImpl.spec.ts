@@ -148,4 +148,25 @@ describe('BankAccountImpl', () => {
         } as Snapshot);
     });
 
+    it('can be restored from a snapshot', () => {
+        const snapshot: Snapshot = {
+            lastEventId: 100,
+            state: {
+                id: '12312312312',
+                balances: [
+                    { currency: 'EUR', amount: 100 },
+                    { currency: 'USD', amount: 3.14 },
+                ]
+            }
+        }
+
+        const account = new BankAccountImpl();
+        account.restoreFromEventStream({ version: -1, events: [] }, snapshot);
+
+        expect(account.getId()).toEqual(new AccountID('12312312312'));
+        expect(account.getBalance('EUR')).toEqual(100);
+        expect(account.getBalance('USD')).toEqual(3.14);
+        expect(account.getVersion()).toEqual(100);
+    });
+    
 });

@@ -51,12 +51,21 @@ export class FakeEventStore implements EventStore {
     }
 
     readStream(streamId: string): Promise<EventStream> {
+        return this.readStreamOffset(streamId, 0);
+    }
+
+    readStreamOffset(streamId: string, readStreamOffset: number): Promise<EventStream> {
         return new Promise((resolve, reject) => {
-            if (!this.streamExists(streamId)) {
+            const stream = this.streams.get(streamId);
+
+            if (stream) {
+                resolve({
+                    version: stream.version,
+                    events: stream.events.slice(readStreamOffset)
+                });
+            } else {
                 reject(new StreamNotFoundException(`Stream not found: ${streamId}`));
             }
-
-            resolve(this.streams.get(streamId));
         });
     }
 

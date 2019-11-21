@@ -7,12 +7,15 @@ import { StreamNotFoundException } from "../../tech/exceptions/StreamNotFoundExc
 import { BankAccountNotFoundException } from "../../exceptions/BankAccountNotFoundException";
 import { StreamAlreadyExistingException } from "../../tech/exceptions/StreamAlreadyExistingException";
 import { DuplicatedBankAccountException } from "../../exceptions/DuplicatedBankAccountException";
+import { SnapshotRepository } from "../../tech/SnapshotRepository";
+import { Snapshot } from "../../tech/Snapshot";
 
 export class BankAccountsRepositoryImpl implements BankAccountsRepository {
 
     constructor(
         private eventStore: EventStore,
-        private accountFactory: Provider<BankAccount>
+        private accountFactory: Provider<BankAccount>,
+        private snapshots: SnapshotRepository
     ) { }
 
     private createEmptyAccount(): BankAccount {
@@ -26,19 +29,22 @@ export class BankAccountsRepositoryImpl implements BankAccountsRepository {
     public async getById(id: AccountID): Promise<BankAccount> {
         const streamName = this.getStreamIdForAccountId(id);
 
-        return this.eventStore
-            .readStream(streamName)
-            .then(stream => {
-                const bankAccount = this.createEmptyAccount();
-                bankAccount.restoreFromEventStream(stream);
-                return bankAccount;
-            }).catch(error => {
-                if (error instanceof StreamNotFoundException) {
-                    throw new BankAccountNotFoundException();
-                } else {
-                    throw error;
-                }
-            });
+        return this.snapshots.getById(streamName)
+            .then((snapshot?: Snapshot) => this.eventStore
+                .readStreamOffset(streamName, snapshot ? snapshot.lastEventId + 1 : 0)
+                .then((stream) => {
+                    const bankAccount = this.createEmptyAccount();
+                    bankAccount.restoreFromEventStream(stream, snapshot);
+                    return bankAccount;
+                })
+                .catch((error) => {
+                    if (error instanceof StreamNotFoundException) {
+                        throw new BankAccountNotFoundException();
+                    } else {
+                        throw error;
+                    }
+                })
+            );
     }
 
     public async add(account: BankAccount): Promise<void> {

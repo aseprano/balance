@@ -53,7 +53,12 @@ export class BankAccountImpl extends AbstractEntity implements BankAccount {
     }
 
     protected applySnapshot(snapshot: Snapshot): void {
-        
+        const state = snapshot.state;
+        this.accountId = new AccountID(state['id']);
+
+        state['balances'].forEach((balance: any) => {
+            this.balances.set(balance['currency'], balance['amount'])
+        });
     }
 
     private hasEnoughBalance(requestedAmount: Money): boolean {
@@ -88,7 +93,10 @@ export class BankAccountImpl extends AbstractEntity implements BankAccount {
         const balances: any[] = [];
 
         for (const currency of this.balances.keys()) {
-            balances.push({amount: this.getBalance(currency), currency });
+            balances.push({
+                currency,
+                amount: this.getBalance(currency)
+            });
         }
 
         return {

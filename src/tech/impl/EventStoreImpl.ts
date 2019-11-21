@@ -116,9 +116,13 @@ export class EventStoreImpl implements EventStore {
     }
 
     async readStream(streamId: string): Promise<EventStream> {
+        return this.readStreamOffset(streamId, 0);
+    }
+
+    async readStreamOffset(streamId: string, fromEventNumber: number): Promise<EventStream> {
         const stream: EventStream = {
             events: [],
-            version: -1
+            version: fromEventNumber-1
         };
 
         const chunkSize = 100;
@@ -129,9 +133,9 @@ export class EventStoreImpl implements EventStore {
             numberOfEventsRead = events.length;
             stream.events.push(...events);
             stream.version += numberOfEventsRead;
-        } while (numberOfEventsRead !== 0 && numberOfEventsRead === chunkSize);
+        } while (numberOfEventsRead === chunkSize);
 
-        return Promise.resolve(stream);
+        return stream;
     }
 
 }
