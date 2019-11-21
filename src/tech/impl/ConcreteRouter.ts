@@ -22,7 +22,15 @@ export class ConcreteRouter implements Router {
         try {
             const service: any = this.serviceContainer.get(mapping.serviceName);
             const ret: ControllerResult = await service[methodName](req);
-            res.status(ret.getStatusCode()).json(ret.getData());
+            res.status(ret.getStatusCode());
+            
+            const responseBody = ret.getData();
+
+            if (responseBody) {
+                res.json(responseBody);
+            } else {
+                res.end();
+            }
         } catch (e) {
             console.log('*** Exception caught: ' + e.message);
             res.status(500).send('Internal server error');
