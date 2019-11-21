@@ -4,7 +4,7 @@ import { DomainEvent } from "../events/DomainEvent";
 
 export interface Entity {
 
-    restoreFromEventStream(stream: EventStream): void;
+    restoreFromEventStream(stream: EventStream, snapshot?: Snapshot): void;
 
     commitEvents(): DomainEvent[];
 

@@ -13,7 +13,11 @@ export abstract class AbstractEntity implements Entity {
         this.applyEvent(event);
     }
 
-    public restoreFromEventStream(stream: EventStream): void {
+    public restoreFromEventStream(stream: EventStream, snaposhot?: Snapshot): void {
+        if (snaposhot) {
+            this.applySnapshot(snaposhot);
+        }
+        
         stream.events.forEach(e => this.applyEvent(e));
         this.currentStreamVersion = stream.version;
     }
@@ -25,6 +29,8 @@ export abstract class AbstractEntity implements Entity {
     public commitEvents(): DomainEvent[] {
         return this.uncommittedEvents.splice(0);
     }
+
+    protected abstract applySnapshot(snapshot: Snapshot): void;
 
     protected abstract applyEvent(event: Event): void;
 

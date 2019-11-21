@@ -52,6 +52,10 @@ export class BankAccountImpl extends AbstractEntity implements BankAccount {
         }
     }
 
+    protected applySnapshot(snapshot: Snapshot): void {
+        
+    }
+
     private hasEnoughBalance(requestedAmount: Money): boolean {
         return this.getBalance(requestedAmount.getCurrency()) >= requestedAmount.getAmount();
     }
