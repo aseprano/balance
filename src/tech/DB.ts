@@ -6,6 +6,6 @@ export interface DB {
 
     update(table: string, values: any, condition: any): Promise<any>;
     
-    select(columns: string[], from: string, condition: any): Promise<any[]>;
+    select(columns: string[], from: string, condition?: any, orderBy?: string[], limit?: number, offset?: number): Promise<any[]>;
 
 }

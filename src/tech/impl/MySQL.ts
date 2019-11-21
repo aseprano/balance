@@ -69,21 +69,32 @@ export class MySQL implements DB {
         });
     }
 
-    async select(columns: string[], source: string, condition: any): Promise<any[]> {
+    async select(columns: string[], source: string, condition?: any, orderBy?: string[], limit?: number, offset?: number): Promise<any[]> {
         return new Promise((resolve, reject) => {
             this.pool.get_connection((conn: any) => {
-                conn.select(columns)
-                .where(condition)
-                .get(source, (err: any, response: any) => {
+                let qb = conn.select(columns);
+
+                if (condition) {
+                    qb = qb.where(condition);
+                }
+
+                if (limit !== undefined) {
+                    qb = qb.limit(limit, offset || 0);
+                }
+
+                if (orderBy !== undefined && orderBy.length > 0) {
+                    qb = qb.order_by(orderBy);
+                }
+
+                qb.get(source, (err: any, response: any) => {
                     conn.release();
-         
+        
                     if (err) {
                         reject(err);
                     } else {
                         resolve(response);
                     }
-                }
-                );
+                });
             });
         });
     }
