@@ -23,7 +23,11 @@ export abstract class AbstractEntity implements Entity {
             stream.events.forEach(e => this.applyEvent(e));
             this.currentStreamVersion = stream.version;
         }
+
+        this.afterRestore();
     }
+
+    protected afterRestore() {}
 
     public getVersion(): number {
         return this.currentStreamVersion;

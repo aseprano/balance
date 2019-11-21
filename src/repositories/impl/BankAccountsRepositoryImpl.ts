@@ -63,7 +63,7 @@ export class BankAccountsRepositoryImpl implements BankAccountsRepository {
 
     public async update(bankAccount: BankAccount): Promise<void> {
         const streamId = this.getStreamIdForAccountId(bankAccount.getId());
-
+        
         return this.eventStore
             .appendToStream(streamId, bankAccount.commitEvents(), bankAccount.getVersion());
     }

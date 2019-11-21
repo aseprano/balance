@@ -2,6 +2,11 @@ import { SnapshotRepository } from "../SnapshotRepository";
 import { Snapshot } from "../Snapshot";
 import { DB } from "../DB";
 
+interface SnapshotDBRow {
+    stream_id: string,
+    data: string,
+};
+
 export class SnapshotRepositoryImpl implements SnapshotRepository {
 
     constructor(
@@ -9,8 +14,8 @@ export class SnapshotRepositoryImpl implements SnapshotRepository {
         private tableName: string
     ) {}
 
-    private reconstituteSnapshot(row: any): Snapshot|undefined {
-        return undefined;
+    private reconstituteSnapshot(row: SnapshotDBRow): Snapshot|undefined {
+        return JSON.parse(row.data);
     }
 
     getById(snapshotId: string): Promise<Snapshot|undefined> {
@@ -20,7 +25,7 @@ export class SnapshotRepositoryImpl implements SnapshotRepository {
             {stream_id: snapshotId},
             ['id desc'],
             1
-        ).then((rows: any[]) => {
+        ).then((rows: SnapshotDBRow[]) => {
             return rows.length > 0 ? this.reconstituteSnapshot(rows[0]) : undefined;
         });
     }
