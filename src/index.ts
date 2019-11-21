@@ -3,7 +3,6 @@ import { ServiceContainer } from "./tech/ServiceContainer";
 import { ConcreteRouter } from "./tech/impl/ConcreteRouter";
 import { Router } from "./tech/Router";
 import { EventSubscriber } from "./tech/EventSubscriber";
-import { EventBus } from "./tech/EventBus";
 import bodyParser from "body-parser";
 import { RabbitMQEventsListener } from "./tech/RabbitMQEventsListener";
 import { EventBusImpl } from "./tech/impl/EventBusImpl";
