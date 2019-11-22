@@ -23,6 +23,10 @@ export class BankAccountsRepositoryImpl implements BankAccountsRepository {
         return this.accountFactory();
     }
 
+    private shouldTakeSnapshot(account: BankAccount): boolean {
+        return this.snapshotInterval > 0 && account.getVersion() % this.snapshotInterval === 0;
+    }
+
     private getStreamIdForAccountId(id: AccountID): string {
         return 'bank-account-' + id.asString();
     }
@@ -68,9 +72,16 @@ export class BankAccountsRepositoryImpl implements BankAccountsRepository {
 
     public async update(bankAccount: BankAccount): Promise<void> {
         const streamId = this.getStreamIdForAccountId(bankAccount.getId());
-        
-        return this.eventStore
-            .appendToStream(streamId, bankAccount.commitEvents(), bankAccount.getVersion());
+        const restoredVersion = bankAccount.getVersion();
+        const eventsToCommit = bankAccount.commitEvents();
+
+        this.eventStore
+            .appendToStream(streamId, eventsToCommit, restoredVersion)
+            .then(() => {
+                if (this.shouldTakeSnapshot(bankAccount)) {
+                    return this.snapshots.add(streamId, bankAccount.getSnapshot());
+                }
+            });
     }
 
 }
