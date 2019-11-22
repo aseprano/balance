@@ -88,7 +88,7 @@ module.exports = (container: ServiceContainer) => {
             const eventStore: EventStore = container.get('EventStore');
             const accountProvider: Provider<BankAccount> = container.get('EmptyAccountProvider');
             const snapshotsRepository: SnapshotRepository = container.get('SnapshotRepository');
-            const snapshotInterval = 1000;
+            const snapshotInterval = 100;
             return new BankAccountsRepositoryImpl(eventStore, accountProvider, snapshotsRepository, snapshotInterval);
         }
     )

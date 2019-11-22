@@ -33,7 +33,8 @@ export class EventStoreImpl implements EventStore {
 
         return new Promise((resolve, reject) => {
             return f(conn.getConnection(), resolve, reject);
-        }).finally(() => {
+        })
+        .finally(() => {
             this.connections.dispose(conn);
         });
     }
