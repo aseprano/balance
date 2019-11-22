@@ -41,6 +41,26 @@ describe('BankAccountImpl', () => {
         expect(account.getBalance('EUR')).toEqual(0.99);
     });
 
+    it('increases the version after committing the events', () => {
+        const account = new BankAccountImpl();
+
+        account.restoreFromEventStream({
+            version: 10,
+            events: [
+                new AccountCreatedEvent(testId),
+                new AccountCreditedEvent(testId, new Money(10, 'EUR')),
+                new AccountDebitedEvent(testId,  new Money(3.14, 'EUR')),
+                new AccountDebitedEvent(testId,  new Money(5.87, 'EUR')),
+            ]
+        });
+
+        account.debit(new Money(0.95, 'EUR'));
+        account.commitEvents();
+
+        expect(account.getVersion()).toEqual(11);
+        expect(account.getBalance('EUR')).toEqual(0.04);
+    });
+
     it('has a balance of zero after initialization', () => {
         const account = new BankAccountImpl();
         expect(account.getBalance('EUR')).toEqual(0);
@@ -107,10 +127,6 @@ describe('BankAccountImpl', () => {
 
         account.commitEvents();
         expect(account.commitEvents()).toEqual([]);
-    });
-
-    it('cannot goes negative', () => {
-
     });
 
     it('returns the snapshot', () => {

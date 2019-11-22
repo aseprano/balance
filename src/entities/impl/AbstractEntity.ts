@@ -34,7 +34,9 @@ export abstract class AbstractEntity implements Entity {
     }
 
     public commitEvents(): DomainEvent[] {
-        return this.uncommittedEvents.splice(0);
+        const events = this.uncommittedEvents.splice(0);
+        this.currentStreamVersion += events.length;
+        return events;
     }
 
     protected abstract applySnapshot(snapshot: Snapshot): void;
