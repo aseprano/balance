@@ -238,4 +238,17 @@ describe('BankAccountsRepositoryImpl', () => {
             });
     });
 
+    it('holds the correct value for snapshotInterval', () => {
+        const eventStore = new FakeEventStore();
+
+        const repo = new BankAccountsRepositoryImpl(
+            eventStore,
+            () => new BankAccountImpl(),
+            instance(emptySnapshotRepo),
+            7
+        );
+
+        expect(repo.getSnapshotInterval()).toEqual(7);
+    });
+
 });

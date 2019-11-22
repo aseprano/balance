@@ -15,7 +15,8 @@ export class BankAccountsRepositoryImpl implements BankAccountsRepository {
     constructor(
         private eventStore: EventStore,
         private accountFactory: Provider<BankAccount>,
-        private snapshots: SnapshotRepository
+        private snapshots: SnapshotRepository,
+        private snapshotInterval: number = 0, // 0 means no snapshots
     ) { }
 
     private createEmptyAccount(): BankAccount {
@@ -24,6 +25,10 @@ export class BankAccountsRepositoryImpl implements BankAccountsRepository {
 
     private getStreamIdForAccountId(id: AccountID): string {
         return 'bank-account-' + id.asString();
+    }
+
+    public getSnapshotInterval(): number {
+        return this.snapshotInterval;
     }
 
     public async getById(id: AccountID): Promise<BankAccount> {
