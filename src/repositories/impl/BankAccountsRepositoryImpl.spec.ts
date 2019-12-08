@@ -11,6 +11,7 @@ import { DuplicatedBankAccountException } from "../../exceptions/DuplicatedBankA
 import { AccountDebitedEvent } from "../../events/AccountDebitedEvent";
 import { StreamConcurrencyException } from "../../tech/exceptions/StreamConcurrencyException";
 import { SnapshotRepositoryImpl } from "../../tech/impl/SnapshotRepositoryImpl";
+import { StreamNotFoundException } from "../../tech/exceptions/StreamNotFoundException";
 
 function mockSnapshot() {
     return mock(SnapshotRepositoryImpl);
@@ -159,7 +160,7 @@ describe('BankAccountsRepositoryImpl', () => {
 
         const eventStore = mock(FakeEventStore);
         when(eventStore.appendToStream('bank-account-12312312312', anything(), anyNumber()))
-            .thenReject(new BankAccountNotFoundException());
+            .thenReject(new StreamNotFoundException('Stream not found'));
 
         const repo = new BankAccountsRepositoryImpl(
             instance(eventStore),
@@ -199,7 +200,7 @@ describe('BankAccountsRepositoryImpl', () => {
         when(fakeAccount.commitEvents()).thenReturn([]);
 
         const eventStore = mock(FakeEventStore);
-        when(eventStore.appendToStream('bank-account-12312312312', anything(), 1))
+        when(eventStore.appendToStream(anyString(), anything(), anyNumber()))
             .thenReject(new StreamConcurrencyException());
 
         const repo = new BankAccountsRepositoryImpl(
@@ -209,7 +210,7 @@ describe('BankAccountsRepositoryImpl', () => {
         );
 
         repo.update(instance(fakeAccount))
-            .catch(error => {
+            .catch((error) => {
                 expect(error instanceof StreamConcurrencyException).toBeTruthy();
                 done();
             });

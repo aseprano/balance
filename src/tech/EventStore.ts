@@ -16,7 +16,6 @@ export interface EventStore {
      * @param streamId 
      * @param events 
      * @param expectedVersion 
-     * @throws StreamNotFoundException if the requested streamId does not exist
      * @throws StreamConcurrencyException if the expectedVersion does not match the current stream version
      */
     appendToStream(streamId: string, events: Event[], expectedVersion: number): Promise<void>;

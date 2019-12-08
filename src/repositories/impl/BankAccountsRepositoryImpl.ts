@@ -9,6 +9,7 @@ import { StreamAlreadyExistingException } from "../../tech/exceptions/StreamAlre
 import { DuplicatedBankAccountException } from "../../exceptions/DuplicatedBankAccountException";
 import { SnapshotRepository } from "../../tech/SnapshotRepository";
 import { Snapshot } from "../../tech/Snapshot";
+import { StreamConcurrencyException } from "../../tech/exceptions/StreamConcurrencyException";
 
 export class BankAccountsRepositoryImpl implements BankAccountsRepository {
 
@@ -75,11 +76,18 @@ export class BankAccountsRepositoryImpl implements BankAccountsRepository {
         const restoredVersion = bankAccount.getVersion();
         const eventsToCommit = bankAccount.commitEvents();
 
-        this.eventStore
+        return this.eventStore
             .appendToStream(streamId, eventsToCommit, restoredVersion)
             .then(() => {
                 if (this.shouldTakeSnapshot(bankAccount)) {
                     return this.snapshots.add(streamId, bankAccount.getSnapshot());
+                }
+            })
+            .catch((error) => {
+                if (error instanceof StreamNotFoundException) {
+                    throw new BankAccountNotFoundException();
+                } else {
+                    throw error;
                 }
             });
     }

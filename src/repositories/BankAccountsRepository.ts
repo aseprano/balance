@@ -7,6 +7,12 @@ export interface BankAccountsRepository {
 
     add(account: BankAccount): Promise<void>;
 
+    /**
+     * Updates a bank account.
+     * Returns a BankAccountNotFoundException if the provided account doesn't exist
+     * 
+     * @param account
+     */
     update(account: BankAccount): Promise<void>;
 
 }

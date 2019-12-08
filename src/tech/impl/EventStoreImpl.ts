@@ -9,6 +9,7 @@ import { Provider } from "../../Provider";
 import { v4 } from "uuid/interfaces";
 import { CustomEvent } from "../CustomEvent";
 import { Pool } from "../Pool";
+import { StreamConcurrencyException } from "../exceptions/StreamConcurrencyException";
 
 export class EventStoreImpl implements EventStore {
 
@@ -109,7 +110,11 @@ export class EventStoreImpl implements EventStore {
                     if (onComplete.result === OperationResult.Success) {
                         resolve();
                     } else {
-                        reject(onComplete.message);
+                        if (onComplete.result === OperationResult.WrongExpectedVersion) {
+                            reject(new StreamConcurrencyException());
+                        } else {
+                            reject(new Error(onComplete.message));
+                        }
                     }
                 }
             )
