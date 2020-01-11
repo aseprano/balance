@@ -1,8 +1,9 @@
 import { Event } from "../tech/Event";
+import { ProjectorRegistrationService } from "./ProjectorRegistrationService";
 
-export interface ProjectionService {
+export interface ProjectionService extends ProjectorRegistrationService {
 
-    onEvent(event: Event, projectorId: string): Promise<void>;
+    onEvent(event: Event): Promise<void>;
 
     replay(event: Event, projectorId: string): Promise<void>;
 
