@@ -12,6 +12,11 @@ export class ProjectorDecorator implements Projector {
     getId(): string {
         return this.innerProjector.getId();
     }
+
+    getEventsOfInterest(): string[] {
+        return this.innerProjector
+            .getEventsOfInterest();
+    }
     
     async clear(): Promise<void> {
         return this.innerProjector

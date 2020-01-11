@@ -12,6 +12,11 @@ export interface Projector {
     getId(): string;
 
     /**
+     * Returns the list of event names that the Projector is interested in
+     */
+    getEventsOfInterest(): string[];
+
+    /**
      * Clears the projection. All the data must be erased.
      */
     clear(): Promise<void>;
