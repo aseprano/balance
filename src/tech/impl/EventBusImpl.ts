@@ -14,8 +14,8 @@ export class EventBusImpl implements EventBus {
         return this.subscriptions.filter(s => s.matchExp.test(eventName));
     }
 
-    private isValidEventName(eventName: string): boolean {
-        return eventName.length > 0 && /^\w+(\.(\w+|\*|\?))+$/i.test(eventName);
+    private isValidPattern(pattern: string): boolean {
+        return pattern.length > 0 && /^\w+(\.(\w+|\*|\?))+$/i.test(pattern);
     }
 
     private createRegExpForEvent(eventName: string): RegExp {
@@ -27,13 +27,13 @@ export class EventBusImpl implements EventBus {
         return new RegExp(`^${matchString}$`);
     }
 
-    on(eventName: string, callback: Consumer<IncomingEvent>): EventBus {
-        if (!this.isValidEventName(eventName)) {
-            throw new Error('Invalid event name in subscription: ' + eventName);
+    on(eventPattern: string, callback: Consumer<IncomingEvent>): EventBus {
+        if (!this.isValidPattern(eventPattern)) {
+            throw new Error(`Invalid event name in subscription: ${eventPattern}`);
         }
 
         this.subscriptions.push({
-            matchExp: this.createRegExpForEvent(eventName),
+            matchExp: this.createRegExpForEvent(eventPattern),
             consumer: callback
         });
 
@@ -41,15 +41,10 @@ export class EventBusImpl implements EventBus {
     }
 
     handle(incomingEvent: IncomingEvent): boolean {
-        const subscribers = this.getSubscriptionsForEvent(incomingEvent.getName());
-
-        if (!subscribers.length) {
-            return false;
-        }
-
-        for (const subscriber of subscribers) {
-            subscriber.consumer(incomingEvent);
-        }
+        this.getSubscriptionsForEvent(incomingEvent.getName())
+            .forEach((sub) => {
+                sub.consumer(incomingEvent);
+            });
 
         return true;
     }
