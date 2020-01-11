@@ -25,6 +25,10 @@ export class ConcreteProjectionService implements ProjectionService {
     }
 
     register(projector: Projector) {
+        if (this.map.has(projector.getId())) {
+            throw new Error(`A projector has been already registered with id: ${projector.getId()}`);
+        }
+        
         this.map.set(projector.getId(), projector);
     }
 
