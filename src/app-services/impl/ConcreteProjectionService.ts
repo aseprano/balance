@@ -34,7 +34,11 @@ export class ConcreteProjectionService implements ProjectionService, ProjectorRe
         return this.projectorsMap.has(projectorId);
     }
 
-    private bindEventToProjector(eventName: string, projector: Projector) {
+    private mapProjector(projector: Projector) {
+        this.projectorsMap.set(projector.getId(), projector);
+    }
+
+    private createEventToProjectorMapping(eventName: string, projector: Projector) {
         if (!this.eventsMapping.has(eventName)) {
             this.eventsMapping.set(eventName, []);
         }
@@ -51,10 +55,10 @@ export class ConcreteProjectionService implements ProjectionService, ProjectorRe
             throw new Error(`A projector has been already registered with id: ${projector.getId()}`);
         }
         
-        this.projectorsMap.set(projector.getId(), projector);
+        this.mapProjector(projector);
 
         projector.getEventsOfInterest()
-            .forEach((eventOfInterest) => this.bindEventToProjector(eventOfInterest, projector));
+            .forEach((eventOfInterest) => this.createEventToProjectorMapping(eventOfInterest, projector));
     }
 
     async onEvent(event: Event): Promise<void> {
