@@ -14,29 +14,46 @@ import { Provider } from "../Provider";
 import { FixedSizePool } from "../tech/impl/FixedSizePool";
 import { EventStoreConnectionProxy } from "../tech/impl/EventStoreConnectionProxy";
 import { MySQL } from "../tech/impl/MySQL";
-import { EventBusImpl } from "../tech/impl/EventBusImpl";
 import { SnapshotRepository } from "../tech/SnapshotRepository";
 import { SnapshotRepositoryImpl } from "../tech/impl/SnapshotRepositoryImpl";
 import { DB } from "../tech/DB";
+import { EnvVariablesConfig, CacheConfigDecorator, CompositeConfig, RedisConfig } from '@darkbyte/ts-config';
 const QueryBuilder = require('node-querybuilder');
 const uuid = require('uuidv4').default;
+const redis = require('redis');
 
 module.exports = (container: ServiceContainer) => {
     container.declare(
-        'EventStore',
+        'Config',
         () => {
+            const redisCli = redis.createClient({
+                host: process.env.REDIS_HOST,
+                port: process.env.REDIS_PORT,
+                db: process.env.REDIS_DB
+            });
+
+            const compositeCfg = new CompositeConfig(new RedisConfig(redisCli, 'banking'))
+                .addConfigAtEnd(new EnvVariablesConfig(process.env));
+
+            return new CacheConfigDecorator(compositeCfg, 600);
+        }
+    ).declare(
+        'EventStore',
+        (container: ServiceContainer) => {
+            const config = container.get('Config');
+
             const connectionsPool = new FixedSizePool(5, () => {
                 return new EventStoreConnectionProxy({
-                    host: 'localhost',
-                    port: 1113,
+                    host: config.get('EVENT_STORE_HOST'),
+                    port: config.get('EVENT_STORE_PORT'),
                 });
             });
 
             return new EventStoreImpl(
                 connectionsPool,
                 {
-                    username: 'admin',
-                    password: 'changeit'
+                    username: config.get('EVENT_STORE_USERNAME'),
+                    password: config.get('EVENT_STORE_PASSWORD')
                 },
                 () => uuid()
             );
@@ -63,18 +80,9 @@ module.exports = (container: ServiceContainer) => {
     ).declare(
         'DB',
         (c: ServiceContainer) => {
-            return new MySQL(
-                new QueryBuilder(
-                    {
-                        host: 'localhost',
-                        user: 'root',
-                        password: 'test',
-                        database: 'balances'
-                    },
-                    'mysql',
-                    'pool'
-                )
-            );
+            const config = c.get('Config');
+
+            return new MySQL({});
         }
     ).declare(
         'SnapshotRepository',

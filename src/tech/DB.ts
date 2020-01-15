@@ -1,5 +1,7 @@
-export interface DB {
+import { Transactionable } from "./Transactionable";
 
+export interface DB extends Transactionable {
+    
     insert(table: string, values: any, onDuplicate?: string): Promise<any>;
 
     insertIgnore(table: string, values: any): Promise<any>;
