@@ -1,6 +1,8 @@
 import { Function } from "../Function";
 import { Provider } from "../Provider";
 
+type Service = Promise<any>;
+
 export class ServiceContainer {
     private singletons: Map<string, any> = new Map();
     private providers: Map<string, Provider<any>> = new Map();
@@ -13,17 +15,18 @@ export class ServiceContainer {
         this.singletons.set(name, service);
     }
 
-    private buildService(provider: Function<ServiceContainer, any>, name: string, shared: boolean): any {
-        const newService = provider(this);
+    private async buildService(provider: Function<ServiceContainer, Service>, name: string, shared: boolean): Promise<any> {
+        return provider(this)
+            .then((service) => {
+                if (shared) {
+                    this.registerSingleton(service, name);
+                }
 
-        if (shared) {
-            this.registerSingleton(newService, name);
-        }
-
-        return newService;
+                return service;
+            });
     }
 
-    declare(serviceName: string, provider: Function<ServiceContainer, any>, shared?: boolean): ServiceContainer {
+    declare(serviceName: string, provider: Function<ServiceContainer, Service>, shared?: boolean): ServiceContainer {
         this.singletons.delete(serviceName);
 
         this.providers.set(
