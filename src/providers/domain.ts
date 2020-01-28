@@ -13,12 +13,10 @@ import { BankAccount } from "../entities/BankAccount";
 import { Provider } from "../Provider";
 import { FixedSizePool } from "../tech/impl/FixedSizePool";
 import { EventStoreConnectionProxy } from "../tech/impl/EventStoreConnectionProxy";
-import { MySQL } from "../tech/impl/MySQL";
 import { SnapshotRepository } from "../tech/SnapshotRepository";
 import { SnapshotRepositoryImpl } from "../tech/impl/SnapshotRepositoryImpl";
 import { DB } from "../tech/DB";
-import { EnvVariablesConfig, CacheConfigDecorator, CompositeConfig, RedisConfig } from '@darkbyte/ts-config';
-const QueryBuilder = require('node-querybuilder');
+import { EnvVariablesConfig, CacheConfigDecorator, CompositeConfig, RedisConfig, Config } from '@darkbyte/ts-config';
 const uuid = require('uuidv4').default;
 const redis = require('redis');
 
@@ -80,9 +78,18 @@ module.exports = (container: ServiceContainer) => {
     ).declare(
         'DB',
         (c: ServiceContainer) => {
-            const config = c.get('Config');
+            const config: Config = c.get('Config');
 
-            return new MySQL({});
+            return require('knex')({
+                client: 'mysql',
+                connection: {
+                  host : config.get('DB_HOST', 'localhost'),
+                  user : config.get('DB_USER', 'root'),
+                  password : config.get('DB_PASS', 'root'),
+                  database : config.get('DB_NAME', 'test')
+                },
+                pool: {min: 1, max: 5}
+              });
         }
     ).declare(
         'SnapshotRepository',
