@@ -41,6 +41,8 @@ export class EventBusImpl implements EventBus {
     }
 
     handle(incomingEvent: IncomingEvent): boolean {
+        console.log(`*** Handling incoming event: ${JSON.stringify(incomingEvent)}`);
+        
         this.getSubscriptionsForEvent(incomingEvent.getName())
             .forEach((sub) => {
                 sub.consumer(incomingEvent);

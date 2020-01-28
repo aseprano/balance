@@ -2,10 +2,13 @@ import express, { Express } from 'express';
 import { ServiceContainer } from "./tech/ServiceContainer";
 import { ConcreteRouter } from "./tech/impl/ConcreteRouter";
 import { Router } from "./tech/Router";
-import { EventSubscriber } from "./tech/EventSubscriber";
 import bodyParser from "body-parser";
 import { RabbitMQEventsListener } from "./tech/RabbitMQEventsListener";
 import { EventBusImpl } from "./tech/impl/EventBusImpl";
+import { ProjectorRegistrationService } from "./app-services/ProjectorRegistrationService";
+import { ConcreteProjectionService } from "./app-services/impl/ConcreteProjectionService";
+import { ProjectionServiceEventRegistrationDecorator } from "./app-services/impl/ProjectionServiceEventRegistrationDecorator";
+import { EventBus } from "./tech/EventBus";
 
 function createServiceContainer(): ServiceContainer {
     const serviceContainer = new ServiceContainer();
@@ -14,6 +17,11 @@ function createServiceContainer(): ServiceContainer {
     require('./providers/controllers')(serviceContainer);
     
     return serviceContainer;
+}
+
+function getProjectorsRegistrationService(eventBus: EventBus): ProjectorRegistrationService {
+    const concreteService = new ConcreteProjectionService();
+    return new ProjectionServiceEventRegistrationDecorator(concreteService, eventBus);
 }
 
 function createRoutes(express: Express, serviceContainer: ServiceContainer): Router {
@@ -26,8 +34,10 @@ function createRoutes(express: Express, serviceContainer: ServiceContainer): Rou
 
 function createEventSubscriptions(serviceContainer: ServiceContainer): EventBusImpl {
     const eventBus = new EventBusImpl();
-    const subscribers: EventSubscriber[] = require('./event-subscribers/exports')(serviceContainer);
-    subscribers.forEach((s) => s.subscribe(eventBus));
+    const projectorsService = getProjectorsRegistrationService(eventBus);
+
+    require('./providers/projectors')(projectorsService, serviceContainer);
+    
     return eventBus;
 }
 

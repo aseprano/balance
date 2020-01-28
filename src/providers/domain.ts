@@ -17,6 +17,7 @@ import { SnapshotRepository } from "../tech/SnapshotRepository";
 import { SnapshotRepositoryImpl } from "../tech/impl/SnapshotRepositoryImpl";
 import { DB } from "../tech/DB";
 import { EnvVariablesConfig, CacheConfigDecorator, CompositeConfig, RedisConfig, Config } from '@darkbyte/ts-config';
+import { DBConnectionProvider } from "../tech/DBConnectionProvider";
 const uuid = require('uuidv4').default;
 const redis = require('redis');
 
@@ -79,17 +80,7 @@ module.exports = (container: ServiceContainer) => {
         'DB',
         (c: ServiceContainer) => {
             const config: Config = c.get('Config');
-
-            return require('knex')({
-                client: 'mysql',
-                connection: {
-                  host : config.get('DB_HOST', 'localhost'),
-                  user : config.get('DB_USER', 'root'),
-                  password : config.get('DB_PASS', 'root'),
-                  database : config.get('DB_NAME', 'test')
-                },
-                pool: {min: 1, max: 5}
-              });
+            return new DBConnectionProvider(config);
         }
     ).declare(
         'SnapshotRepository',

@@ -17,7 +17,7 @@ export class ConcreteProjectionService implements ProjectionService, ProjectorRe
     ) { }
 
     private getProjector(projectorId: string): Projector {
-        const projector = this.map.get(projectorId);
+        const projector = this.projectorsMap.get(projectorId);
 
         if (!projector) {
             throw new Error('Projector not found');
@@ -47,7 +47,7 @@ export class ConcreteProjectionService implements ProjectionService, ProjectorRe
     }
 
     private getProjectorsInterestedInEvent(eventName: string): Projector[] {
-        return this.eventsMapping.get(eventName) ?? [];
+        return this.eventsMapping.get(eventName) || [];
     }
 
     register(projector: Projector): void {
