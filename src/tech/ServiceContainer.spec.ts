@@ -2,15 +2,16 @@ import { ServiceContainer } from "./ServiceContainer";
 
 describe('ServiceContainer', () => {
 
-    it('throws an error when the client asks for a service that has not been declared', () => {
+    it('throws an error when the client asks for a service that has not been declared', (done) => {
         const container = new ServiceContainer();
-        expect(() => container.get('Foo')).toThrow();
+        container.get('foo1')
+            .catch(() => done());
     });
 
-    it('builds the service once if declared shared', () => {
+    it('builds the service once if declared shared', async () => {
         let providerInvocations = 0;
 
-        const provider = () => {
+        const provider = async () => {
             providerInvocations++;
             return 10;
         }
@@ -18,18 +19,18 @@ describe('ServiceContainer', () => {
         const container = new ServiceContainer();
         container.declare('foo', provider);
 
-        const result1 = container.get('foo');
-        const result2 = container.get('foo');
+        const result1 = await container.get('foo');
+        const result2 = await container.get('foo');
 
         expect(result1).toEqual(10);
         expect(result2).toEqual(10);
         expect(providerInvocations).toEqual(1);
     });
 
-    it('builds the service everytime it is required if it has not been declared as shared', () => {
+    it('builds the service everytime it is required if it has not been declared as shared', async () => {
         let providerIvocations = 0;
 
-        const provider = () => {
+        const provider = async () => {
             providerIvocations++;
             return 7;
         };
@@ -37,17 +38,17 @@ describe('ServiceContainer', () => {
         const container = new ServiceContainer();
         container.declare('foobar', provider, false);
 
-        expect(container.get('foobar')).toEqual(7);
-        expect(container.get('foobar')).toEqual(7);
+        expect(await container.get('foobar')).toEqual(7);
+        expect(await container.get('foobar')).toEqual(7);
         expect(providerIvocations).toEqual(2);
     });
 
-    it('replaces the existing instance of singleton if the provider is redeclared', () => {
-        const provider1 = () => {
+    it('replaces the existing instance of singleton if the provider is redeclared', async () => {
+        const provider1 = async () => {
             return 10;
         };
 
-        const provider2 = () => {
+        const provider2 = async () => {
             return 7;
         };
 
@@ -56,8 +57,8 @@ describe('ServiceContainer', () => {
         container.get('foo'); // forces the provider1 to be invoked and its result value to be stored
 
         container.declare('foo', provider2);
-        expect(container.get('foo')).toEqual(7);
-        expect(container.get('foo')).toEqual(7);
+        expect(await container.get('foo')).toEqual(7);
+        expect(await container.get('foo')).toEqual(7);
     });
 
 })

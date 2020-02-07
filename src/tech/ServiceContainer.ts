@@ -1,50 +1,45 @@
 import { Function } from "../Function";
 
 type Service = any;
+type ServiceProvider = Function<ServiceContainer, Promise<Service>>;
 
 export class ServiceContainer {
     private singletons: Map<string, Service> = new Map();
-    private providers: Map<string, Service> = new Map();
+    private providers: Map<string, ServiceProvider> = new Map();
 
-    private getSingleton(name: string): Service {
-        return this.singletons.get(name);
-    }
-
-    private registerSingleton(service: Service, name: string) {
-        this.singletons.set(name, service);
-    }
-
-    private buildService(provider: Function<ServiceContainer, Service>, name: string, shared: boolean): Promise<any> {
-        const service = provider(this);
-
-        if (shared) {
-            this.registerSingleton(service, name);
-        }
-
-        return service;
-    }
-
-    declare(serviceName: string, provider: Function<ServiceContainer, Service>, shared?: boolean): ServiceContainer {
+    declare(serviceName: string, provider: ServiceProvider, shared?: boolean): ServiceContainer {
         this.singletons.delete(serviceName);
 
         this.providers.set(
             serviceName,
-            () => {
-                return this.getSingleton(serviceName) || this.buildService(provider, serviceName, shared === undefined ? true : shared);
+            async () => {
+                const service = await provider(this);
+
+                if (shared === undefined || shared === true) {
+                    this.singletons.set(serviceName, service);
+                }
+
+                return service;
             }
         );
 
         return this;
     }
 
-    get(serviceName: string): any {
-        const provider = this.providers.get(serviceName);
+    get(serviceName: string): Promise<Service> {
+        let service: Service = this.singletons.get(serviceName);
 
-        if (!provider) {
-            throw new Error('Unknown service: ' + serviceName);
+        if (!service) {
+            const provider = this.providers.get(serviceName);
+
+            if (provider !== undefined) {
+                service = provider(this);
+            } else {
+                return Promise.reject(new Error('Unknown service: ' + serviceName));
+            }
         }
 
-        return provider();
+        return Promise.resolve(service);
     }
     
 }

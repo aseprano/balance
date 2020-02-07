@@ -62,7 +62,7 @@ export class BankAccountsRepositoryImpl implements BankAccountsRepository {
 
         return this.eventStore
             .createStream(streamId, account.commitEvents())
-            .catch(error => {
+            .catch((error) => {
                 if (error instanceof StreamAlreadyExistingException) {
                     throw new DuplicatedBankAccountException();
                 } else {

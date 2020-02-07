@@ -13,11 +13,17 @@ export class AccountController {
     constructor(private accountService: AccountService) {}
 
     async create(): Promise<ControllerResult> {
+        console.log('*** Wanna create an account ***');
+
         return this.accountService
             .newAccount()
             .then((id) => success({
                 id: id.asString()
-            }));
+            }))
+            .catch((err) => {
+                console.error('*** Sad trombone ***');
+                return err;
+            });
     }
 
     async debit(req: Request): Promise<ControllerResult> {

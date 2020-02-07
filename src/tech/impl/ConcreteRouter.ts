@@ -20,7 +20,7 @@ export class ConcreteRouter implements Router {
         const methodName = mapping.serviceMethod || 'run';
 
         try {
-            const service: any = this.serviceContainer.get(mapping.serviceName);
+            const service: any = await this.serviceContainer.get(mapping.serviceName);
             const ret: ControllerResult = await service[methodName](req);
             res.status(ret.getStatusCode());
             

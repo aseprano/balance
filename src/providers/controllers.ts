@@ -5,7 +5,8 @@ module.exports = (container: ServiceContainer) => {
     
     container.declare(
         'AccountController',
-        (container) => new AccountController(container.get('AccountService'))
+        (container) => container.get('AccountService')
+            .then((accountService) => new AccountController(accountService))
     );
     
 }
