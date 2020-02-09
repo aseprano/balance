@@ -6,6 +6,6 @@ import { ServiceContainer } from "../tech/ServiceContainer";
 module.exports = (projectors: ProjectorRegistrationService, serviceContainer: ServiceContainer) => {
     serviceContainer.get('DB')
         .then((db) => {
-            projectors.register(new BalancesProjector(new DBBalancesProjection(db)));
+            projectors.register(new BalancesProjector(db, new DBBalancesProjection()));
         });
 }

@@ -24,10 +24,12 @@ export class SnapshotRepositoryImpl implements SnapshotRepository {
                 `SELECT data FROM ${this.tableName} WHERE stream_id = ? ORDER BY id DESC LIMIT 1`,
                 [snapshotId]
             ).then((data) => {
-                console.log('*** GOT DATA ***');
-                const ret = data.fields && data.fields.length ? this.reconstituteSnapshot(data.fields[0]) : undefined;
-                console.log('*** DATA BUILT ***');
-                return ret;
+                if (data.fields && data.fields.length) {
+                    console.log('*** Data rebuilt from snapshot ***');
+                    return this.reconstituteSnapshot(data.fields[0]);
+                } else {
+                    console.log('*** No snapshots found ***');
+                }
             }).catch((err) => {
                 return err;
             });

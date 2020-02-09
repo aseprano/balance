@@ -1,50 +1,33 @@
 import { BalancesProjection } from "../BalancesProjection";
-import { DBConnectionProvider } from "../../tech/DBConnectionProvider";
+import { Queryable, QueryResult } from "../../tech/db/Queryable";
 
 export class DBBalancesProjection implements BalancesProjection {
 
-    constructor(private connectionProvider: DBConnectionProvider) {}
+    async createBalance(dbConnection: Queryable, accountId: string, currency: string, balance: number): Promise<void> {
+        const sql = '' + 
+        'INSERT INTO balances (account_id, currency, balance) ' +
+        'VALUES (?, ?, ?) ' +
+        'ON DUPLICATE KEY UPDATE balance = balance + ?';
 
-    private async getConnection(): Promise<any> {
-        return await this.connectionProvider.getDB();
-    }
-
-    async createBalance(accountId: string, currency: string, balance?: number): Promise<void> {
-        const sql = '\
-        INSERT INTO balances (account_id, currency, balance)\
-        VALUES\
-        (:accountId, :currency, :balance)\
-        ON DUPLICATE KEY UPDATE balance = balance + :balance';
-
-        return (await this.getConnection()).raw(
+        return dbConnection.query(
             sql,
-            {
-                accountId,
-                currency,
-                balance: balance || 0,
-            }
+            [accountId, currency, balance, balance]
         ).then(() => undefined);
     }
     
-    async updateBalance(accountId: string, currency: string, delta: number): Promise<void> {
-        const sql = '\
-        UPDATE balances\
-        SET balance = balance + :delta\
-        WHERE account_id = :accountId\
-        AND currency = :currency';
+    async updateBalance(dbConnection: Queryable, accountId: string, currency: string, delta: number): Promise<void> {
+        const sql = '' +
+        'UPDATE balances ' +
+        'SET balance = balance + ? ' +
+        'WHERE account_id = ? ' +
+        'AND currency = ?';
 
-        return (await this.getConnection()).raw(
+        return dbConnection.query(
             sql,
-            {
-                accountId,
-                currency,
-                delta,
-            }
-        ).then((data: any) => {
-            const affectedRows: number = data[0]['affectedRows'];
-
-            if (affectedRows === 0) {
-                return this.createBalance(accountId, currency, delta);
+            [delta, accountId, currency]
+        ).then((res: QueryResult) => {
+            if (!res.numberOfAffectedRows) {
+                return this.createBalance(dbConnection, accountId, currency, delta);
             }
         });
 
