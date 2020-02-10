@@ -6,4 +6,6 @@ export interface BalancesProjection {
 
     updateBalance(dbConnection: Queryable, accountId: string, currency: string, delta: number): Promise<void>;
 
+    clear(dbConnection: Queryable): Promise<void>;
+
 }

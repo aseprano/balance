@@ -6,17 +6,27 @@ import { AccountCreditedEvent } from "../events/AccountCreditedEvent";
 import { BalancesProjection } from "./BalancesProjection";
 import { DB } from "../tech/db/DB";
 import { Queryable } from "../tech/db/Queryable";
-import { DBTransaction } from "../tech/db/DBTransaction";
+import { AbstractProjector } from "./AbstractProjector";
 
-export class BalancesProjector implements Projector
+export class BalancesProjector extends AbstractProjector
 {
     constructor(
-        private db: DB,
+        db: DB,
         private projection: BalancesProjection
-    ) {}
+    ) {
+        super(db);
+    }
 
     public getId(): string {
         return 'com.herrdoktor.projections.account_balances';
+    }
+
+    public getEventsOfInterest(): string[] {
+        return [
+            AccountCreatedEvent.EventName,
+            AccountCreditedEvent.EventName,
+            AccountDebitedEvent.EventName,
+        ];
     }
 
     private async handleAccountCreated(dbConnection: Queryable, event: IncomingEvent): Promise<void> {
@@ -43,7 +53,7 @@ export class BalancesProjector implements Projector
             .updateBalance(dbConnection, payload['id'], payload['debit']['currency'], -payload['debit']['amount']);
     }
 
-    private async handleIncomingEvent(event: IncomingEvent, dbConnection: Queryable): Promise<void> {
+    async handleIncomingEvent(event: IncomingEvent, dbConnection: Queryable): Promise<void> {
         switch (event.getName()) {
             case AccountCreatedEvent.EventName:
                 return this.handleAccountCreated(dbConnection, event);
@@ -57,28 +67,8 @@ export class BalancesProjector implements Projector
 
     }
 
-    public getEventsOfInterest(): string[] {
-        return [
-            AccountCreatedEvent.EventName,
-            AccountCreditedEvent.EventName,
-            AccountDebitedEvent.EventName,
-        ];
-    }
-
-    async project(event: IncomingEvent): Promise<void> {
-        return this.db.beginTransaction()
-            .then((tx: DBTransaction) => {
-                return this.handleIncomingEvent(event, tx)
-                    .then(() => tx.commit())
-                    .catch((err: any) => {
-                        tx.rollback();
-                        return err;
-                    });
-            });
-    }
-
-    async clear(): Promise<void> {
-        
+    async handleClear(dbConnection: Queryable): Promise<void> {
+        return this.projection.clear(dbConnection);
     }
 
 }

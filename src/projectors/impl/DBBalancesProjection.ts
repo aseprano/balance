@@ -33,4 +33,8 @@ export class DBBalancesProjection implements BalancesProjection {
 
     }
 
+    async clear(dbConnection: Queryable): Promise<void> {
+        return dbConnection.query('TRUNCATE TABLE balances').then(() => undefined);
+    }
+
 }
