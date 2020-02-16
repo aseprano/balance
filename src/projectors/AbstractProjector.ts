@@ -1,12 +1,8 @@
+import { Event } from "../tech/Event";
 import { Projector } from "../tech/projections/Projector";
-import { IncomingEvent } from "../tech/impl/IncomingEvent";
-import { DB } from "../tech/db/DB";
-import { Queryable } from "../tech/db/Queryable";
 
 export abstract class AbstractProjector implements Projector
 {
-
-    constructor(private db: DB) {}
 
     /**
      * @inheritdoc
@@ -18,30 +14,16 @@ export abstract class AbstractProjector implements Projector
      */
     abstract getEventsOfInterest(): string[];
 
-    public project(event: IncomingEvent): Promise<void> {
-        return this.db.beginTransaction()
-            .then((tx) => this.handleIncomingEvent(event, tx)
-                .then(() => tx.commit())
-                .catch((err: any) => {
-                    tx.rollback();
-                    return err;
-                })
-            );
+    public project(event: Event): Promise<void> {
+        return this.handleIncomingEvent(event);
     }
 
     public clear(): Promise<void> {
-        return this.db.beginTransaction()
-            .then((tx) => this.handleClear(tx)
-                .then(() => tx.commit())
-                .catch((err: any) => {
-                    tx.rollback();
-                    return err;
-                })
-            );
+        return this.handleClear();
     }
 
-    public abstract handleIncomingEvent(event: IncomingEvent, dbConnection: Queryable): Promise<void>;
+    public abstract handleIncomingEvent(event: Event): Promise<void>;
 
-    public abstract handleClear(dbConnection: Queryable): Promise<void>;
+    public abstract handleClear(): Promise<void>;
 
 }
