@@ -3,38 +3,40 @@ import { Queryable, QueryResult } from "../../tech/db/Queryable";
 
 export class DBBalancesProjection implements BalancesProjection {
 
-    async createBalance(dbConnection: Queryable, accountId: string, currency: string, balance: number): Promise<void> {
+    constructor(private conn: Queryable) {}
+
+    async createBalance(accountId: string, currency: string, balance: number): Promise<void> {
         const sql = '' + 
         'INSERT INTO balances (account_id, currency, balance) ' +
         'VALUES (?, ?, ?) ' +
         'ON DUPLICATE KEY UPDATE balance = balance + ?';
 
-        return dbConnection.query(
+        return this.conn.query(
             sql,
             [accountId, currency, balance, balance]
         ).then(() => undefined);
     }
     
-    async updateBalance(dbConnection: Queryable, accountId: string, currency: string, delta: number): Promise<void> {
+    async updateBalance(accountId: string, currency: string, delta: number): Promise<void> {
         const sql = '' +
         'UPDATE balances ' +
         'SET balance = balance + ? ' +
         'WHERE account_id = ? ' +
         'AND currency = ?';
 
-        return dbConnection.query(
+        return this.conn.query(
             sql,
             [delta, accountId, currency]
         ).then((res: QueryResult) => {
             if (!res.numberOfAffectedRows) {
-                return this.createBalance(dbConnection, accountId, currency, delta);
+                return this.createBalance(accountId, currency, delta);
             }
         });
 
     }
 
-    async clear(dbConnection: Queryable): Promise<void> {
-        return dbConnection.query('TRUNCATE TABLE balances').then(() => undefined);
+    async clear(): Promise<void> {
+        return this.conn.query('TRUNCATE TABLE balances').then(() => undefined);
     }
 
 }
