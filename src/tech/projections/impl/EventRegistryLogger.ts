@@ -1,5 +1,6 @@
 import { EventRegistry } from "../EventRegistry";
 import { IncomingEvent } from "../../impl/IncomingEvent";
+import { Queryable } from "../../db/Queryable";
 
 export class EventRegistryLogger implements EventRegistry {
 
@@ -11,13 +12,13 @@ export class EventRegistryLogger implements EventRegistry {
         console.log(`[EventRegistry] ${s}`);
     }
 
-    store(event: IncomingEvent, projectionId: string): Promise<boolean> {
-        this.logMessage(`*** Storing event: ${event.getId()} for projection ${projectionId}`);
+    store(event: IncomingEvent, connection: Queryable): Promise<boolean> {
+        this.logMessage(`*** Storing event: ${event.getId()}`);
 
         return this.innerEventRegistry
-            .store(event, projectionId)
+            .store(event, connection)
             .then((success) => {
-                this.logMessage(success ? 'Event stored' : `Event ${event.getId()} duplicated for projection ${projectionId}`);
+                this.logMessage(success ? 'Event stored' : `Event ${event.getId()} duplicated`);
                 return success;
             }).catch((err) => {
                 this.logMessage(err);
@@ -25,13 +26,13 @@ export class EventRegistryLogger implements EventRegistry {
             });
     }
 
-    clear(projectionId: string): Promise<void> {
-        this.logMessage(`*** Clearing all stored events for projection ${projectionId}`);
+    clear(connection: Queryable): Promise<void> {
+        this.logMessage(`Clearing all stored events`);
         
         return this.innerEventRegistry
-            .clear(projectionId)
+            .clear(connection)
             .then(() => {
-                this.logMessage(`Events cleared for projection ${projectionId}`);
+                this.logMessage(`Events cleared`);
             }).catch((err) => {
                 this.logMessage(err);
                 return err;

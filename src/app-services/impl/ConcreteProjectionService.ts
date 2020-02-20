@@ -1,83 +1,52 @@
 import { ProjectionService } from "../ProjectionService";
-import { Event } from "../../tech/Event";
-import { Projector } from "../../tech/projections/Projector";
-import { Predicate } from "../../Predicate";
 import { ProjectorRegistrationService } from "../ProjectorRegistrationService";
+import { DB } from "../../tech/db/DB";
+import { Queryable } from "../../tech/db/Queryable";
+import { IncomingEvent } from "../../tech/impl/IncomingEvent";
+import { Projector } from "../../tech/projections/Projector";
 
-export class ConcreteProjectionService implements ProjectionService, ProjectorRegistrationService {
-    private projectorsMap: Map<string, Projector> = new Map();
-    private eventsMapping: Map<string, Projector[]> = new Map();
+export class ConcreteProjectionService implements ProjectionService {
 
-    /**
-     * 
-     * @param filter A predicate that states whether an event can be processed or not.
-     */
     constructor(
-        private filter: Predicate<Event> = () => true
-    ) { }
+        private projectors: ProjectorRegistrationService,
+        private transactionManager: DB
+    ) {}
 
-    private getProjector(projectorId: string): Projector {
-        const projector = this.projectorsMap.get(projectorId);
-
-        if (!projector) {
-            throw new Error('Projector not found');
-        }
-
-        return projector;
+    private async performInTransaction(f: (tx: Queryable) => Promise<void>): Promise<void> {
+        return this.transactionManager
+            .beginTransaction()
+            .then((tx) => {
+                return f(tx)
+                    .then(() => tx.commit())
+                    .catch((err: any) => {
+                        tx.rollback();
+                        return err;
+                    });
+            })
+    }
+    private async forwardEventToProjector(event: IncomingEvent, projector: Projector): Promise<void> {
+        return this.performInTransaction((tx: Queryable) => projector.project(event, tx));
     }
 
-    private eventMustBeSkipped(event: Event): boolean {
-        return !this.filter(event);
+    private async clearProjector(projector: Projector): Promise<void> {
+        return this.performInTransaction((tx: Queryable) => projector.clear(tx));
     }
 
-    private registrationExists(projectorId: string): boolean {
-        return this.projectorsMap.has(projectorId);
-    }
+    async onEvent(event: IncomingEvent): Promise<void> {
+        const projections = this.projectors
+            .getByEventName(event.getName())
+            .map((projector) => this.forwardEventToProjector(event, projector));
 
-    private mapProjector(projector: Projector) {
-        this.projectorsMap.set(projector.getId(), projector);
-    }
-
-    private createEventToProjectorMapping(eventName: string, projector: Projector) {
-        if (!this.eventsMapping.has(eventName)) {
-            this.eventsMapping.set(eventName, []);
-        }
-
-        this.eventsMapping.get(eventName)!.push(projector);
-    }
-
-    private getProjectorsInterestedInEvent(eventName: string): Projector[] {
-        return this.eventsMapping.get(eventName) || [];
-    }
-
-    register(projector: Projector): void {
-        if (this.registrationExists(projector.getId())) {
-            throw new Error(`A projector has been already registered with id: ${projector.getId()}`);
-        }
-        
-        this.mapProjector(projector);
-
-        projector.getEventsOfInterest()
-            .forEach((eventOfInterest) => this.createEventToProjectorMapping(eventOfInterest, projector));
-    }
-
-    async onEvent(event: Event): Promise<void> {
-        if (this.eventMustBeSkipped(event)) {
-            return;
-        }
-
-        this.getProjectorsInterestedInEvent(event.getName())
-            .forEach((projector) => projector.project(event));
+        return Promise.all(projections)
+            .then(() => undefined);
     }
     
-    async replay(event: Event, projectorId: string): Promise<void> {
-        return this.getProjector(projectorId)
-            .project(event);
+    async replay(event: IncomingEvent, projectorId: string): Promise<void> {
+        return this.forwardEventToProjector(event, this.projectors.getById(projectorId));
     }
 
     async clear(projectorId: string): Promise<void> {
-        return this.getProjector(projectorId)
-            .clear();
+        return this.clearProjector(this.projectors.getById(projectorId));
     }
 
 }

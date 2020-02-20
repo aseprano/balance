@@ -1,4 +1,5 @@
 import { IncomingEvent } from "../impl/IncomingEvent";
+import { Queryable } from "../db/Queryable";
 
 /**
  * EventRegistry is an abstraction for a registry used by Projectors.
@@ -12,11 +13,11 @@ export interface EventRegistry {
      * @param event 
      * @returns true if the event has been added, false if it was already in the registry
      */
-    store(event: IncomingEvent, projectionId: string): Promise<boolean>;
+    store(event: IncomingEvent, connection: Queryable): Promise<boolean>;
 
     /**
      * Clears the registry for the specified projection
      */
-    clear(projectionId: string): Promise<void>;
+    clear(connection: Queryable): Promise<void>;
 
 }

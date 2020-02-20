@@ -1,6 +1,7 @@
 import { Projector } from "../../tech/projections/Projector";
 import { EventRegistry } from "../../tech/projections/EventRegistry";
 import { IncomingEvent } from "../../tech/impl/IncomingEvent";
+import { Queryable } from "../../tech/db/Queryable";
 
 export class DuplicatedEventsProjectorDecorator implements Projector {
 
@@ -18,16 +19,16 @@ export class DuplicatedEventsProjectorDecorator implements Projector {
             .getEventsOfInterest();
     }
 
-    async project(event: IncomingEvent): Promise<void> {
+    async project(event: IncomingEvent, connection: Queryable): Promise<void> {
         return this.registry
-            .store(event, this.getId())
-            .then((stored) => stored ? this.innerProjector.project(event) : undefined);
+            .store(event, connection)
+            .then((stored) => stored ? this.innerProjector.project(event, connection) : undefined);
     }
     
-    async clear(): Promise<void> {
+    async clear(connection: Queryable): Promise<void> {
         return this.innerProjector
-            .clear()
-            .then(() => this.registry.clear(this.getId()));
+            .clear(connection)
+            .then(() => this.registry.clear(connection));
     }
     
 }

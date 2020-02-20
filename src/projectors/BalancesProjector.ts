@@ -2,9 +2,9 @@ import { AccountCreatedEvent } from "../events/AccountCreatedEvent";
 import { AccountDebitedEvent } from "../events/AccountDebitedEvent";
 import { AccountCreditedEvent } from "../events/AccountCreditedEvent";
 import { BalancesProjection } from "./BalancesProjection";
-import { DB } from "../tech/db/DB";
 import { AbstractProjector } from "./AbstractProjector";
-import { Event } from "../tech/Event";
+import { IncomingEvent } from "../tech/impl/IncomingEvent";
+import { Queryable } from "../tech/db/Queryable";
 
 export class BalancesProjector extends AbstractProjector
 {
@@ -26,45 +26,45 @@ export class BalancesProjector extends AbstractProjector
         ];
     }
 
-    private async handleAccountCreated(event: Event): Promise<void> {
+    private async handleAccountCreated(event: IncomingEvent, connection: Queryable): Promise<void> {
         const payload = event.getPayload();
 
         return Promise.all([
-            this.projection.createBalance(payload['id'], 'EUR', 0),
-            this.projection.createBalance(payload['id'], 'USD', 0)
+            this.projection.createBalance(connection, payload['id'], 'EUR', 0),
+            this.projection.createBalance(connection, payload['id'], 'USD', 0)
         ]).then(() => undefined);
     }
 
-    private async handleAccountCredited(event: Event): Promise<void> {
+    private async handleAccountCredited(event: IncomingEvent, connection: Queryable): Promise<void> {
         const payload = event.getPayload();
         
         return this.projection
-            .updateBalance(payload['id'], payload['credit']['currency'], payload['credit']['amount']);
+            .updateBalance(connection, payload['id'], payload['credit']['currency'], payload['credit']['amount']);
     }
 
-    private async handleAccountDebited(event: Event): Promise<void> {
+    private async handleAccountDebited(event: IncomingEvent, connection: Queryable): Promise<void> {
         const payload = event.getPayload();
 
         return this.projection
-            .updateBalance(payload['id'], payload['debit']['currency'], -payload['debit']['amount']);
+            .updateBalance(connection, payload['id'], payload['debit']['currency'], -payload['debit']['amount']);
     }
 
-    async handleIncomingEvent(event: Event): Promise<void> {
+    async handleIncomingEvent(event: IncomingEvent, connection: Queryable): Promise<void> {
         switch (event.getName()) {
             case AccountCreatedEvent.EventName:
-                return this.handleAccountCreated(event);
+                return this.handleAccountCreated(event, connection);
 
             case AccountCreditedEvent.EventName:
-                return this.handleAccountCredited(event);
+                return this.handleAccountCredited(event, connection);
 
             case AccountDebitedEvent.EventName:
-                return this.handleAccountDebited(event);
+                return this.handleAccountDebited(event, connection);
         }
 
     }
 
-    async handleClear(): Promise<void> {
-        return this.projection.clear();
+    async handleClear(connection: Queryable): Promise<void> {
+        return this.projection.clear(connection);
     }
 
 }

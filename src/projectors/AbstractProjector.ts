@@ -1,5 +1,6 @@
-import { Event } from "../tech/Event";
 import { Projector } from "../tech/projections/Projector";
+import { IncomingEvent } from "../tech/impl/IncomingEvent";
+import { Queryable } from "../tech/db/Queryable";
 
 export abstract class AbstractProjector implements Projector
 {
@@ -14,16 +15,16 @@ export abstract class AbstractProjector implements Projector
      */
     abstract getEventsOfInterest(): string[];
 
-    public project(event: Event): Promise<void> {
-        return this.handleIncomingEvent(event);
+    public project(event: IncomingEvent, connetion: Queryable): Promise<void> {
+        return this.handleIncomingEvent(event, connetion);
     }
 
-    public clear(): Promise<void> {
-        return this.handleClear();
+    public clear(connection: Queryable): Promise<void> {
+        return this.handleClear(connection);
     }
 
-    public abstract handleIncomingEvent(event: Event): Promise<void>;
+    public abstract handleIncomingEvent(event: IncomingEvent, connection: Queryable): Promise<void>;
 
-    public abstract handleClear(): Promise<void>;
+    public abstract handleClear(connection: Queryable): Promise<void>;
 
 }

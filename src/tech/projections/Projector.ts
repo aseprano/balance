@@ -1,4 +1,5 @@
-import { Event } from "../Event";
+import { IncomingEvent } from "../impl/IncomingEvent";
+import { Queryable } from "../db/Queryable";
 
 /**
  * A Projector projects events to a projection (i.e.: a database table)
@@ -17,14 +18,14 @@ export interface Projector {
     getEventsOfInterest(): string[];
 
     /**
-     * Clears the projection. All the data must be erased.
-     */
-    clear(): Promise<void>;
-
-    /**
      * Projects an event to the Projection.
      * @param event 
      */
-    project(event: Event): Promise<void>;
+    project(event: IncomingEvent, connection: Queryable): Promise<void>;
+
+    /**
+     * Clears the projection. All the data must be erased.
+     */
+    clear(connection: Queryable): Promise<void>;
     
 }
