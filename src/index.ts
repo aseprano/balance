@@ -48,13 +48,20 @@ async function createEventSubscriptions(serviceContainer: ServiceContainer): Pro
         );
 
         projectorsRegtistrationService.register(wrappedProjector);
-
-        projector.getEventsOfInterest()
-            .forEach((eventName) => {
-                eventBus.on(eventName, (e) => projectionsService.onEvent(e));
-            });
     });
 
+    const allEventsOfInterest: string[] = [];
+    
+    projectors.forEach((p) => {
+        allEventsOfInterest.push(...p.getEventsOfInterest());
+    });
+
+    // take unique events
+    allEventsOfInterest
+        .filter((e, index) => allEventsOfInterest.indexOf(e) === index)
+        .forEach((e) => {
+            eventBus.on(e, (e) => projectionsService.onEvent(e));
+        });
 
     return eventBus;
 }

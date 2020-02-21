@@ -11,7 +11,7 @@ export class EventBusImpl implements EventBus {
     private subscriptions: EventConsumer[] = [];
 
     private getSubscriptionsForEvent(eventName: string): EventConsumer[] {
-        return this.subscriptions.filter(s => s.matchExp.test(eventName));
+        return this.subscriptions.filter((s) => s.matchExp.test(eventName));
     }
 
     private isValidPattern(pattern: string): boolean {

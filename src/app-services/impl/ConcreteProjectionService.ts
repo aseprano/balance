@@ -24,6 +24,7 @@ export class ConcreteProjectionService implements ProjectionService {
                     });
             })
     }
+
     private async forwardEventToProjector(event: IncomingEvent, projector: Projector): Promise<void> {
         return this.performInTransaction((tx: Queryable) => projector.project(event, tx));
     }

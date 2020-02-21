@@ -31,7 +31,8 @@ export class MySQLDB implements DB {
             .then((conn) => {
                 const connectionWrapper = new DBConnectionLogger(conn);
 
-                return connectionWrapper.query('START TRANSACTION')
+                return connectionWrapper
+                    .query('START TRANSACTION')
                     .then(() => {
                         const tx = new DBTransactionProxy(connectionWrapper)
                         tx.onEnd(() => this.dispose(conn));
