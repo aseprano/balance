@@ -19,11 +19,15 @@ export class DBMonthlyExpensesProjection implements MonthlyExpensesProjection
         ).then((ret) => {
             if (!ret.numberOfAffectedRows) {
                 return connection.query(
-                    `INSERT INTO monthly_expenses (account_id, month, currency, amount) VALUES (?, ?, ?, ?) ON DUPLICAT KEY UPDATE amount = amount + ?`,
+                    `INSERT INTO monthly_expenses (account_id, month, currency, amount) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE amount = amount + ?`,
                     [accountId, month, currency, amount, amount]
                 ).then(() => undefined);
             }
         });
+    }
+
+    clear(connection: Queryable) {
+        return connection.query('TRUNCATE TABLE monthly_expenses').then(() => undefined);
     }
     
 }

@@ -37,8 +37,6 @@ export class RabbitMQEventsListener {
                         json['streamId'],
                         json['eventSeq'],
                     );
-
-                    console.log(event);
                     
                     this.delegate(event);
                     ch.ack(data);

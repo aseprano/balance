@@ -10,4 +10,6 @@ export interface MonthlyExpensesProjection {
         currency: string
     ): Promise<void>;
 
+    clear(connection: Queryable): Promise<void>;
+    
 }

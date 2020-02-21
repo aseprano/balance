@@ -39,7 +39,7 @@ export class MonthlyExpensesProjector extends AbstractProjector {
     }
 
     public async handleClear(connection: Queryable): Promise<void> {
-        
+        return this.projection.clear(connection);
     }
 
 

@@ -1,9 +1,15 @@
 import { BalancesProjection } from "../BalancesProjection";
 import { Queryable, QueryResult } from "../../tech/db/Queryable";
+import { BalancesProjector } from "../BalancesProjector";
 
+function fixBalance(balance: number): number {
+    return Math.floor(balance*100);
+}
 export class DBBalancesProjection implements BalancesProjection {
 
     async createBalance(connection: Queryable, accountId: string, currency: string, balance: number): Promise<void> {
+        balance = fixBalance(balance);
+
         const sql = '' + 
         'INSERT INTO balances (account_id, currency, balance) ' +
         'VALUES (?, ?, ?) ' +
@@ -16,6 +22,8 @@ export class DBBalancesProjection implements BalancesProjection {
     }
     
     async updateBalance(connection: Queryable, accountId: string, currency: string, delta: number): Promise<void> {
+        delta = fixBalance(delta);
+        
         const sql = '' +
         'UPDATE balances ' +
         'SET balance = balance + ? ' +
