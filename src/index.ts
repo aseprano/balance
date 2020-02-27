@@ -8,7 +8,7 @@ import { EventBusImpl } from "./tech/impl/EventBusImpl";
 import { ProjectorRegistrationService } from "./domain/app-services/ProjectorRegistrationService";
 import { ConcreteProjectionService } from "./domain/app-services/impl/ConcreteProjectionService";
 import { Projector } from "./tech/projections/Projector";
-import { DBEventRegistry } from "./tech/projections/impl/DBEventRegistry";
+import { DBEventRegistry } from "./tech/impl/projections/DBEventRegistry";
 import { DuplicatedEventsProjectorDecorator } from "./projectors/impl/DuplicatedEventsProjectorDecorator";
 import { ConcreteProjectorRegistrationService } from "./domain/app-services/impl/ConcreteProjectorRegistrationService";
 

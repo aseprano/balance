@@ -1,4 +1,4 @@
-import { Queryable, QueryResult } from "../Queryable";
+import { Queryable, QueryResult } from "../../db/Queryable";
 
 export class NullConnection implements Queryable {
 

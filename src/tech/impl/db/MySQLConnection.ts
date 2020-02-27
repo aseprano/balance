@@ -1,5 +1,5 @@
-import { DBConnection } from "../DBConnection";
-import { QueryResult } from "../Queryable";
+import { DBConnection } from "../../db/DBConnection";
+import { QueryResult } from "../../db/Queryable";
 
 export class MySQLConnection implements DBConnection {
 

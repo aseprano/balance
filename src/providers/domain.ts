@@ -16,7 +16,7 @@ import { EventStoreConnectionProxy } from "../tech/impl/EventStoreConnectionProx
 import { SnapshotRepository } from "../tech/SnapshotRepository";
 import { SnapshotRepositoryImpl } from "../tech/impl/SnapshotRepositoryImpl";
 import { EnvVariablesConfig, CacheConfigDecorator, CompositeConfig, RedisConfig, Config } from '@darkbyte/ts-config';
-import { MySQLDB } from "../tech/db/impl/MySQLDB";
+import { MySQLDB } from "../tech/impl/db/MySQLDB";
 
 const mysql = require('mysql');
 

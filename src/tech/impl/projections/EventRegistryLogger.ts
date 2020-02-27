@@ -1,5 +1,5 @@
-import { EventRegistry } from "../EventRegistry";
-import { IncomingEvent } from "../../impl/IncomingEvent";
+import { EventRegistry } from "../../projections/EventRegistry";
+import { IncomingEvent } from "../IncomingEvent";
 import { Queryable } from "../../db/Queryable";
 
 export class EventRegistryLogger implements EventRegistry {

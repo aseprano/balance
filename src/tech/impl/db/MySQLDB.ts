@@ -1,8 +1,8 @@
-import { DB } from "../DB";
-import { DBTransaction } from "../DBTransaction";
+import { DB } from "../../db/DB";
+import { DBTransaction } from "../../db/DBTransaction";
 import { MySQLConnection } from "./MySQLConnection";
 import { DBTransactionProxy } from "./DBTransactionProxy";
-import { QueryResult } from "../Queryable";
+import { QueryResult } from "../../db/Queryable";
 import { DBConnectionLogger } from "./DBConnectionLogger";
 
 export class MySQLDB implements DB {
