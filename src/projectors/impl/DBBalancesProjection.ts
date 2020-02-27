@@ -1,6 +1,6 @@
 import { BalancesProjection } from "../BalancesProjection";
 import { Queryable, QueryResult } from "../../tech/db/Queryable";
-import { BalancesProjector } from "../BalancesProjector";
+import { BalancesProjector } from "./BalancesProjector";
 
 function fixBalance(balance: number): number {
     return Math.floor(balance*100);
