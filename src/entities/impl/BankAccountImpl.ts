@@ -2,7 +2,7 @@ import { AbstractEntity } from "./AbstractEntity";
 import { BankAccount } from "../BankAccount";
 import { AccountID } from "../../values/AccountID";
 import { Money } from "../../values/Money";
-import { Event } from "../../tech/Event";
+import { Event } from "../../tech/events/Event";
 import { AccountCreatedEvent } from "../../events/AccountCreatedEvent";
 import { AccountDebitedEvent } from "../../events/AccountDebitedEvent";
 import { AccountCreditedEvent } from "../../events/AccountCreditedEvent";

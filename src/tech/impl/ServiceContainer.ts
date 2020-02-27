@@ -1,4 +1,4 @@
-import { Function } from "../lib/Function";
+import { Function } from "../../lib/Function";
 
 type Service = any;
 type ServiceProvider = Function<ServiceContainer, Promise<Service>>;

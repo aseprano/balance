@@ -1,5 +1,5 @@
-import { EventStream } from "../../tech/EventStream";
-import { Event } from "../../tech/Event";
+import { EventStream } from "../../tech/events/EventStream";
+import { Event } from "../../tech/events/Event";
 import { Entity } from "../Entity";
 import { DomainEvent } from "../../events/DomainEvent";
 import { Snapshot } from "../../tech/Snapshot";

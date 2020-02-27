@@ -1,4 +1,4 @@
-import { ServiceContainer } from "../tech/ServiceContainer";
+import { ServiceContainer } from "../tech/impl/ServiceContainer";
 import { AccountController } from "../controllers/AccountController";
 
 module.exports = (container: ServiceContainer) => {

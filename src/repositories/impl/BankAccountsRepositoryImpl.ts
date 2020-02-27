@@ -1,7 +1,7 @@
 import { BankAccountsRepository } from "../BankAccountsRepository";
 import { AccountID } from "../../values/AccountID";
 import { BankAccount } from "../../entities/BankAccount";
-import { EventStore } from "../../tech/EventStore";
+import { EventStore } from "../../tech/events/EventStore";
 import { Provider } from "../../lib/Provider";
 import { StreamNotFoundException } from "../../tech/exceptions/StreamNotFoundException";
 import { BankAccountNotFoundException } from "../../exceptions/BankAccountNotFoundException";

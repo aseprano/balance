@@ -1,13 +1,13 @@
 /// <reference path='../../../node_modules/event-store-client/event-store-client.d.ts'/>
 
-import { EventStore } from "../EventStore";
+import { EventStore } from "../events/EventStore";
 import { EventStoreConnectionProxy } from "./EventStoreConnectionProxy";
-import { EventStream } from "../EventStream";
-import { Event } from "../Event";
+import { EventStream } from "../events/EventStream";
+import { Event } from "../events/Event";
 import { ICredentials, ExpectedVersion, OperationResult, ReadStreamResult, Connection } from "event-store-client";
 import { Provider } from "../../lib/Provider";
 import { v4 } from "uuid/interfaces";
-import { CustomEvent } from "../CustomEvent";
+import { CustomEvent } from "./CustomEvent";
 import { Pool } from "../Pool";
 import { StreamConcurrencyException } from "../exceptions/StreamConcurrencyException";
 

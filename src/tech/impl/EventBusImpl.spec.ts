@@ -1,5 +1,5 @@
 import { EventBusImpl } from "./EventBusImpl";
-import { CustomEvent } from "../CustomEvent";
+import { CustomEvent } from "./CustomEvent";
 import { IncomingEvent } from "./IncomingEvent";
 
 describe('EventBusImpl', () => {

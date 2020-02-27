@@ -1,8 +1,8 @@
-import { ServiceContainer } from "../tech/ServiceContainer";
+import { ServiceContainer } from "../tech/impl/ServiceContainer";
 import { EventStoreImpl } from "../tech/impl/EventStoreImpl";
 import RandomAccountIDProvider from "../domain-services/RandomAccountIDProvider";
 import { BankAccountFactory } from "../factories/BankAccountFactory";
-import { EventStore } from "../tech/EventStore";
+import { EventStore } from "../tech/events/EventStore";
 import { BankAccountsRepositoryImpl } from "../repositories/impl/BankAccountsRepositoryImpl";
 import { BankAccountsRepository } from "../repositories/BankAccountsRepository";
 import { AccountServiceImpl } from "../app-services/impl/AccountServiceImpl";
@@ -17,7 +17,6 @@ import { SnapshotRepository } from "../tech/SnapshotRepository";
 import { SnapshotRepositoryImpl } from "../tech/impl/SnapshotRepositoryImpl";
 import { EnvVariablesConfig, CacheConfigDecorator, CompositeConfig, RedisConfig, Config } from '@darkbyte/ts-config';
 import { MySQLDB } from "../tech/db/impl/MySQLDB";
-import { ConfigLogger } from "../tech/ConfigLogger";
 
 const mysql = require('mysql');
 

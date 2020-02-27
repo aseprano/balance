@@ -1,9 +1,9 @@
-import { EventStore } from "./EventStore";
-import { EventStream } from "./EventStream";
-import { Event } from "./Event";
-import { StreamNotFoundException } from "./exceptions/StreamNotFoundException";
-import { StreamAlreadyExistingException } from "./exceptions/StreamAlreadyExistingException";
-import { StreamConcurrencyException } from "./exceptions/StreamConcurrencyException";
+import { EventStore } from "../events/EventStore";
+import { EventStream } from "../events/EventStream";
+import { Event } from "../events/Event";
+import { StreamNotFoundException } from "../exceptions/StreamNotFoundException";
+import { StreamAlreadyExistingException } from "../exceptions/StreamAlreadyExistingException";
+import { StreamConcurrencyException } from "../exceptions/StreamConcurrencyException";
 
 export class FakeEventStore implements EventStore {
     private streams: Map<string, EventStream> = new Map();

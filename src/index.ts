@@ -1,9 +1,9 @@
 import express, { Express } from 'express';
-import { ServiceContainer } from "./tech/ServiceContainer";
+import { ServiceContainer } from "./tech/impl/ServiceContainer";
 import { ConcreteRouter } from "./tech/impl/ConcreteRouter";
 import { Router } from "./tech/Router";
 import bodyParser from "body-parser";
-import { RabbitMQEventsListener } from "./tech/RabbitMQEventsListener";
+import { RabbitMQEventsListener } from "./tech/impl/RabbitMQEventsListener";
 import { EventBusImpl } from "./tech/impl/EventBusImpl";
 import { ProjectorRegistrationService } from "./app-services/ProjectorRegistrationService";
 import { ConcreteProjectionService } from "./app-services/impl/ConcreteProjectionService";

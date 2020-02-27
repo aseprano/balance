@@ -1,4 +1,4 @@
-import { EventBus } from "../EventBus";
+import { EventBus } from "../events/EventBus";
 import { Consumer } from "../../lib/Conumer";
 import { IncomingEvent } from "./IncomingEvent";
 

@@ -1,4 +1,4 @@
-import { EventStream } from "../tech/EventStream";
+import { EventStream } from "../tech/events/EventStream";
 import { Snapshot } from "../tech/Snapshot";
 import { DomainEvent } from "../events/DomainEvent";
 

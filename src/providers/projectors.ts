@@ -1,4 +1,4 @@
-import { ServiceContainer } from "../tech/ServiceContainer";
+import { ServiceContainer } from "../tech/impl/ServiceContainer";
 import { Projector } from "../tech/projections/Projector";
 import { BalancesProjector } from "../projectors/BalancesProjector";
 import { DBBalancesProjection } from "../projectors/impl/DBBalancesProjection";

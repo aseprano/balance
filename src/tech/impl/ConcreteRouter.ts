@@ -1,6 +1,6 @@
 import { Router } from "../Router";
 import { Express, Request, Response } from "express";
-import { ServiceContainer } from "../ServiceContainer";
+import { ServiceContainer } from "./ServiceContainer";
 import { NextFunction } from "connect";
 import { ControllerResult } from "../ControllerResult";
 

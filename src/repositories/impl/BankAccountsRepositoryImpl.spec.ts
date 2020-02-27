@@ -1,7 +1,7 @@
 import { mock, instance, when, anything, anyNumber, anyString } from "ts-mockito";
 import { BankAccountsRepositoryImpl } from "./BankAccountsRepositoryImpl";
 import { BankAccountImpl } from "../../entities/impl/BankAccountImpl";
-import { FakeEventStore } from "../../tech/FakeEventStore";
+import { FakeEventStore } from "../../tech/impl/FakeEventStore";
 import { AccountCreatedEvent } from "../../events/AccountCreatedEvent";
 import { AccountID } from "../../values/AccountID";
 import { AccountCreditedEvent } from "../../events/AccountCreditedEvent";
