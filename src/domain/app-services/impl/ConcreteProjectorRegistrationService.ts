@@ -1,5 +1,5 @@
 import { ProjectorRegistrationService } from "../ProjectorRegistrationService";
-import { Projector } from "../../tech/projections/Projector";
+import { Projector } from "../../../tech/projections/Projector";
 
 export class ConcreteProjectorRegistrationService implements ProjectorRegistrationService {
     private projectorsMap: Map<string, Projector> = new Map();

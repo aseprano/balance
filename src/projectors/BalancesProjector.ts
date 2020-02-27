@@ -1,6 +1,6 @@
-import { AccountCreatedEvent } from "../events/AccountCreatedEvent";
-import { AccountDebitedEvent } from "../events/AccountDebitedEvent";
-import { AccountCreditedEvent } from "../events/AccountCreditedEvent";
+import { AccountCreatedEvent } from "../domain/events/AccountCreatedEvent";
+import { AccountDebitedEvent } from "../domain/events/AccountDebitedEvent";
+import { AccountCreditedEvent } from "../domain/events/AccountCreditedEvent";
 import { BalancesProjection } from "./BalancesProjection";
 import { AbstractProjector } from "./AbstractProjector";
 import { IncomingEvent } from "../tech/impl/IncomingEvent";

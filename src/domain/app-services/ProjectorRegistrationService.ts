@@ -1,4 +1,4 @@
-import { Projector } from "../tech/projections/Projector";
+import { Projector } from "../../tech/projections/Projector";
 
 export interface ProjectorRegistrationService {
     

@@ -1,8 +1,8 @@
-import { EventStream } from "../../tech/events/EventStream";
-import { Event } from "../../tech/events/Event";
+import { EventStream } from "../../../tech/events/EventStream";
+import { Event } from "../../../tech/events/Event";
 import { Entity } from "../Entity";
 import { DomainEvent } from "../../events/DomainEvent";
-import { Snapshot } from "../../tech/Snapshot";
+import { Snapshot } from "../../../tech/Snapshot";
 
 export abstract class AbstractEntity implements Entity {
     private currentStreamVersion: number = 0;

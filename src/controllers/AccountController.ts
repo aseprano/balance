@@ -1,12 +1,12 @@
-import { AccountService } from "../app-services/AccountService";
+import { AccountService } from "../domain/app-services/AccountService";
 import { Request } from "express";
-import { Money } from "../values/Money";
-import { AccountID } from "../values/AccountID";
-import { InvalidAccountIDException } from "../exceptions/InvalidAccountIDException";
-import { BankAccountNotFoundException } from "../exceptions/BankAccountNotFoundException";
-import { InsufficientFundsException } from "../exceptions/InsufficientFundsException";
+import { Money } from "../domain/values/Money";
+import { AccountID } from "../domain/values/AccountID";
+import { InvalidAccountIDException } from "../domain/exceptions/InvalidAccountIDException";
+import { BankAccountNotFoundException } from "../domain/exceptions/BankAccountNotFoundException";
+import { InsufficientFundsException } from "../domain/exceptions/InsufficientFundsException";
 import { ControllerResult, success, error } from "../tech/ControllerResult";
-import { BadMoneyException } from "../exceptions/BadMoneyException";
+import { BadMoneyException } from "../domain/exceptions/BadMoneyException";
 
 export class AccountController {
 

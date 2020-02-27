@@ -4,8 +4,8 @@ import { AccountCreatedEvent } from "../../events/AccountCreatedEvent";
 import { Money } from "../../values/Money";
 import { AccountCreditedEvent } from "../../events/AccountCreditedEvent";
 import { AccountDebitedEvent } from "../../events/AccountDebitedEvent";
-import { EventStream } from "../../tech/events/EventStream";
-import { Snapshot } from "../../tech/Snapshot";
+import { EventStream } from "../../../tech/events/EventStream";
+import { Snapshot } from "../../../tech/Snapshot";
 
 describe('BankAccountImpl', () => {
 

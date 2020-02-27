@@ -1,7 +1,7 @@
 import { mock, instance, when, anything, anyNumber, anyString } from "ts-mockito";
 import { BankAccountsRepositoryImpl } from "./BankAccountsRepositoryImpl";
 import { BankAccountImpl } from "../../entities/impl/BankAccountImpl";
-import { FakeEventStore } from "../../tech/impl/FakeEventStore";
+import { FakeEventStore } from "../../../tech/impl/FakeEventStore";
 import { AccountCreatedEvent } from "../../events/AccountCreatedEvent";
 import { AccountID } from "../../values/AccountID";
 import { AccountCreditedEvent } from "../../events/AccountCreditedEvent";
@@ -9,9 +9,9 @@ import { Money } from "../../values/Money";
 import { BankAccountNotFoundException } from "../../exceptions/BankAccountNotFoundException";
 import { DuplicatedBankAccountException } from "../../exceptions/DuplicatedBankAccountException";
 import { AccountDebitedEvent } from "../../events/AccountDebitedEvent";
-import { StreamConcurrencyException } from "../../tech/exceptions/StreamConcurrencyException";
-import { SnapshotRepositoryImpl } from "../../tech/impl/SnapshotRepositoryImpl";
-import { StreamNotFoundException } from "../../tech/exceptions/StreamNotFoundException";
+import { StreamConcurrencyException } from "../../../tech/exceptions/StreamConcurrencyException";
+import { SnapshotRepositoryImpl } from "../../../tech/impl/SnapshotRepositoryImpl";
+import { StreamNotFoundException } from "../../../tech/exceptions/StreamNotFoundException";
 
 function mockSnapshot() {
     return mock(SnapshotRepositoryImpl);

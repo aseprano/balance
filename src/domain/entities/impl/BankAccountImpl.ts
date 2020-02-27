@@ -2,12 +2,12 @@ import { AbstractEntity } from "./AbstractEntity";
 import { BankAccount } from "../BankAccount";
 import { AccountID } from "../../values/AccountID";
 import { Money } from "../../values/Money";
-import { Event } from "../../tech/events/Event";
+import { Event } from "../../../tech/events/Event";
 import { AccountCreatedEvent } from "../../events/AccountCreatedEvent";
 import { AccountDebitedEvent } from "../../events/AccountDebitedEvent";
 import { AccountCreditedEvent } from "../../events/AccountCreditedEvent";
 import { InsufficientFundsException } from "../../exceptions/InsufficientFundsException";
-import { Snapshot } from "../../tech/Snapshot";
+import { Snapshot } from "../../../tech/Snapshot";
 
 export class BankAccountImpl extends AbstractEntity implements BankAccount {
     private accountId?: AccountID;

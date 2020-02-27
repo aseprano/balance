@@ -1,4 +1,4 @@
-import { Event } from "../tech/events/Event";
+import { Event } from "../../tech/events/Event";
 import { ProjectorRegistrationService } from "./ProjectorRegistrationService";
 
 export interface ProjectionService {

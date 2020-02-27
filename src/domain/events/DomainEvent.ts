@@ -1,4 +1,4 @@
-import { Event, EventPayload } from "../tech/events/Event";
+import { Event, EventPayload } from "../../tech/events/Event";
 
 export abstract class DomainEvent implements Event {
     private payload: EventPayload = Object.freeze({});

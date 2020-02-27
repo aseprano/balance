@@ -2,7 +2,7 @@ import { mock, instance, when, anything } from "ts-mockito";
 import { BankAccountImpl } from "../../entities/impl/BankAccountImpl";
 import { BankAccountsRepositoryImpl } from "../../repositories/impl/BankAccountsRepositoryImpl";
 import { AccountServiceImpl } from "./AccountServiceImpl";
-import { NoRetryPolicy } from "../../tech/impl/NoRetryPolicy";
+import { NoRetryPolicy } from "../../../tech/impl/NoRetryPolicy";
 import { AccountID } from "../../values/AccountID";
 import { AccountCreatedEvent } from "../../events/AccountCreatedEvent";
 import { BankAccountFactory } from "../../factories/BankAccountFactory";
@@ -10,7 +10,7 @@ import { BankAccount } from "../../entities/BankAccount";
 import { Money } from "../../values/Money";
 import { InsufficientFundsException } from "../../exceptions/InsufficientFundsException";
 import { BankAccountNotFoundException } from "../../exceptions/BankAccountNotFoundException";
-import { RetryPolicy } from "../../tech/RetryPolicy";
+import { RetryPolicy } from "../../../tech/RetryPolicy";
 
 describe('AccountServiceImpl', () => {
     const noRetryPolicy = new NoRetryPolicy<any>();

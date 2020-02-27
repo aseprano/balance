@@ -3,7 +3,7 @@ import { AccountID } from "../../values/AccountID";
 import { Money } from "../../values/Money";
 import { BankAccountsRepository } from "../../repositories/BankAccountsRepository";
 import { BankAccountFactory } from "../../factories/BankAccountFactory";
-import { RetryPolicy } from "../../tech/RetryPolicy";
+import { RetryPolicy } from "../../../tech/RetryPolicy";
 
 export class AccountServiceImpl implements AccountService {
 

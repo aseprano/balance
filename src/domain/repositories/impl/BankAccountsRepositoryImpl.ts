@@ -1,15 +1,15 @@
 import { BankAccountsRepository } from "../BankAccountsRepository";
 import { AccountID } from "../../values/AccountID";
 import { BankAccount } from "../../entities/BankAccount";
-import { EventStore } from "../../tech/events/EventStore";
-import { Provider } from "../../lib/Provider";
-import { StreamNotFoundException } from "../../tech/exceptions/StreamNotFoundException";
+import { EventStore } from "../../../tech/events/EventStore";
+import { Provider } from "../../../lib/Provider";
+import { StreamNotFoundException } from "../../../tech/exceptions/StreamNotFoundException";
 import { BankAccountNotFoundException } from "../../exceptions/BankAccountNotFoundException";
-import { StreamAlreadyExistingException } from "../../tech/exceptions/StreamAlreadyExistingException";
+import { StreamAlreadyExistingException } from "../../../tech/exceptions/StreamAlreadyExistingException";
 import { DuplicatedBankAccountException } from "../../exceptions/DuplicatedBankAccountException";
-import { SnapshotRepository } from "../../tech/SnapshotRepository";
-import { Snapshot } from "../../tech/Snapshot";
-import { StreamConcurrencyException } from "../../tech/exceptions/StreamConcurrencyException";
+import { SnapshotRepository } from "../../../tech/SnapshotRepository";
+import { Snapshot } from "../../../tech/Snapshot";
+import { StreamConcurrencyException } from "../../../tech/exceptions/StreamConcurrencyException";
 
 export class BankAccountsRepositoryImpl implements BankAccountsRepository {
 

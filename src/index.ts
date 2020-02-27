@@ -5,12 +5,12 @@ import { Router } from "./tech/Router";
 import bodyParser from "body-parser";
 import { RabbitMQEventsListener } from "./tech/impl/RabbitMQEventsListener";
 import { EventBusImpl } from "./tech/impl/EventBusImpl";
-import { ProjectorRegistrationService } from "./app-services/ProjectorRegistrationService";
-import { ConcreteProjectionService } from "./app-services/impl/ConcreteProjectionService";
+import { ProjectorRegistrationService } from "./domain/app-services/ProjectorRegistrationService";
+import { ConcreteProjectionService } from "./domain/app-services/impl/ConcreteProjectionService";
 import { Projector } from "./tech/projections/Projector";
 import { DBEventRegistry } from "./tech/projections/impl/DBEventRegistry";
 import { DuplicatedEventsProjectorDecorator } from "./projectors/impl/DuplicatedEventsProjectorDecorator";
-import { ConcreteProjectorRegistrationService } from "./app-services/impl/ConcreteProjectorRegistrationService";
+import { ConcreteProjectorRegistrationService } from "./domain/app-services/impl/ConcreteProjectorRegistrationService";
 
 function createServiceContainer(): ServiceContainer {
     const serviceContainer = new ServiceContainer();

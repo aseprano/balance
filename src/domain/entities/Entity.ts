@@ -1,5 +1,5 @@
-import { EventStream } from "../tech/events/EventStream";
-import { Snapshot } from "../tech/Snapshot";
+import { EventStream } from "../../tech/events/EventStream";
+import { Snapshot } from "../../tech/Snapshot";
 import { DomainEvent } from "../events/DomainEvent";
 
 export interface Entity {

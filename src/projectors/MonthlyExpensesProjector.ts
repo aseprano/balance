@@ -1,7 +1,7 @@
 import { AbstractProjector } from "./AbstractProjector";
 import { IncomingEvent } from "../tech/impl/IncomingEvent";
 import { Queryable } from "../tech/db/Queryable";
-import { AccountDebitedEvent } from "../events/AccountDebitedEvent";
+import { AccountDebitedEvent } from "../domain/events/AccountDebitedEvent";
 import { MonthlyExpensesProjection } from "./MonthlyExpensesProjection";
 
 export class MonthlyExpensesProjector extends AbstractProjector {
