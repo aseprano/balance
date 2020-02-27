@@ -1,5 +1,5 @@
 import { CustomEvent } from "./CustomEvent";
-import { Function } from "../Function";
+import { Function } from "../lib/Function";
 import { IncomingEvent } from "./impl/IncomingEvent";
 const amqp = require('amqplib');
 

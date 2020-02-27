@@ -5,7 +5,7 @@ import { EventStoreConnectionProxy } from "./EventStoreConnectionProxy";
 import { EventStream } from "../EventStream";
 import { Event } from "../Event";
 import { ICredentials, ExpectedVersion, OperationResult, ReadStreamResult, Connection } from "event-store-client";
-import { Provider } from "../../Provider";
+import { Provider } from "../../lib/Provider";
 import { v4 } from "uuid/interfaces";
 import { CustomEvent } from "../CustomEvent";
 import { Pool } from "../Pool";

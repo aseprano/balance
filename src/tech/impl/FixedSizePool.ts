@@ -1,5 +1,5 @@
 import { AbstractPool } from "./AbstractPool";
-import { Provider } from "../../Provider";
+import { Provider } from "../../lib/Provider";
 import { Resource } from "../Pool";
 
 /**

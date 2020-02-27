@@ -1,7 +1,7 @@
 import { DBTransaction } from "../DBTransaction";
 import { QueryResult } from "../Queryable";
 import { DBConnection } from "../DBConnection";
-import { Function } from "../../../Function";
+import { Function } from "../../../lib/Function";
 
 type OnEndFunction = Function<void,void>;
 

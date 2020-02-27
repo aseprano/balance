@@ -2,7 +2,7 @@ import { BankAccountsRepository } from "../BankAccountsRepository";
 import { AccountID } from "../../values/AccountID";
 import { BankAccount } from "../../entities/BankAccount";
 import { EventStore } from "../../tech/EventStore";
-import { Provider } from "../../Provider";
+import { Provider } from "../../lib/Provider";
 import { StreamNotFoundException } from "../../tech/exceptions/StreamNotFoundException";
 import { BankAccountNotFoundException } from "../../exceptions/BankAccountNotFoundException";
 import { StreamAlreadyExistingException } from "../../tech/exceptions/StreamAlreadyExistingException";

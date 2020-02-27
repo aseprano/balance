@@ -1,6 +1,6 @@
 import { BankAccount } from "../entities/BankAccount";
 import { BankAccountImpl } from "../entities/impl/BankAccountImpl";
-import { Provider } from "../Provider";
+import { Provider } from "../lib/Provider";
 import { AccountID } from "../values/AccountID";
 
 export class BankAccountFactory {

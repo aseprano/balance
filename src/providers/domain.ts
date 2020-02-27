@@ -10,7 +10,7 @@ import { LimitedRetryPolicy } from "../tech/impl/LimitedRetryPolicy";
 import { StreamConcurrencyException } from "../tech/exceptions/StreamConcurrencyException";
 import { BankAccountImpl } from "../entities/impl/BankAccountImpl";
 import { BankAccount } from "../entities/BankAccount";
-import { Provider } from "../Provider";
+import { Provider } from "../lib/Provider";
 import { FixedSizePool } from "../tech/impl/FixedSizePool";
 import { EventStoreConnectionProxy } from "../tech/impl/EventStoreConnectionProxy";
 import { SnapshotRepository } from "../tech/SnapshotRepository";

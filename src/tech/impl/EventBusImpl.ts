@@ -1,5 +1,5 @@
 import { EventBus } from "../EventBus";
-import { Consumer } from "../../Conumer";
+import { Consumer } from "../../lib/Conumer";
 import { IncomingEvent } from "./IncomingEvent";
 
 interface EventConsumer {

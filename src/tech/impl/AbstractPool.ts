@@ -1,5 +1,5 @@
 import { Pool, Resource } from "../Pool";
-import { Consumer } from "../../Conumer";
+import { Consumer } from "../../lib/Conumer";
 
 export abstract class AbstractPool<T extends Resource> implements Pool<T> {
     private resources: T[] = [];

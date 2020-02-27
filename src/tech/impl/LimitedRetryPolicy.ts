@@ -1,5 +1,5 @@
 import { RetryPolicy } from "../RetryPolicy";
-import { Predicate } from "../../Predicate";
+import { Predicate } from "../../lib/Predicate";
 
 export class LimitedRetryPolicy<T> implements RetryPolicy<T> {
 
