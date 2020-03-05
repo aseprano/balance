@@ -8,7 +8,8 @@ export class IncomingEvent implements Event {
         private dateFired: string,
         private payload: EventPayload,
         private streamName: string = '',
-        private seq: number = 0
+        private seq: number = 0,
+        private registrationKey: string = ''
     ) {}
 
     getId(): string {
@@ -35,5 +36,8 @@ export class IncomingEvent implements Event {
         return this.payload;
     }
 
-
+    getRegistrationKey(): string {
+        return this.registrationKey;
+    }
+    
 }
