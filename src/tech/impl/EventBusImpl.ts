@@ -7,14 +7,12 @@ class EventSubscription {
     constructor(
         private namePattern: RegExp,
         private consumer: Consumer<IncomingEvent>,
-        private registrationKey?: string
+        private registrationKey: string = ''
     ) {}
 
     isSatisfiedBy(event: IncomingEvent): boolean {
         return this.namePattern.test(event.getName()) &&
-            (
-                (this.registrationKey || '') === event.getRegistrationKey()
-            );
+            this.registrationKey === event.getRegistrationKey();
     }
 
     handle(event: IncomingEvent): void {
@@ -51,7 +49,7 @@ export class EventBusImpl implements EventBus {
             new EventSubscription(
                 this.createRegExpForEvent(eventPattern),
                 callback,
-                registrationKey
+                registrationKey || ""
             )
         );
 
