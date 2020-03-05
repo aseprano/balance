@@ -12,7 +12,9 @@ class EventSubscription {
 
     isSatisfiedBy(event: IncomingEvent): boolean {
         return this.namePattern.test(event.getName()) &&
-            (!this.registrationKey || this.registrationKey === event.getRegistrationKey());
+            (
+                (this.registrationKey || '') === event.getRegistrationKey()
+            );
     }
 
     handle(event: IncomingEvent): void {
