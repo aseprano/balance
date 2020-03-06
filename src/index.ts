@@ -76,7 +76,7 @@ createEventSubscriptions(serviceContainer)
     .then((eventBus) => {
         new RabbitMQEventsListener(
             "amqp://eventbus:eventbus@localhost:5672/banking",
-            "test",
+            "balance-queue",
             (e) => eventBus.handle(e)
         );
         
