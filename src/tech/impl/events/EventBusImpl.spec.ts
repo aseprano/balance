@@ -90,23 +90,4 @@ describe('EventBusImpl', () => {
         expect(subscriber2Invoked).toEqual(false);
     });
 
-    it('delivers event with same RegistrationKey', async () => {
-        const eventBus = new EventBusImpl();
-        let subscriber1Invoked = false;
-        let subscriber2Invoked = false;
-
-        eventBus.on(
-            'com.darkbyte.foo',
-            () => { subscriber1Invoked = true; },
-            'someRegistrationKey'
-        ).on(
-            'com.darkbyte.foo',
-            () => { subscriber2Invoked = true; }
-        );
-
-        await eventBus.handle(new IncomingEvent('ev-123', 'com.darkbyte.foo', '2010-10-01', {}, '', 0, 'someRegistrationKey'));
-        expect(subscriber1Invoked).toEqual(true);
-        expect(subscriber2Invoked).toEqual(false);
-    });
-
 });

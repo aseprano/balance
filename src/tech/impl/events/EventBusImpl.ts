@@ -6,26 +6,22 @@ class EventSubscription {
     
     constructor(
         private namePattern: RegExp,
-        private consumer: Consumer<IncomingEvent>,
-        private registrationKey: string = ''
+        private consumer: Consumer<IncomingEvent>
     ) {}
 
-    isSatisfiedBy(event: IncomingEvent): boolean {
-        return this.namePattern.test(event.getName()) &&
-            this.registrationKey === event.getRegistrationKey();
+    private isSatisfiedBy(event: IncomingEvent): boolean {
+        return this.namePattern.test(event.getName());
     }
 
     handle(event: IncomingEvent): void {
-        this.consumer(event);
+        if (this.isSatisfiedBy(event)) {
+            this.consumer(event);
+        }
     }
 }
 
 export class EventBusImpl implements EventBus {
     private subscriptions: EventSubscription[] = [];
-
-    private getSubscriptionsForEvent(event: IncomingEvent): EventSubscription[] {
-        return this.subscriptions.filter((s) => s.isSatisfiedBy(event));
-    }
 
     private isValidPattern(pattern: string): boolean {
         return pattern.length > 0 && /^\w+(\.(\w+|\*|\?))+$/i.test(pattern);
@@ -40,7 +36,7 @@ export class EventBusImpl implements EventBus {
         return new RegExp(`^${matchString}$`);
     }
 
-    on(eventPattern: string, callback: Consumer<IncomingEvent>, registrationKey?: string): EventBus {
+    on(eventPattern: string, callback: Consumer<IncomingEvent>): EventBus {
         if (!this.isValidPattern(eventPattern)) {
             throw new Error(`Invalid event name in subscription: ${eventPattern}`);
         }
@@ -48,8 +44,7 @@ export class EventBusImpl implements EventBus {
         this.subscriptions.push(
             new EventSubscription(
                 this.createRegExpForEvent(eventPattern),
-                callback,
-                registrationKey || ""
+                callback
             )
         );
 
@@ -59,7 +54,7 @@ export class EventBusImpl implements EventBus {
     handle(incomingEvent: IncomingEvent): boolean {
         //console.log(`*** Handling incoming event: ${JSON.stringify(incomingEvent)}`);
         
-        this.getSubscriptionsForEvent(incomingEvent)
+        this.subscriptions
             .forEach((subscription) => subscription.handle(incomingEvent));
 
         return true;
