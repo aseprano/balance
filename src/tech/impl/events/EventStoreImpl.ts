@@ -1,15 +1,15 @@
 /// <reference path='../../../node_modules/event-store-client/event-store-client.d.ts'/>
 
-import { EventStore } from "../events/EventStore";
+import { EventStore } from "../../events/EventStore";
 import { EventStoreConnectionProxy } from "./EventStoreConnectionProxy";
-import { EventStream } from "../events/EventStream";
-import { Event } from "../events/Event";
+import { EventStream } from "../../events/EventStream";
+import { Event } from "../../events/Event";
 import { ICredentials, ExpectedVersion, OperationResult, ReadStreamResult, Connection } from "event-store-client";
-import { Provider } from "../../lib/Provider";
+import { Provider } from "../../../lib/Provider";
 import { v4 } from "uuid/interfaces";
 import { CustomEvent } from "./CustomEvent";
-import { Pool } from "../Pool";
-import { StreamConcurrencyException } from "../exceptions/StreamConcurrencyException";
+import { Pool } from "../../Pool";
+import { StreamConcurrencyException } from "../../exceptions/StreamConcurrencyException";
 
 export class EventStoreImpl implements EventStore {
 

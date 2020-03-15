@@ -1,5 +1,5 @@
 import { ServiceContainer } from "../tech/impl/ServiceContainer";
-import { EventStoreImpl } from "../tech/impl/EventStoreImpl";
+import { EventStoreImpl } from "../tech/impl/events/EventStoreImpl";
 import RandomAccountIDProvider from "../domain/domain-services/RandomAccountIDProvider";
 import { BankAccountFactory } from "../domain/factories/BankAccountFactory";
 import { EventStore } from "../tech/events/EventStore";
@@ -12,7 +12,7 @@ import { BankAccountImpl } from "../domain/entities/impl/BankAccountImpl";
 import { BankAccount } from "../domain/entities/BankAccount";
 import { Provider } from "../lib/Provider";
 import { FixedSizePool } from "../tech/impl/FixedSizePool";
-import { EventStoreConnectionProxy } from "../tech/impl/EventStoreConnectionProxy";
+import { EventStoreConnectionProxy } from "../tech/impl/events/EventStoreConnectionProxy";
 import { SnapshotRepository } from "../tech/SnapshotRepository";
 import { SnapshotRepositoryImpl } from "../tech/impl/SnapshotRepositoryImpl";
 import { EnvVariablesConfig, CacheConfigDecorator, CompositeConfig, RedisConfig, Config } from '@darkbyte/ts-config';

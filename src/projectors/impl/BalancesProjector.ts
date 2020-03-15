@@ -3,7 +3,7 @@ import { AccountDebitedEvent } from "../../domain/events/AccountDebitedEvent";
 import { AccountCreditedEvent } from "../../domain/events/AccountCreditedEvent";
 import { BalancesProjection } from "../BalancesProjection";
 import { AbstractProjector } from "./AbstractProjector";
-import { IncomingEvent } from "../../tech/impl/IncomingEvent";
+import { IncomingEvent } from "../../tech/impl/events/IncomingEvent";
 import { Queryable } from "../../tech/db/Queryable";
 
 export class BalancesProjector extends AbstractProjector

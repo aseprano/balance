@@ -1,5 +1,5 @@
 import { Projector } from "../../tech/projections/Projector";
-import { IncomingEvent } from "../../tech/impl/IncomingEvent";
+import { IncomingEvent } from "../../tech/impl/events/IncomingEvent";
 import { Queryable } from "../../tech/db/Queryable";
 
 export abstract class AbstractProjector implements Projector

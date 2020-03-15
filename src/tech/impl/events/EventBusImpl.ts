@@ -1,5 +1,5 @@
-import { EventBus } from "../events/EventBus";
-import { Consumer } from "../../lib/Conumer";
+import { EventBus } from "../../events/EventBus";
+import { Consumer } from "../../../lib/Conumer";
 import { IncomingEvent } from "./IncomingEvent";
 
 class EventSubscription {

@@ -1,4 +1,4 @@
-import { Resource } from "../Pool";
+import { Resource } from "../../Pool";
 import { Connection } from "event-store-client";
 
 export class EventStoreConnectionProxy implements Resource {

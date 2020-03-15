@@ -1,5 +1,5 @@
 import { Function } from "../../lib/Function";
-import { IncomingEvent } from "./IncomingEvent";
+import { IncomingEvent } from "./events/IncomingEvent";
 const amqp = require('amqplib');
 
 export class RabbitMQEventsListener {

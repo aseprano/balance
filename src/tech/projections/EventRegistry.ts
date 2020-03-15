@@ -1,4 +1,4 @@
-import { IncomingEvent } from "../impl/IncomingEvent";
+import { IncomingEvent } from "../impl/events/IncomingEvent";
 import { Queryable } from "../db/Queryable";
 
 /**

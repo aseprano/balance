@@ -1,4 +1,4 @@
-import { Event, EventPayload } from "../events/Event";
+import { Event, EventPayload } from "../../events/Event";
 
 export class CustomEvent implements Event {
 

@@ -4,7 +4,7 @@ import { ConcreteRouter } from "./tech/impl/ConcreteRouter";
 import { Router } from "./tech/Router";
 import bodyParser from "body-parser";
 import { RabbitMQEventsListener } from "./tech/impl/RabbitMQEventsListener";
-import { EventBusImpl } from "./tech/impl/EventBusImpl";
+import { EventBusImpl } from "./tech/impl/events/EventBusImpl";
 import { ProjectorRegistrationService } from "./domain/app-services/ProjectorRegistrationService";
 import { ConcreteProjectionService } from "./domain/app-services/impl/ConcreteProjectionService";
 import { Projector } from "./tech/projections/Projector";

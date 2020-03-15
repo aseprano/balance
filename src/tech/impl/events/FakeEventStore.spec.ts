@@ -1,9 +1,9 @@
 import { FakeEventStore } from "./FakeEventStore";
-import { EventStream } from "../events/EventStream";
+import { EventStream } from "../../events/EventStream";
 import { CustomEvent } from "./CustomEvent";
-import { StreamNotFoundException } from "../exceptions/StreamNotFoundException";
-import { StreamAlreadyExistingException } from "../exceptions/StreamAlreadyExistingException";
-import { StreamConcurrencyException } from "../exceptions/StreamConcurrencyException";
+import { StreamNotFoundException } from "../../exceptions/StreamNotFoundException";
+import { StreamAlreadyExistingException } from "../../exceptions/StreamAlreadyExistingException";
+import { StreamConcurrencyException } from "../../exceptions/StreamConcurrencyException";
 
 describe('FakeEventStore', () => {
 

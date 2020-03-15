@@ -1,5 +1,5 @@
 import { AbstractProjector } from "./AbstractProjector";
-import { IncomingEvent } from "../../tech/impl/IncomingEvent";
+import { IncomingEvent } from "../../tech/impl/events/IncomingEvent";
 import { Queryable } from "../../tech/db/Queryable";
 import { AccountDebitedEvent } from "../../domain/events/AccountDebitedEvent";
 import { MonthlyExpensesProjection } from "../MonthlyExpensesProjection";

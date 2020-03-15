@@ -2,7 +2,7 @@ import { ProjectionService } from "../ProjectionService";
 import { ProjectorRegistrationService } from "../ProjectorRegistrationService";
 import { DB } from "../../../tech/db/DB";
 import { Queryable } from "../../../tech/db/Queryable";
-import { IncomingEvent } from "../../../tech/impl/IncomingEvent";
+import { IncomingEvent } from "../../../tech/impl/events/IncomingEvent";
 import { Projector } from "../../../tech/projections/Projector";
 
 export class ConcreteProjectionService implements ProjectionService {

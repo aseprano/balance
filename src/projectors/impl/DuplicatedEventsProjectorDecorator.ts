@@ -1,6 +1,6 @@
 import { Projector } from "../../tech/projections/Projector";
 import { EventRegistry } from "../../tech/projections/EventRegistry";
-import { IncomingEvent } from "../../tech/impl/IncomingEvent";
+import { IncomingEvent } from "../../tech/impl/events/IncomingEvent";
 import { Queryable } from "../../tech/db/Queryable";
 
 export class DuplicatedEventsProjectorDecorator implements Projector {
