@@ -90,4 +90,17 @@ describe('EventBusImpl', () => {
         expect(subscriber2Invoked).toEqual(false);
     });
 
+    it('returns the list of unique subscribed events names', () => {
+        const eventBus = new EventBusImpl();
+        eventBus.on('com.*', () => {});
+        eventBus.on('com.darkbyte', () => {});
+        eventBus.on('com.*', () => {});
+
+        const eventsNames = eventBus.getListOfEventNames();
+        expect(eventsNames).toEqual([
+            'com.*',
+            'com.darkbyte'
+        ]);
+    });
+
 });

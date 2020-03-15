@@ -21,6 +21,7 @@ class EventSubscription {
 }
 
 export class EventBusImpl implements EventBus {
+    private eventPatterns: string[] = [];
     private subscriptions: EventSubscription[] = [];
 
     private isValidPattern(pattern: string): boolean {
@@ -36,19 +37,31 @@ export class EventBusImpl implements EventBus {
         return new RegExp(`^${matchString}$`);
     }
 
-    on(eventPattern: string, callback: Consumer<IncomingEvent>): EventBus {
-        if (!this.isValidPattern(eventPattern)) {
-            throw new Error(`Invalid event name in subscription: ${eventPattern}`);
+    private addEventNameToList(eventNamePattern: string): void {
+        if (this.eventPatterns.indexOf(eventNamePattern) === -1) {
+            this.eventPatterns.push(eventNamePattern);
         }
+    }
+
+    on(eventNamePattern: string, callback: Consumer<IncomingEvent>): EventBus {
+        if (!this.isValidPattern(eventNamePattern)) {
+            throw new Error(`Invalid event name in subscription: ${eventNamePattern}`);
+        }
+
+        this.addEventNameToList(eventNamePattern);
 
         this.subscriptions.push(
             new EventSubscription(
-                this.createRegExpForEvent(eventPattern),
+                this.createRegExpForEvent(eventNamePattern),
                 callback
             )
         );
 
         return this;
+    }
+
+    getListOfEventNames(): string[] {
+        return this.eventPatterns.slice(0);
     }
 
     handle(incomingEvent: IncomingEvent): boolean {
