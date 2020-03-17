@@ -1,4 +1,4 @@
-/// <reference path='../../../node_modules/event-store-client/event-store-client.d.ts'/>
+/// <reference path='../../../../node_modules/event-store-client/event-store-client.d.ts'/>
 
 import { EventStore } from "../../events/EventStore";
 import { EventStoreConnectionProxy } from "./EventStoreConnectionProxy";
