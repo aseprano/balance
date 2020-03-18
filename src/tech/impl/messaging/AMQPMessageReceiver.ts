@@ -56,6 +56,8 @@ export class AMQPMessageReceiver implements MessageReceiver {
     }
 
     async startAcceptingMessages(): Promise<void> {
+        console.debug(`*** Reading messages from queue ${this.queueName}`);
+        
         return this.channel.consume(
             this.queueName,
             (data: ConsumeMessage|null) => {

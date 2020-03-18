@@ -46,19 +46,6 @@ async function createMessagingSystem(): Promise<MessagingSystem> {
 async function createEventSubscriptions(serviceContainer: ServiceContainer, messagingSystem: MessagingSystem): Promise<EventBusImpl> {
     const eventBus = new EventBusImpl();
     await require('./domain/event-subscriptions')(serviceContainer, eventBus);
-
-    // Register all the event handlers to the messaging system
-    const messageToEventBus = new MessageToEventHandler((e) => eventBus.handle(e));
-
-    eventBus.getListOfEventNames()
-        .forEach((eventName) => {
-            messagingSystem.on(
-                eventName,
-                (incomingMessage) => messageToEventBus.handle(incomingMessage),
-                ''
-            );
-        });
-    
     return eventBus;
 }
 
@@ -87,7 +74,15 @@ async function loadProjectors(
             
             projector.getEventsOfInterest()
                 .forEach((eventName) => {
-                    eventBus.on(eventName, (e) => projectionsService.onEvent(e), '');
+                    console.debug(`*** Registering for event: ${eventName}`);
+
+                    eventBus.on(
+                        eventName,
+                        (e) => {
+                            console.log(`*** Projecting event: ${e.getName()}`);
+                            projectionsService.onEvent(e);
+                        }
+                    );
 
                     messagingSystem.on(
                         eventName,
@@ -111,6 +106,18 @@ createMessagingSystem()
     .then(async (messagingSystem) => {
         const eventBus = await createEventSubscriptions(serviceContainer, messagingSystem);
         await loadProjectors(serviceContainer, eventBus, messagingSystem);
+
+        // Register all the event handlers to the messaging system
+        const messageToEventBus = new MessageToEventHandler((e) => eventBus.handle(e));
+
+        eventBus.getListOfEventNames()
+            .forEach((eventName) => {
+                messagingSystem.on(
+                    eventName,
+                    (incomingMessage) => messageToEventBus.handle(incomingMessage),
+                    ''
+                );
+            });
 
         const port = process.env['PORT'] || 8000;
         
