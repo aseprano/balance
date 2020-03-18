@@ -17,6 +17,8 @@ import { SnapshotRepository } from "../tech/SnapshotRepository";
 import { SnapshotRepositoryImpl } from "../tech/impl/SnapshotRepositoryImpl";
 import { EnvVariablesConfig, CacheConfigDecorator, CompositeConfig, RedisConfig, Config } from '@darkbyte/ts-config';
 import { MySQLDB } from "../tech/impl/db/MySQLDB";
+import { ConcreteProjectorRegistrationService } from "../domain/app-services/impl/ConcreteProjectorRegistrationService";
+import { ConcreteProjectionService } from "../domain/app-services/impl/ConcreteProjectionService";
 
 const mysql = require('mysql');
 
@@ -124,6 +126,18 @@ module.exports = (container: ServiceContainer) => {
             const snapshotsRepository: SnapshotRepository = await container.get('SnapshotRepository');
             const snapshotInterval = 100;
             return new BankAccountsRepositoryImpl(eventStore, accountProvider, snapshotsRepository, snapshotInterval);
+        }
+    ).declare(
+        'ProjectorsRegistrationService',
+        async (container: ServiceContainer) => {
+            return new ConcreteProjectorRegistrationService();
+        }
+    ).declare(
+        'ProjectionService',
+        async (container: ServiceContainer) => {
+            const db = await container.get('DB');
+            const projectorsRegtistrationService = await container.get('ProjectorsRegistrationService');
+            return new ConcreteProjectionService(projectorsRegtistrationService, db);        
         }
     )
 }

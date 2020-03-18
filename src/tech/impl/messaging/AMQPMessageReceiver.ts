@@ -18,7 +18,7 @@ export class AMQPMessageReceiver implements MessageReceiver {
     }
 
     private namePatternToRoutingKey(pattern: string, registrationKey?: string): string {
-        return (registrationKey ? (registrationKey + '/') : '') + pattern.replace(/\*/g, '#').replace(/\?/g, '*');
+        return (typeof registrationKey !== undefined ? registrationKey : '#') + '/' + pattern.replace(/\*/g, '#').replace(/\?/g, '*');
     }
     
     on(messageNamePattern: string, handler: MessageHandler, registrationKey?: string): void {
@@ -26,7 +26,7 @@ export class AMQPMessageReceiver implements MessageReceiver {
             throw new Error(`Invalid message name pattern: ${messageNamePattern}`);
         }
 
-        this.subscriptions.push(new MessageSubscription(messageNamePattern, handler, registrationKey || ''));
+        this.subscriptions.push(new MessageSubscription(messageNamePattern, handler, registrationKey));
         
         this.channel.bindQueue(
             this.queueName,

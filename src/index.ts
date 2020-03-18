@@ -1,16 +1,18 @@
 import express, { Express } from 'express';
+import bodyParser from "body-parser";
 import { ServiceContainer } from "./tech/impl/ServiceContainer";
 import { ConcreteRouter } from "./tech/impl/ConcreteRouter";
 import { Router } from "./tech/Router";
-import bodyParser from "body-parser";
-import { RabbitMQEventsListener } from "./tech/impl/RabbitMQEventsListener";
 import { EventBusImpl } from "./tech/impl/events/EventBusImpl";
-import { ProjectorRegistrationService } from "./domain/app-services/ProjectorRegistrationService";
-import { ConcreteProjectionService } from "./domain/app-services/impl/ConcreteProjectionService";
 import { Projector } from "./tech/projections/Projector";
 import { DBEventRegistry } from "./tech/impl/projections/DBEventRegistry";
 import { DuplicatedEventsProjectorDecorator } from "./projectors/impl/DuplicatedEventsProjectorDecorator";
-import { ConcreteProjectorRegistrationService } from "./domain/app-services/impl/ConcreteProjectorRegistrationService";
+import { MessagingSystem } from "./tech/messaging/MessagingSystem";
+import { AMQPMessagingSystem } from "./tech/impl/messaging/AMQPMessagingSystem";
+import { MessageToEventHandler } from "./tech/impl/events/MessageToEventHandler";
+import { EventBus } from "./tech/events/EventBus";
+import { ProjectorRegistrationService } from "./domain/app-services/ProjectorRegistrationService";
+import { ProjectionService } from "./domain/app-services/ProjectionService";
 
 function createServiceContainer(): ServiceContainer {
     const serviceContainer = new ServiceContainer();
@@ -21,10 +23,6 @@ function createServiceContainer(): ServiceContainer {
     return serviceContainer;
 }
 
-function getProjectorsRegistrationService(): ProjectorRegistrationService {
-    return new ConcreteProjectorRegistrationService();
-}
-
 function createRoutes(express: Express, serviceContainer: ServiceContainer): Router {
     const router = new ConcreteRouter(express, serviceContainer);
 
@@ -33,37 +31,74 @@ function createRoutes(express: Express, serviceContainer: ServiceContainer): Rou
     return router;
 }
 
-async function createEventSubscriptions(serviceContainer: ServiceContainer): Promise<EventBusImpl> {
-    const db = await serviceContainer.get('DB');
-    const projectorsRegtistrationService = getProjectorsRegistrationService();
-    const projectionsService = new ConcreteProjectionService(projectorsRegtistrationService, db);
-    const eventBus = new EventBusImpl();
+async function createMessagingSystem(): Promise<MessagingSystem> {
+    const msg = new AMQPMessagingSystem(
+        "amqp://eventbus:eventbus@localhost:5672/banking",
+        "all-events",
+        "balance-queue",
+    );
 
+    msg.startAcceptingMessages();
+
+    return msg;
+}
+
+async function createEventSubscriptions(serviceContainer: ServiceContainer, messagingSystem: MessagingSystem): Promise<EventBusImpl> {
+    const eventBus = new EventBusImpl();
+    await require('./domain/event-subscriptions')(serviceContainer, eventBus);
+
+    // Register all the event handlers to the messaging system
+    const messageToEventBus = new MessageToEventHandler((e) => eventBus.handle(e));
+
+    eventBus.getListOfEventNames()
+        .forEach((eventName) => {
+            messagingSystem.on(
+                eventName,
+                (incomingMessage) => messageToEventBus.handle(incomingMessage),
+                ''
+            );
+        });
+    
+    return eventBus;
+}
+
+async function loadProjectors(
+    serviceContainer: ServiceContainer,
+    eventBus: EventBus,
+    messagingSystem: MessagingSystem
+): Promise<Projector[]> {
     const projectors: Projector[] = await require('./providers/projectors')(serviceContainer);
 
-    projectors.forEach((projector) => {
-        const wrappedProjector = new DuplicatedEventsProjectorDecorator(
-            projector,
-            new DBEventRegistry('handled_events', projector.getId())
+    if (projectors.length) {
+        const projectorsRegtistrationService: ProjectorRegistrationService = await serviceContainer.get('ProjectorsRegistrationService');
+        const projectionsService: ProjectionService = await serviceContainer.get('ProjectionService');
+        
+        const messageToProjections = new MessageToEventHandler(
+            (incomingEvent) => projectionsService.replay(incomingEvent, incomingEvent.getRegistrationKey())
         );
-
-        projectorsRegtistrationService.register(wrappedProjector);
-    });
-
-    const allEventsOfInterest: string[] = [];
     
-    projectors.forEach((p) => {
-        allEventsOfInterest.push(...p.getEventsOfInterest());
-    });
+        projectors.forEach((projector) => {
+            const wrappedProjector = new DuplicatedEventsProjectorDecorator(
+                projector,
+                new DBEventRegistry('handled_events', projector.getId())
+            );
+    
+            projectorsRegtistrationService.register(wrappedProjector);
+            
+            projector.getEventsOfInterest()
+                .forEach((eventName) => {
+                    eventBus.on(eventName, (e) => projectionsService.onEvent(e), '');
 
-    // take unique events
-    allEventsOfInterest
-        .filter((e, index) => allEventsOfInterest.indexOf(e) === index)
-        .forEach((e) => {
-            eventBus.on(e, (e) => projectionsService.onEvent(e));
+                    messagingSystem.on(
+                        eventName,
+                        (message) => messageToProjections.handle(message),
+                        projector.getId()
+                    );
+                });
         });
+    }
 
-    return eventBus;
+    return projectors;
 }
 
 const app = express();
@@ -72,14 +107,11 @@ app.use(bodyParser.json());
 const serviceContainer = createServiceContainer();
 createRoutes(app, serviceContainer);
 
-createEventSubscriptions(serviceContainer)
-    .then((eventBus) => {
-        new RabbitMQEventsListener(
-            "amqp://eventbus:eventbus@localhost:5672/banking",
-            "balance-queue",
-            (e) => eventBus.handle(e)
-        );
-        
+createMessagingSystem()
+    .then(async (messagingSystem) => {
+        const eventBus = await createEventSubscriptions(serviceContainer, messagingSystem);
+        await loadProjectors(serviceContainer, eventBus, messagingSystem);
+
         const port = process.env['PORT'] || 8000;
         
         app.listen(
@@ -89,4 +121,3 @@ createEventSubscriptions(serviceContainer)
             }
         );        
     });
-

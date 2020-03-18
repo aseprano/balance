@@ -2,8 +2,8 @@ import { ProjectorRegistrationService } from "../ProjectorRegistrationService";
 import { Projector } from "../../../tech/projections/Projector";
 
 export class ConcreteProjectorRegistrationService implements ProjectorRegistrationService {
-    private projectorsMap: Map<string, Projector> = new Map();
-    private eventsMapping: Map<string, Projector[]> = new Map();
+    private projectorsMap: Map<string, Projector> = new Map(); // projectors by id
+    private eventsMapping: Map<string, Projector[]> = new Map(); // projectors by eventName
 
     private mapProjector(projector: Projector) {
         this.projectorsMap.set(projector.getId(), projector);

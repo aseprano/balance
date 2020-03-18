@@ -7,7 +7,7 @@ export class MessageSubscription {
     constructor(
         messageName: string,
         private handler: MessageHandler,
-        private registrationKey: string
+        private registrationKey?: string
     ) {
         this.nameRegex = new RegExp(
             '^' +
@@ -19,8 +19,12 @@ export class MessageSubscription {
         );
     }
 
+    private hasRegistrationKey(): boolean {
+        return typeof this.registrationKey !== undefined;
+    }
+
     private messageMatchesSubscription(message: IncomingMessage): boolean {
-        return this.nameRegex.test(message.name) && (!this.registrationKey || this.registrationKey === message.registrationKey)
+        return this.nameRegex.test(message.name) && (!this.hasRegistrationKey() || this.registrationKey === message.registrationKey)
     }
     
     private routeMessageToHandler(message: IncomingMessage) {

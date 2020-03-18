@@ -16,7 +16,7 @@ export class AMQPMessageSender implements MessageSender {
     }
 
     async send(message: Message, registrationKey?: string | undefined): Promise<void> {
-        const routingKey = (registrationKey ? registrationKey + '/' : '') + message.name;
+        const routingKey = (registrationKey || '') + '/' + message.name;
 
         const data = {
             ...message,
@@ -29,7 +29,7 @@ export class AMQPMessageSender implements MessageSender {
         if (!this.channel.publish(
             this.exchangeName,
             routingKey,
-            Buffer.from(JSON.stringify(data))
+            Buffer.from(JSON.stringify(data)),
         )) {
             return Promise.reject(`Error publishing on exchange ${this.exchangeName} using routingKey ${routingKey}`);
         }
