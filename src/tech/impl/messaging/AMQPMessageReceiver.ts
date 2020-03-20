@@ -43,7 +43,7 @@ export class AMQPMessageReceiver implements MessageReceiver {
         const message = JSON.parse(data.content.toString()) as IncomingMessage;
 
         if (!message.name || !message.data || !message.id) {
-            throw new Error('* Got a non valid IncomingMessage');
+            throw new Error('* Got malformed IncomingMessage');
         }
 
         message.registrationKey = message.registrationKey || '';
@@ -61,15 +61,17 @@ export class AMQPMessageReceiver implements MessageReceiver {
         return this.channel.consume(
             this.queueName,
             (data: ConsumeMessage|null) => {
-                console.debug(`* Received data: ${data ? data.content.toString() : null}`);
+                if (!data) {
+                    return;
+                }
 
                 try {
-                    const message = this.parseMessageFromData(data);
-                    console.debug(`* Got message: ${message}`);
-                    this.route(message);
+                    this.route(this.parseMessageFromData(data));
                 } catch (e) {
                     console.error('* Error reading message: ' + e.message);
                 }
+
+                this.channel.ack(data);
             }
         ).then(() => undefined);
     }

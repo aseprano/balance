@@ -59,11 +59,12 @@ async function loadProjectors(
     if (projectors.length) {
         const projectorsRegtistrationService: ProjectorRegistrationService = await serviceContainer.get('ProjectorsRegistrationService');
         const projectionsService: ProjectionService = await serviceContainer.get('ProjectionService');
-        
-        const messageToProjections = new MessageToEventHandler(
+        const allEvents: string[] = [];
+
+        const replayHandler = new MessageToEventHandler(
             (incomingEvent) => projectionsService.replay(incomingEvent, incomingEvent.getRegistrationKey())
         );
-    
+
         projectors.forEach((projector) => {
             const wrappedProjector = new DuplicatedEventsProjectorDecorator(
                 projector,
@@ -71,26 +72,25 @@ async function loadProjectors(
             );
     
             projectorsRegtistrationService.register(wrappedProjector);
+            allEvents.push(...projector.getEventsOfInterest().filter((e) => allEvents.indexOf(e) === -1));
             
             projector.getEventsOfInterest()
                 .forEach((eventName) => {
-                    console.debug(`*** Registering for event: ${eventName}`);
-
-                    eventBus.on(
-                        eventName,
-                        (e) => {
-                            console.log(`*** Projecting event: ${e.getName()}`);
-                            projectionsService.onEvent(e);
-                        }
-                    );
-
                     messagingSystem.on(
                         eventName,
-                        (message) => messageToProjections.handle(message),
+                        (e) => replayHandler.handle(e),
                         projector.getId()
-                    );
+                    )
                 });
         });
+        
+        allEvents.forEach((eventName) => {
+            eventBus.on(
+                eventName,
+                (e) => projectionsService.onEvent(e)
+            );
+        });
+
     }
 
     return projectors;
