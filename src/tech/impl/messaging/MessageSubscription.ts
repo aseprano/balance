@@ -20,7 +20,7 @@ export class MessageSubscription {
     }
 
     private hasRegistrationKey(): boolean {
-        return typeof this.registrationKey !== undefined;
+        return typeof this.registrationKey === "string";
     }
 
     private messageMatchesSubscription(message: IncomingMessage): boolean {

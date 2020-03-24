@@ -19,6 +19,10 @@ import { EnvVariablesConfig, CacheConfigDecorator, CompositeConfig, RedisConfig,
 import { MySQLDB } from "../tech/impl/db/MySQLDB";
 import { ConcreteProjectorRegistrationService } from "../domain/app-services/impl/ConcreteProjectorRegistrationService";
 import { ConcreteProjectionService } from "../domain/app-services/impl/ConcreteProjectionService";
+import { ProjectionistLogger } from "../tech/impl/projections/ProjectionistLogger";
+import { ProjectionistProxy } from "../tech/impl/projections/ProjectionistProxy";
+import { AMQPMessagingSystem } from "../tech/impl/messaging/AMQPMessagingSystem";
+import { ProjectorRegistrationService } from "../domain/app-services/ProjectorRegistrationService";
 
 const mysql = require('mysql');
 
@@ -138,6 +142,48 @@ module.exports = (container: ServiceContainer) => {
             const db = await container.get('DB');
             const projectorsRegtistrationService = await container.get('ProjectorsRegistrationService');
             return new ConcreteProjectionService(projectorsRegtistrationService, db);        
+        }
+    ).declare(
+        'CommandsMessagingSystem',
+        async (container: ServiceContainer) => {
+            const msg = new AMQPMessagingSystem(
+                "amqp://eventbus:eventbus@localhost:5672/banking",
+                "xcommands",
+                "commands-queue",
+            );
+        
+            msg.startAcceptingMessages();
+        
+            return msg;
+        }
+    ).declare(
+        'EventsMessagingSystem',
+        async (container: ServiceContainer) => {
+            const msg = new AMQPMessagingSystem(
+                "amqp://eventbus:eventbus@localhost:5672/banking",
+                "all-events",
+                "balance-queue",
+            );
+        
+            msg.startAcceptingMessages();
+        
+            return msg;
+        }
+    ).declare(
+        'Projectionist',
+        async (container: ServiceContainer) => {
+            return container.get('CommandsMessagingSystem')
+                .then(async (messagingService) => {
+                    const projectorsRegtistrationService: ProjectorRegistrationService = await container.get('ProjectorsRegistrationService');
+
+                    return new ProjectionistLogger(
+                        new ProjectionistProxy(
+                            messagingService,
+                            projectorsRegtistrationService
+                        ),
+                        '[Projectionist]'
+                    )
+                });
         }
     )
 }

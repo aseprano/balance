@@ -13,6 +13,7 @@ import { MessageToEventHandler } from "./tech/impl/events/MessageToEventHandler"
 import { EventBus } from "./tech/events/EventBus";
 import { ProjectorRegistrationService } from "./domain/app-services/ProjectorRegistrationService";
 import { ProjectionService } from "./domain/app-services/ProjectionService";
+import { Projectionist } from "./tech/projections/Projectionist";
 
 function createServiceContainer(): ServiceContainer {
     const serviceContainer = new ServiceContainer();
@@ -29,18 +30,6 @@ function createRoutes(express: Express, serviceContainer: ServiceContainer): Rou
     require('./routes/routes')(router);
 
     return router;
-}
-
-async function createMessagingSystem(): Promise<MessagingSystem> {
-    const msg = new AMQPMessagingSystem(
-        "amqp://eventbus:eventbus@localhost:5672/banking",
-        "all-events",
-        "balance-queue",
-    );
-
-    msg.startAcceptingMessages();
-
-    return msg;
 }
 
 async function createEventSubscriptions(serviceContainer: ServiceContainer, messagingSystem: MessagingSystem): Promise<EventBusImpl> {
@@ -102,11 +91,14 @@ app.use(bodyParser.json());
 const serviceContainer = createServiceContainer();
 createRoutes(app, serviceContainer);
 
-createMessagingSystem()
-    .then(async (messagingSystem) => {
+serviceContainer.get('EventsMessagingSystem')
+    .then(async (messagingSystem: MessagingSystem) => {
         const eventBus = await createEventSubscriptions(serviceContainer, messagingSystem);
         await loadProjectors(serviceContainer, eventBus, messagingSystem);
 
+        const projectionist: Projectionist = await serviceContainer.get('Projectionist');
+        projectionist.replay('com.herrdoktor.projections.account_balances');
+        
         // Register all the event handlers to the messaging system
         const messageToEventBus = new MessageToEventHandler((e) => eventBus.handle(e));
 
