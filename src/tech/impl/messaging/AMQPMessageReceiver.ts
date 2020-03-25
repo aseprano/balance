@@ -67,7 +67,7 @@ export class AMQPMessageReceiver implements MessageReceiver {
 
                 try {
                     const message = this.parseMessageFromData(data);
-                    console.debug(`*** Got message: ${message.name} (regKey: ${message.registrationKey}) from queue: ${this.queueName}`);
+                    console.debug(`*** Got message: '${message.name}' (regKey: '${message.registrationKey}') from queue: '${this.queueName}'`);
                     this.route(message);
                 } catch (e) {
                     console.error('* Error reading message: ' + e.message);

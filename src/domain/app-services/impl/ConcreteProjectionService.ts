@@ -19,6 +19,7 @@ export class ConcreteProjectionService implements ProjectionService {
                 return f(tx)
                     .then(() => tx.commit())
                     .catch((err: any) => {
+                        console.debug(`*** ERROR: ${err.message}`);
                         tx.rollback();
                         return err;
                     });
