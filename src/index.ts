@@ -51,7 +51,10 @@ async function loadProjectors(
         const allEvents: string[] = [];
 
         const replayHandler = new MessageToEventHandler(
-            (incomingEvent) => projectionsService.replay(incomingEvent, incomingEvent.getRegistrationKey())
+            (incomingEvent) => {
+                console.debug(`*** Replaying event: ${incomingEvent.getName()}`);
+                return projectionsService.replay(incomingEvent, incomingEvent.getRegistrationKey());
+            }
         );
 
         projectors.forEach((projector) => {

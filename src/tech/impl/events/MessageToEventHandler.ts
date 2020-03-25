@@ -12,7 +12,7 @@ export class MessageToEventHandler {
         const decodedData = JSON.parse(message.data);
         
         return new IncomingEvent(
-            decodedData['eventId'],
+            decodedData['id'],
             decodedData['name'],
             decodedData['dateFired'],
             decodedData['payload'],
