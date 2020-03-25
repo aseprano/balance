@@ -1,6 +1,5 @@
 import { BalancesProjection } from "../BalancesProjection";
 import { Queryable, QueryResult } from "../../tech/db/Queryable";
-import { BalancesProjector } from "./BalancesProjector";
 
 function fixBalance(balance: number): number {
     return Math.floor(balance*100);
@@ -42,7 +41,8 @@ export class DBBalancesProjection implements BalancesProjection {
     }
 
     async clear(connection: Queryable): Promise<void> {
-        return connection.query('TRUNCATE TABLE balances').then(() => undefined);
+        return connection.query('TRUNCATE TABLE balances')
+            .then(() => undefined);
     }
 
 }

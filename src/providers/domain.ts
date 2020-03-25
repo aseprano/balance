@@ -23,6 +23,7 @@ import { ProjectionistLogger } from "../tech/impl/projections/ProjectionistLogge
 import { ProjectionistProxy } from "../tech/impl/projections/ProjectionistProxy";
 import { AMQPMessagingSystem } from "../tech/impl/messaging/AMQPMessagingSystem";
 import { ProjectorRegistrationService } from "../domain/app-services/ProjectorRegistrationService";
+import { DB } from "../tech/db/DB";
 
 const mysql = require('mysql');
 
@@ -175,11 +176,13 @@ module.exports = (container: ServiceContainer) => {
             return container.get('CommandsMessagingSystem')
                 .then(async (messagingService) => {
                     const projectorsRegtistrationService: ProjectorRegistrationService = await container.get('ProjectorsRegistrationService');
+                    const db: DB = await container.get('DB');
 
                     return new ProjectionistLogger(
                         new ProjectionistProxy(
                             messagingService,
-                            projectorsRegtistrationService
+                            projectorsRegtistrationService,
+                            db
                         ),
                         '[Projectionist]'
                     )
