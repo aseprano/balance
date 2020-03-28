@@ -22,7 +22,6 @@ export class MySQLDB implements DB {
     }
 
     private dispose(conn: MySQLConnection) {
-        console.log('*** Disposing connection ***');
         conn.getInnerConnection().release();
     }
 

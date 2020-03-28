@@ -24,12 +24,14 @@ export class AMQPMessageSender implements MessageSender {
             registrationKey: registrationKey || '',
         };
 
-        console.debug(`* Sending message: ${JSON.stringify(data)}`);
+        const stringifiedData = JSON.stringify(data);
 
+        console.debug(`* Sending message: ${stringifiedData} to exchange ${this.exchangeName} (routingKey=${routingKey})`);
+        
         if (!this.channel.publish(
             this.exchangeName,
             routingKey,
-            Buffer.from(JSON.stringify(data)),
+            Buffer.from(stringifiedData)
         )) {
             return Promise.reject(`Error publishing on exchange ${this.exchangeName} using routingKey ${routingKey}`);
         }

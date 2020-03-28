@@ -18,7 +18,7 @@ export class AMQPMessageReceiver implements MessageReceiver {
     }
 
     private namePatternToRoutingKey(pattern: string, registrationKey?: string): string {
-        return (typeof registrationKey !== undefined ? registrationKey : '#') + '/' + pattern.replace(/\*/g, '#').replace(/\?/g, '*');
+        return (typeof registrationKey !== "undefined" ? registrationKey : '#') + '/' + pattern.replace(/\*/g, '#').replace(/\?/g, '*');
     }
     
     on(messageNamePattern: string, handler: MessageHandler, registrationKey?: string): void {
@@ -40,7 +40,8 @@ export class AMQPMessageReceiver implements MessageReceiver {
             throw new Error('Got no data');
         }
 
-        const message = JSON.parse(data.content.toString()) as IncomingMessage;
+        const stringContent = data!.content.toString();
+        const message = JSON.parse(stringContent) as IncomingMessage;
 
         if (!message.name || !message.data || !message.id) {
             throw new Error('* Got malformed IncomingMessage');
@@ -67,7 +68,7 @@ export class AMQPMessageReceiver implements MessageReceiver {
 
                 try {
                     const message = this.parseMessageFromData(data);
-                    console.debug(`*** Got message: '${message.name}' (regKey: '${message.registrationKey}') from queue: '${this.queueName}'`);
+                    //console.debug(`*** Got message: '${message.name}' (regKey: '${message.registrationKey}') from queue: '${this.queueName}'`);
                     this.route(message);
                 } catch (e) {
                     console.error('* Error reading message: ' + e.message);
