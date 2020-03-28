@@ -149,8 +149,7 @@ module.exports = (container: ServiceContainer) => {
         async (container: ServiceContainer) => {
             const msg = new AMQPMessagingSystem(
                 "amqp://eventbus:eventbus@localhost:5672/banking",
-                "xcommands",
-                "commands-queue",
+                "xcommands"
             );
         
             msg.startAcceptingMessages();

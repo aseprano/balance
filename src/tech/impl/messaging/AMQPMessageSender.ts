@@ -16,7 +16,7 @@ export class AMQPMessageSender implements MessageSender {
     }
 
     async send(message: Message, registrationKey?: string | undefined): Promise<void> {
-        const routingKey = (registrationKey || '') + '/' + message.name;
+        const routingKey = (registrationKey ? registrationKey + '/' : '') + message.name;
 
         const data = {
             ...message,
