@@ -8,8 +8,21 @@ type OnEndFunction = Function<void,void>;
 export class DBTransactionProxy implements DBTransaction {
     private transactionIsOpen = true;
     private onEndFunctions: OnEndFunction[] = [];
+    private randomTxId: string = '';
 
-    constructor(private conn: DBConnection) {}
+    constructor(private conn: DBConnection) {
+        this.randomTxId = this.generateRandomTransactionId();
+    }
+
+    private generateRandomTransactionId(): string {
+        let txId = '';
+
+        while (txId.length < 6) {
+            txId += Math.floor(Math.random() * 10);
+        }
+
+        return txId;
+    }
 
     private markTransactionClosed(): void {
         this.transactionIsOpen = false;
@@ -36,9 +49,9 @@ export class DBTransactionProxy implements DBTransaction {
             .then(() => this.markTransactionClosed());
     }
 
-    query(sql: string, params?: any[]): Promise<QueryResult> {
+    query(sql: string, params?: any[], transactionId?: string): Promise<QueryResult> {
         return this.getConnection()
-            .then((conn) => conn.query(sql, params));
+            .then((conn) => conn.query(sql, params, transactionId || this.randomTxId));
     }
 
     onEnd(f: OnEndFunction) {
