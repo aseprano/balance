@@ -18,7 +18,7 @@ export class AMQPMessageReceiver implements MessageReceiver {
     }
 
     private namePatternToRoutingKey(pattern: string, registrationKey?: string): string {
-        return (typeof registrationKey !== "undefined" ? registrationKey + '/' : '') + pattern.replace(/\*/g, '#').replace(/\?/g, '*');
+        return (typeof registrationKey !== "undefined" ? registrationKey : '#') + '.' + pattern.replace(/\*/g, '#').replace(/\?/g, '*');
     }
     
     on(messageNamePattern: string, handler: MessageHandler, registrationKey?: string): void {
