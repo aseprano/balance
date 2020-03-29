@@ -15,7 +15,9 @@ import { ProjectionService } from "./domain/app-services/ProjectionService";
 import { Projectionist } from "./tech/projections/Projectionist";
 import { IncomingMessage } from "./tech/messaging/IncomingMessage";
 import { ProjectorLogger } from "./projectors/impl/ProjectorLogger";
-const { Queue, QueueConsumer } = require('@darkbyte/aqueue');
+import { QueuedProjector } from "./projectors/impl/QueuedProjector";
+import { DB } from "./tech/db/DB";
+import { AbstractProjector } from "./projectors/impl/DBAbstractProjector";
 
 function createServiceContainer(): ServiceContainer {
     const serviceContainer = new ServiceContainer();
@@ -34,10 +36,19 @@ function createRoutes(express: Express, serviceContainer: ServiceContainer): Rou
     return router;
 }
 
-async function createEventSubscriptions(serviceContainer: ServiceContainer, messagingSystem: MessagingSystem): Promise<EventBusImpl> {
+async function createEventSubscriptions(serviceContainer: ServiceContainer): Promise<EventBusImpl> {
     const eventBus = new EventBusImpl();
     await require('./domain/event-subscriptions')(serviceContainer, eventBus);
     return eventBus;
+}
+
+function wrapProjector(projector: Projector, db: DB): Projector {
+    if (projector instanceof AbstractProjector) {
+        projector.setDB(db);
+        projector.setHandledEventsTableName('handled_events');
+    }
+
+    return new ProjectorLogger(new QueuedProjector(projector));
 }
 
 async function loadProjectors(
@@ -48,6 +59,7 @@ async function loadProjectors(
     const projectors: Projector[] = await require('./providers/projectors')(serviceContainer);
 
     if (projectors.length) {
+        const db: DB = await serviceContainer.get('DB');
         const projectorsRegtistrationService: ProjectorRegistrationService = await serviceContainer.get('ProjectorsRegistrationService');
         const projectionsService: ProjectionService = await serviceContainer.get('ProjectionService');
         const allEvents: string[] = [];
@@ -56,41 +68,20 @@ async function loadProjectors(
             (incomingEvent) => projectionsService.replay(incomingEvent, incomingEvent.getRegistrationKey())
         );
 
-        const messagesQueue = new Queue();
-        const messagesQueueConsumer = new QueueConsumer(messagesQueue);
-
-        messagesQueueConsumer.startConsuming((message: IncomingMessage) => {
-            console.debug(`Replaying message ${message.name} (regKey: ${message.registrationKey})`);
-
-            return replayHandler.handle(message)
-                .then(() => {
-                    console.debug(`Message ${message.name} properly handled`);
-                }).catch((error) => {
-                    console.debug(`Error handling message ${message.name}: ${error.message}`);
-                    return Promise.reject(error);
-                });
-        });
-
-        projectors.forEach((projector) => {
-            const wrappedProjector = new ProjectorLogger(
-                new DuplicatedEventsProjectorDecorator(
-                    projector,
-                    new DBEventRegistry('handled_events', projector.getId())
-                )
-            );
-    
-            projectorsRegtistrationService.register(wrappedProjector);
-            allEvents.push(...projector.getEventsOfInterest().filter((e) => allEvents.indexOf(e) === -1));
-            
-            projector.getEventsOfInterest()
-                .forEach((eventName) => {
-                    messagingSystem.on(
-                        eventName,
-                        (message) => messagesQueue.push(message),
-                        projector.getId()
-                    )
-                });
-        });
+        projectors.map((p) => wrapProjector(p, db))
+            .forEach((projector) => {
+                projectorsRegtistrationService.register(projector);
+                allEvents.push(...projector.getEventsOfInterest().filter((e) => allEvents.indexOf(e) === -1));
+                
+                projector.getEventsOfInterest()
+                    .forEach((eventName) => {
+                        messagingSystem.on(
+                            eventName,
+                            (message) => replayHandler.handle(message),
+                            projector.getId()
+                        )
+                    });
+            });
         
         allEvents.forEach((eventName) => {
             eventBus.on(
@@ -124,7 +115,7 @@ createRoutes(app, serviceContainer);
 
 serviceContainer.get('EventsMessagingSystem')
     .then(async (messagingSystem: MessagingSystem) => {
-        const eventBus = await createEventSubscriptions(serviceContainer, messagingSystem);
+        const eventBus = await createEventSubscriptions(serviceContainer);
         await loadProjectors(serviceContainer, eventBus, messagingSystem);
 
         // Register all the event handlers to the messaging system

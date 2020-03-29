@@ -21,11 +21,11 @@ export interface Projector {
      * Projects an event to the Projection.
      * @param event 
      */
-    project(event: IncomingEvent, connection: Queryable): Promise<void>;
+    project(event: IncomingEvent): Promise<void>;
 
     /**
      * Clears the projection. All the data must be erased.
      */
-    clear(connection: Queryable): Promise<void>;
+    clear(): Promise<void>;
     
 }

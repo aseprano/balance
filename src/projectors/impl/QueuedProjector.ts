@@ -1,24 +1,16 @@
 import { IncomingEvent } from "../../tech/impl/events/IncomingEvent";
-import { DB } from "../../tech/db/DB";
 import { Projector } from "../../tech/projections/Projector";
-const { Queue, QueueConsumer } = require('@darkbyte/aqueue');
-
-interface ProjectionRequest {
-    event: IncomingEvent,
-    db: DB
-}
+import { Queue, QueueConsumer } from "@darkbyte/aqueue";
 
 export class QueuedProjector implements Projector {
+    private queuedEvents: Queue<IncomingEvent> = new Queue();
 
     constructor(
         private wrappedProjector: Projector,
-        private queue: Queue<ProjectionRequest>
+        
     ) {
-        const queueConsumer: QueueConsumer<ProjectionRequest> = new QueueConsumer(queue);
-
-        queueConsumer.startConsuming((req) => {
-            this.wrappedProjector.project(req.event, req.db);
-        });
+        const queueConsumer: QueueConsumer<IncomingEvent> = new QueueConsumer(this.queuedEvents);
+        queueConsumer.startConsuming((event) => this.wrappedProjector.project(event));
     }
 
     getId(): string {
@@ -31,14 +23,13 @@ export class QueuedProjector implements Projector {
             .getEventsOfInterest();
     }
 
-    async project(event: IncomingEvent, connection: DB): Promise<void> {
-        this.queue
-            .push({event, db: connection});
+    async project(event: IncomingEvent): Promise<void> {
+        this.queuedEvents.push(event);
     }
 
-    async clear(connection: DB): Promise<void> {
+    async clear(): Promise<void> {
         return this.wrappedProjector
-            .clear(connection);
+            .clear();
     }
    
 }
