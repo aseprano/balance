@@ -1,39 +1,22 @@
 import { ProjectionService } from "../ProjectionService";
 import { ProjectorRegistrationService } from "../ProjectorRegistrationService";
-import { DB } from "../../../tech/db/DB";
-import { Queryable } from "../../../tech/db/Queryable";
 import { IncomingEvent } from "../../../tech/impl/events/IncomingEvent";
 import { Projector } from "../../../tech/projections/Projector";
 
 export class ConcreteProjectionService implements ProjectionService {
 
     constructor(
-        private projectors: ProjectorRegistrationService,
-        private transactionManager: DB
+        private projectors: ProjectorRegistrationService
     ) {}
 
     private doLog(message: string) {
         //console.log(`[ProjectionService] ${message}`);
     }
 
-    private async performInTransaction(f: (tx: Queryable) => Promise<void>): Promise<void> {
-        return this.transactionManager
-            .beginTransaction()
-            .then((tx) => {
-                return f(tx)
-                    .then(() => tx.commit())
-                    .catch((err: any) => {
-                        this.doLog(`${err.message}`);
-                        tx.rollback();
-                        return err;
-                    });
-            })
-    }
-
     private async forwardEventToProjector(event: IncomingEvent, projector: Projector): Promise<void> {
         this.doLog(`Forwarding event ${event.getName()} to projector ${projector.getId()}`);
-
-        return this.performInTransaction((tx: Queryable) => projector.project(event, tx))
+        
+        return projector.project(event)
             .then(() => {
                 this.doLog(`Event ${event.getName()} successfully forwarded to ${projector.getId()}`);
             }).catch((error) => {
@@ -43,11 +26,11 @@ export class ConcreteProjectionService implements ProjectionService {
     }
 
     private async clearProjector(projector: Projector): Promise<void> {
-        return this.performInTransaction((tx: Queryable) => projector.clear(tx));
+        return projector.clear();
     }
 
     async onEvent(event: IncomingEvent): Promise<void> {
-        console.debug(`*** OnEvent: ${event.getName()}`);
+        this.doLog(`*** OnEvent: ${event.getName()}`);
         
         const projections = this.projectors
             .getByEventName(event.getName())

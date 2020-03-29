@@ -1,4 +1,4 @@
-import { AbstractProjector } from "./AbstractProjector";
+import { AbstractProjector } from "./DBAbstractProjector";
 import { IncomingEvent } from "../../tech/impl/events/IncomingEvent";
 import { Queryable } from "../../tech/db/Queryable";
 import { AccountDebitedEvent } from "../../domain/events/AccountDebitedEvent";

@@ -18,10 +18,10 @@ export class ProjectorLogger implements Projector {
         //console.debug(`[${this.getId()}] ${message}`);
     }
 
-    async project(event: IncomingEvent, connection: Queryable): Promise<void> {
+    async project(event: IncomingEvent): Promise<void> {
         this.doLog(`Projecting event ${event.getName()}`);
 
-        return this.innerProjector.project(event, connection)
+        return this.innerProjector.project(event)
             .then(() => {
                 this.doLog(`Event ${event.getName()} projected`);
             }).catch((error) => {
@@ -30,10 +30,10 @@ export class ProjectorLogger implements Projector {
             });
     }
 
-    async clear(connection: Queryable): Promise<void> {
+    async clear(): Promise<void> {
         this.doLog(`Clearing projection`);
 
-        return this.innerProjector.clear(connection)
+        return this.innerProjector.clear()
             .then(() => {
                 this.doLog('Projection cleared');
             }).catch((error) => {

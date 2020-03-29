@@ -23,7 +23,6 @@ import { ProjectionistLogger } from "../tech/impl/projections/ProjectionistLogge
 import { ProjectionistProxy } from "../tech/impl/projections/ProjectionistProxy";
 import { AMQPMessagingSystem } from "../tech/impl/messaging/AMQPMessagingSystem";
 import { ProjectorRegistrationService } from "../domain/app-services/ProjectorRegistrationService";
-import { DB } from "../tech/db/DB";
 
 const mysql = require('mysql');
 
@@ -140,9 +139,8 @@ module.exports = (container: ServiceContainer) => {
     ).declare(
         'ProjectionService',
         async (container: ServiceContainer) => {
-            const db = await container.get('DB');
             const projectorsRegtistrationService = await container.get('ProjectorsRegistrationService');
-            return new ConcreteProjectionService(projectorsRegtistrationService, db);        
+            return new ConcreteProjectionService(projectorsRegtistrationService);
         }
     ).declare(
         'CommandsMessagingSystem',
@@ -175,13 +173,11 @@ module.exports = (container: ServiceContainer) => {
             return container.get('CommandsMessagingSystem')
                 .then(async (messagingService) => {
                     const projectorsRegtistrationService: ProjectorRegistrationService = await container.get('ProjectorsRegistrationService');
-                    const db: DB = await container.get('DB');
 
                     return new ProjectionistLogger(
                         new ProjectionistProxy(
                             messagingService,
-                            projectorsRegtistrationService,
-                            db
+                            projectorsRegtistrationService
                         ),
                         '[Projectionist]'
                     )
