@@ -10,7 +10,9 @@ export class IncomingEvent implements Event {
         private streamName: string = '',
         private seq: number = 0,
         private registrationKey: string = ''
-    ) {}
+    ) {
+        this.dateFired = this.dateFired.substr(0, this.dateFired.length-1);
+    }
 
     getId(): string {
         return this.id;
