@@ -4,7 +4,7 @@ import { Queryable } from "../../tech/db/Queryable";
 import { DB } from "../../tech/db/DB";
 import { Function } from "../../lib/Function";
 
-export abstract class AbstractProjector implements Projector
+export abstract class DBAbstractProjector implements Projector
 {
     private handledEventsTableName: string = 'handled_events';
     private db?: DB;

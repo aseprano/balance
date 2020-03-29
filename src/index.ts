@@ -17,7 +17,7 @@ import { IncomingMessage } from "./tech/messaging/IncomingMessage";
 import { ProjectorLogger } from "./projectors/impl/ProjectorLogger";
 import { QueuedProjector } from "./projectors/impl/QueuedProjector";
 import { DB } from "./tech/db/DB";
-import { AbstractProjector } from "./projectors/impl/DBAbstractProjector";
+import { DBAbstractProjector } from "./projectors/impl/DBAbstractProjector";
 
 function createServiceContainer(): ServiceContainer {
     const serviceContainer = new ServiceContainer();
@@ -43,7 +43,7 @@ async function createEventSubscriptions(serviceContainer: ServiceContainer): Pro
 }
 
 function wrapProjector(projector: Projector, db: DB): Projector {
-    if (projector instanceof AbstractProjector) {
+    if (projector instanceof DBAbstractProjector) {
         projector.setDB(db);
         projector.setHandledEventsTableName('handled_events');
     }

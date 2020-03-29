@@ -1,10 +1,10 @@
-import { AbstractProjector } from "./DBAbstractProjector";
+import { DBAbstractProjector } from "./DBAbstractProjector";
 import { IncomingEvent } from "../../tech/impl/events/IncomingEvent";
 import { Queryable } from "../../tech/db/Queryable";
 import { AccountDebitedEvent } from "../../domain/events/AccountDebitedEvent";
 import { MonthlyExpensesProjection } from "../MonthlyExpensesProjection";
 
-export class MonthlyExpensesProjector extends AbstractProjector {
+export class MonthlyExpensesProjector extends DBAbstractProjector {
 
     constructor(private projection: MonthlyExpensesProjection) {
         super();

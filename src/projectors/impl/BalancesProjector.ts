@@ -1,12 +1,12 @@
+import { DBAbstractProjector } from "./DBAbstractProjector";
 import { AccountCreatedEvent } from "../../domain/events/AccountCreatedEvent";
 import { AccountDebitedEvent } from "../../domain/events/AccountDebitedEvent";
 import { AccountCreditedEvent } from "../../domain/events/AccountCreditedEvent";
 import { BalancesProjection } from "../BalancesProjection";
-import { AbstractProjector } from "./DBAbstractProjector";
 import { IncomingEvent } from "../../tech/impl/events/IncomingEvent";
 import { Queryable } from "../../tech/db/Queryable";
 
-export class BalancesProjector extends AbstractProjector
+export class BalancesProjector extends DBAbstractProjector
 {
     constructor(
         private projection: BalancesProjection
