@@ -100,8 +100,7 @@ function doAskReplay(serviceContainer: ServiceContainer) {
         serviceContainer.get('Projectionist')
             .then(
                 (projectionist: Projectionist) => {
-                    projectionist.replay('com.herrdoktor.projections.account_balances');
-                    projectionist.replay('com.herrdoktor.projections.monthly_expenses');
+                    projectionist.replay('com.herrdoktor.projections.transactions');
                 }
             );
     }, 5000);
