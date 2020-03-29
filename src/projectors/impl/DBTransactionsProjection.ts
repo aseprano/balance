@@ -8,13 +8,14 @@ export class DBTransactionProjection implements TransactionsProjection {
         const amount = Math.floor(transaction.amount*100);
 
         return connection.query(
-            `INSERT INTO transactions (account_id, type, amount, currency, date) VALUES (?, ?, ?, ?, ?)`,
+            `INSERT INTO transactions (account_id, type, amount, currency, date, month) VALUES (?, ?, ?, ?, ?, ?)`,
             [
                 transaction.accountId,
                 transaction.type as string,
                 amount,
                 transaction.currency,
-                transaction.date
+                transaction.date,
+                transaction.date.substr(0, 7)
             ]
         ).then((ret) => ret.numberOfAffectedRows ? undefined : Promise.reject(new Error('Cannot insert new transaction')));
     }

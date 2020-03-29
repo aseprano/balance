@@ -74,11 +74,11 @@ export class BankAccountImpl extends AbstractEntity implements BankAccount {
     }
     
     debit(amount: Money): void {
-        if (!this.hasEnoughBalance(amount)) {
+        if (this.hasEnoughBalance(amount)) {
+            this.appendUncommittedEvent(new AccountDebitedEvent(this.getId(), amount));
+        } else {
             throw new InsufficientFundsException();
         }
-
-        this.appendUncommittedEvent(new AccountDebitedEvent(this.getId(), amount));
     }
 
     credit(amount: Money): void {
