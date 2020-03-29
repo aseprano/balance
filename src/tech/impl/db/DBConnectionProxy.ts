@@ -8,8 +8,8 @@ export class DBConnectionProxy implements Queryable {
         this.connection = newConnection;
     }
 
-    query(query: string, params?: any[]): Promise<QueryResult> {
-        return this.connection.query(query, params);
+    query(query: string, params?: any[], transactionId?: string): Promise<QueryResult> {
+        return this.connection.query(query, params, transactionId);
     }
 
 }

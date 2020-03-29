@@ -22,7 +22,6 @@ export class MySQLDB implements DB {
     }
 
     private dispose(conn: MySQLConnection) {
-        console.log('*** Disposing connection ***');
         conn.getInnerConnection().release();
     }
 
@@ -30,7 +29,7 @@ export class MySQLDB implements DB {
         return this.getConnection()
             .then((conn) => {
                 const connectionWrapper = new DBConnectionLogger(conn);
-
+                
                 return connectionWrapper
                     .query('START TRANSACTION')
                     .then(() => {
@@ -41,7 +40,7 @@ export class MySQLDB implements DB {
             });
     }
     
-    query(query: string, params?: any[] | undefined): Promise<QueryResult> {
+    query(query: string, params?: any[] | undefined, transactionId?: string): Promise<QueryResult> {
         return this.getConnection()
             .then((conn) => {
                 return conn.query(query, params)

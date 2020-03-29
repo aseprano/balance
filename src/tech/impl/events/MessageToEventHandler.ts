@@ -22,12 +22,12 @@ export class MessageToEventHandler {
         );
     }
 
-    public handle(message: IncomingMessage) {
+    public async handle(message: IncomingMessage): Promise<void> {
         try {
-            this.eventHandler(this.extractEvent(message));
-        } catch (e) {
-            console.error('*** Error parsing event: ' + e.message);
-            throw e;
+            return this.eventHandler(this.extractEvent(message));
+        } catch (error) {
+            console.error('*** Error parsing event: ' + error.message);
+            return Promise.reject(error);
         }
     }
 }

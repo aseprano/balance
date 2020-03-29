@@ -1,4 +1,4 @@
-import { Consumer } from "../../lib/Conumer";
 import { IncomingEvent } from "../impl/events/IncomingEvent";
+import { Function } from "../../lib/Function";
 
-export type EventHandler = Consumer<IncomingEvent>;
+export type EventHandler = Function<IncomingEvent, Promise<void>>;

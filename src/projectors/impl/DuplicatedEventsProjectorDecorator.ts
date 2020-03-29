@@ -22,7 +22,7 @@ export class DuplicatedEventsProjectorDecorator implements Projector {
     async project(event: IncomingEvent, connection: Queryable): Promise<void> {
         return this.registry
             .store(event, connection)
-            .then((stored) => stored ? this.innerProjector.project(event, connection) : undefined);
+            .then((stored) => stored ? this.innerProjector.project(event, connection) : Promise.reject(new Error('Event already handled')));
     }
     
     async clear(connection: Queryable): Promise<void> {

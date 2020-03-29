@@ -8,7 +8,7 @@ export class ProjectionistLogger implements Projectionist {
     ) {}
 
     private doLog(message: string) {
-        console.debug((this.prefix ? this.prefix + ' ' : '') + message);
+        //console.debug((this.prefix ? this.prefix + ' ' : '') + message);
     }
 
     replay(projectorId: string): Promise<void> {

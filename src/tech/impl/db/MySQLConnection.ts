@@ -9,7 +9,7 @@ export class MySQLConnection implements DBConnection {
         return this.conn;
     }
     
-    query(query: string, params?: any[]): Promise<QueryResult> {
+    query(query: string, params?: any[], transactionId?: string): Promise<QueryResult> {
         return new Promise((resolve, reject) => {
             this.conn.query(query, params, (err: any, results: any, fields: any) => {
                 if (err) {

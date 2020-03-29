@@ -6,6 +6,6 @@ export interface QueryResult {
 
 export interface Queryable {
     
-    query(query: string, params?: any[]): Promise<QueryResult>;
+    query(query: string, params?: any[], transactionId?: string): Promise<QueryResult>;
 
 }

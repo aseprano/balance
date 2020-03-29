@@ -12,6 +12,10 @@ export class ConcreteProjectionService implements ProjectionService {
         private transactionManager: DB
     ) {}
 
+    private doLog(message: string) {
+        //console.log(`[ProjectionService] ${message}`);
+    }
+
     private async performInTransaction(f: (tx: Queryable) => Promise<void>): Promise<void> {
         return this.transactionManager
             .beginTransaction()
@@ -19,7 +23,7 @@ export class ConcreteProjectionService implements ProjectionService {
                 return f(tx)
                     .then(() => tx.commit())
                     .catch((err: any) => {
-                        console.debug(`*** ERROR: ${err.message}`);
+                        this.doLog(`${err.message}`);
                         tx.rollback();
                         return err;
                     });
@@ -27,7 +31,15 @@ export class ConcreteProjectionService implements ProjectionService {
     }
 
     private async forwardEventToProjector(event: IncomingEvent, projector: Projector): Promise<void> {
-        return this.performInTransaction((tx: Queryable) => projector.project(event, tx));
+        this.doLog(`Forwarding event ${event.getName()} to projector ${projector.getId()}`);
+
+        return this.performInTransaction((tx: Queryable) => projector.project(event, tx))
+            .then(() => {
+                this.doLog(`Event ${event.getName()} successfully forwarded to ${projector.getId()}`);
+            }).catch((error) => {
+                this.doLog(`Error projecting event ${event.getName()} to ${projector.getId()}: ${error.message}`);
+                return Promise.reject(error);
+            });
     }
 
     private async clearProjector(projector: Projector): Promise<void> {
@@ -35,6 +47,8 @@ export class ConcreteProjectionService implements ProjectionService {
     }
 
     async onEvent(event: IncomingEvent): Promise<void> {
+        console.debug(`*** OnEvent: ${event.getName()}`);
+        
         const projections = this.projectors
             .getByEventName(event.getName())
             .map((projector) => this.forwardEventToProjector(event, projector));

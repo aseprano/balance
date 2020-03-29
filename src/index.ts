@@ -8,12 +8,14 @@ import { Projector } from "./tech/projections/Projector";
 import { DBEventRegistry } from "./tech/impl/projections/DBEventRegistry";
 import { DuplicatedEventsProjectorDecorator } from "./projectors/impl/DuplicatedEventsProjectorDecorator";
 import { MessagingSystem } from "./tech/messaging/MessagingSystem";
-import { AMQPMessagingSystem } from "./tech/impl/messaging/AMQPMessagingSystem";
 import { MessageToEventHandler } from "./tech/impl/events/MessageToEventHandler";
 import { EventBus } from "./tech/events/EventBus";
 import { ProjectorRegistrationService } from "./domain/app-services/ProjectorRegistrationService";
 import { ProjectionService } from "./domain/app-services/ProjectionService";
 import { Projectionist } from "./tech/projections/Projectionist";
+import { IncomingMessage } from "./tech/messaging/IncomingMessage";
+import { ProjectorLogger } from "./projectors/impl/ProjectorLogger";
+const { Queue, QueueConsumer } = require('@darkbyte/aqueue');
 
 function createServiceContainer(): ServiceContainer {
     const serviceContainer = new ServiceContainer();
@@ -51,16 +53,30 @@ async function loadProjectors(
         const allEvents: string[] = [];
 
         const replayHandler = new MessageToEventHandler(
-            (incomingEvent) => {
-                console.debug(`*** Replaying event: ${incomingEvent.getName()}`);
-                return projectionsService.replay(incomingEvent, incomingEvent.getRegistrationKey());
-            }
+            (incomingEvent) => projectionsService.replay(incomingEvent, incomingEvent.getRegistrationKey())
         );
 
+        const messagesQueue = new Queue();
+        const messagesQueueConsumer = new QueueConsumer(messagesQueue);
+
+        messagesQueueConsumer.startConsuming((message: IncomingMessage) => {
+            console.debug(`Replaying message ${message.name} (regKey: ${message.registrationKey})`);
+
+            return replayHandler.handle(message)
+                .then(() => {
+                    console.debug(`Message ${message.name} properly handled`);
+                }).catch((error) => {
+                    console.debug(`Error handling message ${message.name}: ${error.message}`);
+                    return Promise.reject(error);
+                });
+        });
+
         projectors.forEach((projector) => {
-            const wrappedProjector = new DuplicatedEventsProjectorDecorator(
-                projector,
-                new DBEventRegistry('handled_events', projector.getId())
+            const wrappedProjector = new ProjectorLogger(
+                new DuplicatedEventsProjectorDecorator(
+                    projector,
+                    new DBEventRegistry('handled_events', projector.getId())
+                )
             );
     
             projectorsRegtistrationService.register(wrappedProjector);
@@ -70,7 +86,7 @@ async function loadProjectors(
                 .forEach((eventName) => {
                     messagingSystem.on(
                         eventName,
-                        (e) => replayHandler.handle(e),
+                        (message) => messagesQueue.push(message),
                         projector.getId()
                     )
                 });
@@ -88,6 +104,18 @@ async function loadProjectors(
     return projectors;
 }
 
+function doAskReplay(serviceContainer: ServiceContainer) {
+    setTimeout(() => {
+        serviceContainer.get('Projectionist')
+            .then(
+                (projectionist: Projectionist) => {
+                    projectionist.replay('com.herrdoktor.projections.account_balances');
+                    projectionist.replay('com.herrdoktor.projections.monthly_expenses');
+                }
+            );
+    }, 5000);
+}
+
 const app = express();
 app.use(bodyParser.json());
 
@@ -99,11 +127,10 @@ serviceContainer.get('EventsMessagingSystem')
         const eventBus = await createEventSubscriptions(serviceContainer, messagingSystem);
         await loadProjectors(serviceContainer, eventBus, messagingSystem);
 
-        const projectionist: Projectionist = await serviceContainer.get('Projectionist');
-        projectionist.replay('com.herrdoktor.projections.account_balances');
-        
         // Register all the event handlers to the messaging system
-        const messageToEventBus = new MessageToEventHandler((e) => eventBus.handle(e));
+        const messageToEventBus = new MessageToEventHandler(async (e) => {
+            eventBus.handle(e);
+        });
 
         eventBus.getListOfEventNames()
             .forEach((eventName) => {
@@ -120,6 +147,7 @@ serviceContainer.get('EventsMessagingSystem')
             port,
             () => {
                 console.log(`» Listening on port ${port}`);
+                doAskReplay(serviceContainer);
             }
         );        
     });

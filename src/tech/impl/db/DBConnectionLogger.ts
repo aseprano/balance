@@ -5,15 +5,29 @@ export class DBConnectionLogger implements DBConnection
 {
     constructor(private dbConnection: DBConnection) {}
 
-    query(query: string, params?: any[] | undefined): Promise<QueryResult> {
-        console.log(`> ${query}`);
+    private doLog(message: string, txId?: string, error?: boolean) {
+        (error ? console.error : console.debug)(`[#${txId || '??????'}] ${message}`);
+    }
 
-        return this.dbConnection.query(query, params)
+    private doLogQuery(query: string, params?: any[] | undefined, transactionId?: string) {
+        if (params && params.length) {
+            params.forEach((param) => {
+                query = query.replace('?', typeof param === "string" ? `'${param}'` : param);
+            });
+        }
+
+        this.doLog(`> ${query}`, transactionId);
+    }
+
+    query(query: string, params?: any[], transactionId?: string): Promise<QueryResult> {
+        this.doLogQuery(query, params, transactionId);
+
+        return this.dbConnection.query(query, params, transactionId)
             .then((ret) => {
-                console.log(`< Success, ${ret.numberOfAffectedRows} rows affected`);
+                this.doLog(`< OK, ${ret.numberOfAffectedRows} rows affected`, transactionId);
                 return ret;
             }).catch((err) => {
-                console.error(`! ${err}`);
+                this.doLog(`! ${err}`, transactionId, true);
                 return err;
             });
     }
