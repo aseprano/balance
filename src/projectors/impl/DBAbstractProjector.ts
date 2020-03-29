@@ -45,9 +45,7 @@ export abstract class DBAbstractProjector implements Projector
 
     private markAllEventsAsNonHandled(connection: Queryable): Promise<void> {
         return connection.query(`DELETE FROM handled_events WHERE projection_id = ?`, [this.getId()])
-            .then((result) => {
-                return result.numberOfAffectedRows ? undefined : Promise.reject(new Error(`Could not clear handled events for projection ${this.getId()}`));
-            });
+            .then(() => undefined);
     }
 
     public project(event: IncomingEvent): Promise<void> {
