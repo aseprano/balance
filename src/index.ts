@@ -58,15 +58,13 @@ async function loadProjectors(
 
         const messagesQueue = new Queue();
         const messagesQueueConsumer = new QueueConsumer(messagesQueue);
+
         messagesQueueConsumer.startConsuming((message: IncomingMessage) => {
             console.debug(`Replaying message ${message.name} (regKey: ${message.registrationKey})`);
 
             return replayHandler.handle(message)
                 .then(() => {
-                    return new Promise((resolve) => {
-                        console.debug(`Message ${message.name} properly handled`);
-                        setTimeout(resolve, 3000);
-                    });
+                    console.debug(`Message ${message.name} properly handled`);
                 }).catch((error) => {
                     console.debug(`Error handling message ${message.name}: ${error.message}`);
                     return Promise.reject(error);
