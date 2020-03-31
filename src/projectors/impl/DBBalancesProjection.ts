@@ -6,6 +6,11 @@ function fixBalance(balance: number): number {
 }
 export class DBBalancesProjection implements BalancesProjection {
 
+    private createAccount(connection: Queryable, accountId: string): Promise<void> {
+        return connection.query('INSERT IGNORE INTO accounts VALUES (?)', [accountId])
+            .then(() => undefined);
+    }
+
     async createBalance(connection: Queryable, accountId: string, currency: string, balance: number): Promise<void> {
         balance = fixBalance(balance);
 
@@ -14,10 +19,12 @@ export class DBBalancesProjection implements BalancesProjection {
         'VALUES (?, ?, ?) ' +
         'ON DUPLICATE KEY UPDATE balance = balance + ?';
 
-        return connection.query(
-            sql,
-            [accountId, currency, balance, balance]
-        ).then(() => undefined);
+        return this.createAccount(connection, accountId)
+            .then(() => connection.query(
+                sql,
+                [accountId, currency, balance, balance]
+            ))
+            .then(() => undefined);
     }
     
     async updateBalance(connection: Queryable, accountId: string, currency: string, delta: number): Promise<void> {
