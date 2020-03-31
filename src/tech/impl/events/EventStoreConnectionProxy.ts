@@ -10,16 +10,13 @@ export class EventStoreConnectionProxy implements Resource {
         options = {
             ...options,
             'onConnect': () => {
-                console.log('*** Connection established ***');
                 this.connectionIsOpen = true;
                 this.connectionIsOpening = false;
             },
             'onClose': () => {
-                console.log('*** Connection closed ***');
                 this.connectionIsOpen = false;
             },
             'onError': () => {
-                console.log('*** Connection error ***');
                 this.connectionIsOpen = false;
                 this.connectionIsOpening = false;
                 this.connection.close();
