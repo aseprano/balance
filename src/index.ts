@@ -5,7 +5,7 @@ import { ConcreteRouter } from "./tech/impl/ConcreteRouter";
 import { Router } from "./tech/Router";
 import { EventBusImpl } from "./tech/impl/events/EventBusImpl";
 import { Projector } from "./tech/projections/Projector";
-import { MessagingSystem, IncomingMessage } from "@darkbyte/messaging";
+import { MessagingSystem } from "@darkbyte/messaging";
 import { MessageToEventHandler } from "./tech/impl/events/MessageToEventHandler";
 import { EventBus } from "./tech/events/EventBus";
 import { ProjectorRegistrationService } from "./domain/app-services/ProjectorRegistrationService";
