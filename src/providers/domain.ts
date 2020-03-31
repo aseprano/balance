@@ -21,7 +21,7 @@ import { ConcreteProjectorRegistrationService } from "../domain/app-services/imp
 import { ConcreteProjectionService } from "../domain/app-services/impl/ConcreteProjectionService";
 import { ProjectionistLogger } from "../tech/impl/projections/ProjectionistLogger";
 import { ProjectionistProxy } from "../tech/impl/projections/ProjectionistProxy";
-import { AMQPMessagingSystem } from "../tech/impl/messaging/AMQPMessagingSystem";
+import { AMQPMessagingSystem } from "@darkbyte/messaging";
 import { ProjectorRegistrationService } from "../domain/app-services/ProjectorRegistrationService";
 
 const mysql = require('mysql');
@@ -102,8 +102,6 @@ module.exports = (container: ServiceContainer) => {
                         config.get('DB_PASS', 'test'),
                         config.get('DB_NAME', 'balances')
                     ]).then((values) => {
-                        console.log('* Got DB config: ', values);
-
                         const pool = mysql.createPool({
                             connectionLimit : 5,
                             host            : values[0],
@@ -147,6 +145,8 @@ module.exports = (container: ServiceContainer) => {
         async (container: ServiceContainer) => {
             const msg = new AMQPMessagingSystem(
                 "amqp://eventbus:eventbus@localhost:5672/banking",
+                uuid,
+                ["xcommands"],
                 "xcommands"
             );
         
@@ -159,8 +159,10 @@ module.exports = (container: ServiceContainer) => {
         async (container: ServiceContainer) => {
             const msg = new AMQPMessagingSystem(
                 "amqp://eventbus:eventbus@localhost:5672/banking",
+                uuid,
+                ["all-events"],
                 "all-events",
-                "balance-queue",
+                "balance-queue"
             );
         
             msg.startAcceptingMessages();

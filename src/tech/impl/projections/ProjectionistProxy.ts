@@ -1,8 +1,7 @@
 import { Projectionist } from "../../projections/Projectionist";
-import { MessageSender } from "../../messaging/MessageSender";
+import { MessageSender, Message } from "@darkbyte/messaging";
 import { ReplayProjectionCommand } from "../messages/ReplayProjectionCommand";
 import { ProjectorRegistrationService } from "../../../domain/app-services/ProjectorRegistrationService";
-import { Message } from "../../messaging/Message";
 import { Projector } from "../../projections/Projector";
 
 export class ProjectionistProxy implements Projectionist {

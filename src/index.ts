@@ -5,15 +5,12 @@ import { ConcreteRouter } from "./tech/impl/ConcreteRouter";
 import { Router } from "./tech/Router";
 import { EventBusImpl } from "./tech/impl/events/EventBusImpl";
 import { Projector } from "./tech/projections/Projector";
-import { DBEventRegistry } from "./tech/impl/projections/DBEventRegistry";
-import { DuplicatedEventsProjectorDecorator } from "./projectors/impl/DuplicatedEventsProjectorDecorator";
-import { MessagingSystem } from "./tech/messaging/MessagingSystem";
+import { MessagingSystem, IncomingMessage } from "@darkbyte/messaging";
 import { MessageToEventHandler } from "./tech/impl/events/MessageToEventHandler";
 import { EventBus } from "./tech/events/EventBus";
 import { ProjectorRegistrationService } from "./domain/app-services/ProjectorRegistrationService";
 import { ProjectionService } from "./domain/app-services/ProjectionService";
 import { Projectionist } from "./tech/projections/Projectionist";
-import { IncomingMessage } from "./tech/messaging/IncomingMessage";
 import { ProjectorLogger } from "./projectors/impl/ProjectorLogger";
 import { QueuedProjector } from "./projectors/impl/QueuedProjector";
 import { DB } from "./tech/db/DB";
@@ -100,7 +97,8 @@ function doAskReplay(serviceContainer: ServiceContainer) {
         serviceContainer.get('Projectionist')
             .then(
                 (projectionist: Projectionist) => {
-                    projectionist.replay('com.herrdoktor.projections.transactions');
+                    //projectionist.replay('com.herrdoktor.projections.account_balances');
+                    //projectionist.replay('com.herrdoktor.projections.monthly_expenses');
                 }
             );
     }, 5000);

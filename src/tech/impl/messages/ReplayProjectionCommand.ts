@@ -1,4 +1,4 @@
-import { Message } from "../../messaging/Message";
+import { Message } from "@darkbyte/messaging";
 import { Commands } from "../../../domain/Commands";
 import { Projector } from "../../projections/Projector";
 

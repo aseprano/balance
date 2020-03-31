@@ -1,4 +1,4 @@
-import { IncomingMessage } from "../../messaging/IncomingMessage";
+import { IncomingMessage } from "@darkbyte/messaging";
 import { EventHandler } from "../../events/EventHandler";
 import { IncomingEvent } from "./IncomingEvent";
 
