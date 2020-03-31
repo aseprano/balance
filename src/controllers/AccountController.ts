@@ -17,8 +17,7 @@ export class AccountController {
             .newAccount()
             .then((id) => success({
                 id: id.asString()
-            }))
-            .catch((err) => {
+            })).catch((err) => {
                 return err;
             });
     }

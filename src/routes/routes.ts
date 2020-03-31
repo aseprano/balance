@@ -10,5 +10,11 @@ module.exports = (router: Router) => {
     ).post(
         '/accounts/:id/credits',
         'AccountController', 'credit'
+    ).get(
+        '/accounts/:id',
+        'AccountQueryController', 'getAccount'
+    ).get(
+        '/accounts',
+        'AccountQueryController', 'listAccounts'
     );
 }

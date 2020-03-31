@@ -33,9 +33,14 @@ export class ControllerResult {
 }
 
 export function success(data: any = '', statusCode: number = 200): ControllerResult {
+    console.debug(`* Sending success response with statusCode: ${statusCode}`);
     return ControllerResult.success(data, statusCode);
 }
 
 export function error(statusCode: number, message: string, errorCode: number = 0): ControllerResult {
     return ControllerResult.error(statusCode, message, errorCode);
+}
+
+export function NotFoundError(): ControllerResult {
+    return error(404, 'Not Found');
 }
