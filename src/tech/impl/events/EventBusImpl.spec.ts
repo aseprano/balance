@@ -14,7 +14,7 @@ describe('EventBusImpl', () => {
         const bus = new EventBusImpl();
         let subscriptionInvoked = false;
 
-        bus.on('com.darkbyte.foo', (e) => {
+        bus.on('com.darkbyte.foo', async () => {
             subscriptionInvoked = true;
         });
 
@@ -28,10 +28,10 @@ describe('EventBusImpl', () => {
         const events2: string[] = [];
 
         eventBus
-            .on('com.darkbyte.*', (e) => {
+            .on('com.darkbyte.*', async (e) => {
                 events1.push(e.getName());
             })
-            .on('com.foobar.?', (e) => {
+            .on('com.foobar.?', async (e) => {
                 events2.push(e.getName());
             });
 
@@ -66,8 +66,8 @@ describe('EventBusImpl', () => {
         const eventBus = new EventBusImpl();
 
         eventBus
-            .on('com.darkbyte.foo', () => { s1count++; })
-            .on('com.darkbyte.foo', () => { s2count++; });
+            .on('com.darkbyte.foo', async () => { s1count++; })
+            .on('com.darkbyte.foo', async () => { s2count++; });
 
         await eventBus.handle(new IncomingEvent('ev-123', 'com.darkbyte.foo', '2010-10-01', {}));
         expect(s1count).toEqual(1);
@@ -81,7 +81,7 @@ describe('EventBusImpl', () => {
 
         eventBus.on('com.darkbyte.foo', () => {
             subscriber1Invoked = true;
-        }).on('com.darkbyte.Foo', () => {
+        }).on('com.darkbyte.Foo',async  () => {
             subscriber2Invoked = true;
         });
 

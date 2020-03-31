@@ -7,7 +7,7 @@ import { AccountCreatedEvent } from "../../events/AccountCreatedEvent";
 import { AccountDebitedEvent } from "../../events/AccountDebitedEvent";
 import { AccountCreditedEvent } from "../../events/AccountCreditedEvent";
 import { InsufficientFundsException } from "../../exceptions/InsufficientFundsException";
-import { Snapshot } from "../../../tech/Snapshot";
+import { Snapshot, SnapshotState } from "../../../tech/Snapshot";
 
 export class BankAccountImpl extends AbstractEntity implements BankAccount {
     private accountId?: AccountID;
@@ -52,11 +52,26 @@ export class BankAccountImpl extends AbstractEntity implements BankAccount {
         }
     }
 
-    protected applySnapshot(snapshot: Snapshot): void {
-        const state = snapshot.state;
-        this.accountId = new AccountID(state['id']);
+    protected buildSnapshot(): SnapshotState {
+        const balances: any[] = [];
 
-        state['balances'].forEach((balance: any) => {
+        for (const currency of this.balances.keys()) {
+            balances.push({
+                currency,
+                amount: this.getBalance(currency)
+            });
+        }
+
+        return {
+            entityId: this.getId().asString(),
+            balances
+        };
+    }
+
+    protected applySnapshot(snapshot: SnapshotState): void {
+        this.accountId = new AccountID(snapshot['entityId']);
+
+        snapshot['balances'].forEach((balance: any) => {
             this.balances.set(balance['currency'], balance['amount'])
         });
     }
@@ -87,26 +102,6 @@ export class BankAccountImpl extends AbstractEntity implements BankAccount {
 
     getBalance(currency: string): number {
         return this.balances.get(currency) || 0;
-    }
-
-    getSnapshot(): Snapshot {
-        const balances: any[] = [];
-
-        for (const currency of this.balances.keys()) {
-            balances.push({
-                currency,
-                amount: this.getBalance(currency)
-            });
-        }
-
-        return {
-            state: {
-                id: this.getId().asString(),
-                balances
-            },
-
-            lastEventId: this.getVersion(),
-        };
     }
 
 }

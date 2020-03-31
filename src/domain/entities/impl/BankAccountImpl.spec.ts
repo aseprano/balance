@@ -153,10 +153,10 @@ describe('BankAccountImpl', () => {
         const snapshot = account.getSnapshot();
         
         expect(snapshot).toEqual({
-            lastEventId: 3,
+            version: 3,
             state: {
-                'id': accountId.asString(),
-                'balances': [
+                entityId: accountId.asString(),
+                balances: [
                     { amount: 12.14, currency: 'EUR' },
                     { amount: 11.61, currency: 'USD' },
                 ]
@@ -166,9 +166,9 @@ describe('BankAccountImpl', () => {
 
     it('can be restored from a snapshot', () => {
         const snapshot: Snapshot = {
-            lastEventId: 100,
+            version: 100,
             state: {
-                id: '12312312312',
+                entityId: '12312312312',
                 balances: [
                     { currency: 'EUR', amount: 100 },
                     { currency: 'USD', amount: 3.14 },

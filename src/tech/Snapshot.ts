@@ -1,7 +1,10 @@
-export interface Snapshot {
-    state: {
-        [key: string]: any
-    };
 
-    lastEventId: number;
+export interface SnapshotState {
+    entityId: any;
+    [key: string]: any;
+}
+
+export interface Snapshot {
+    state: SnapshotState;
+    version: number;
 }

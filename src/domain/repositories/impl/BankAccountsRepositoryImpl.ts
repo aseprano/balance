@@ -9,7 +9,6 @@ import { StreamAlreadyExistingException } from "../../../tech/exceptions/StreamA
 import { DuplicatedBankAccountException } from "../../exceptions/DuplicatedBankAccountException";
 import { SnapshotRepository } from "../../../tech/SnapshotRepository";
 import { Snapshot } from "../../../tech/Snapshot";
-import { StreamConcurrencyException } from "../../../tech/exceptions/StreamConcurrencyException";
 
 export class BankAccountsRepositoryImpl implements BankAccountsRepository {
 
@@ -41,13 +40,12 @@ export class BankAccountsRepositoryImpl implements BankAccountsRepository {
 
         return this.snapshots.getById(streamName)
             .then((snapshot?: Snapshot) => this.eventStore
-                .readStreamOffset(streamName, snapshot ? snapshot.lastEventId + 1 : 0)
+                .readStreamOffset(streamName, snapshot ? snapshot.version + 1 : 0)
                 .then((stream) => {
                     const bankAccount = this.createEmptyAccount();
                     bankAccount.restoreFromEventStream(stream, snapshot);
                     return bankAccount;
-                })
-                .catch((error) => {
+                }).catch((error) => {
                     if (error instanceof StreamNotFoundException) {
                         throw new BankAccountNotFoundException();
                     } else {
@@ -82,8 +80,7 @@ export class BankAccountsRepositoryImpl implements BankAccountsRepository {
                 if (this.shouldTakeSnapshot(bankAccount)) {
                     return this.snapshots.add(streamId, bankAccount.getSnapshot());
                 }
-            })
-            .catch((error) => {
+            }).catch((error) => {
                 if (error instanceof StreamNotFoundException) {
                     throw new BankAccountNotFoundException();
                 } else {

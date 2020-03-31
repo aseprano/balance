@@ -126,7 +126,7 @@ module.exports = (container: ServiceContainer) => {
             const eventStore: EventStore = await container.get('EventStore');
             const accountProvider: Provider<BankAccount> = await container.get('EmptyAccountProvider');
             const snapshotsRepository: SnapshotRepository = await container.get('SnapshotRepository');
-            const snapshotInterval = 100;
+            const snapshotInterval = 30;
             return new BankAccountsRepositoryImpl(eventStore, accountProvider, snapshotsRepository, snapshotInterval);
         }
     ).declare(
