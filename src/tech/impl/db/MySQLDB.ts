@@ -29,6 +29,7 @@ export class MySQLDB implements DB {
         return this.getConnection()
             .then((conn) => {
                 const connectionWrapper = new DBConnectionLogger(conn);
+                connectionWrapper.disableLogs();
                 
                 return connectionWrapper
                     .query('START TRANSACTION')

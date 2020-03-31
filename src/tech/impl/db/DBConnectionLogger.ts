@@ -3,9 +3,15 @@ import { QueryResult } from "../../db/Queryable";
 
 export class DBConnectionLogger implements DBConnection
 {
+    private logsOn = true;
+
     constructor(private dbConnection: DBConnection) {}
 
     private doLog(message: string, txId?: string, error?: boolean) {
+        if (!this.logsOn) {
+            return;
+        }
+        
         (error ? console.error : console.debug)(`[#${txId || '??????'}] ${message}`);
     }
 
@@ -30,6 +36,10 @@ export class DBConnectionLogger implements DBConnection
                 this.doLog(`! ${err}`, transactionId, true);
                 return err;
             });
+    }
+
+    disableLogs() {
+        this.logsOn = false;
     }
     
 }
