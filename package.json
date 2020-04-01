@@ -43,6 +43,7 @@
     "test:live": "nodemon --watch 'src' --ext 'ts' --exec 'jasmine-ts'",
     "coverage": "nyc npm test report --reporter=text-lcov | coveralls",
     "start": "ts-node src/index.ts",
+    "start:live": "nodemon --watch 'src' --ext 'ts' --exec 'ts-node src/index.ts'",
     "startjs": "node build/index.js"
   },
   "repository": {
