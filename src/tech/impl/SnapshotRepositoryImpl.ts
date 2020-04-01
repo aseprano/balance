@@ -25,10 +25,7 @@ export class SnapshotRepositoryImpl implements SnapshotRepository {
                 [snapshotId]
             ).then((data) => {
                 if (data.fields && data.fields.length) {
-                    console.log('*** Data rebuilt from snapshot ***');
                     return this.reconstituteSnapshot(data.fields[0]);
-                } else {
-                    console.log('*** No snapshots found ***');
                 }
             }).catch((err) => {
                 return err;
