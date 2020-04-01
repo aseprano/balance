@@ -1,6 +1,8 @@
 import { Queryable } from "../tech/db/Queryable";
-import { NotFoundError, success } from "../tech/ControllerResult";
 import { Request } from "express";
+import { ApiResponse } from "../tech/api/ApiResponse";
+import { NotFoundApiResponse } from "../tech/api/NotFoundApiResponse";
+import { MicroserviceApiResponse } from "./MicroserviceApiResponse";
 
 function formatAccountBalance(rows: any[]): any {
     return {
@@ -83,7 +85,9 @@ export class AccountQueryController {
             .then((ret) => formatMultipleRows(ret.fields));
     }
 
-    public getAccount(req: Request): any {
+    /** PUBLIC APIs **/
+
+    public getAccount(req: Request): Promise<ApiResponse> {
         const sql = `
         SELECT  account_id AS id,
                 currency,
@@ -92,18 +96,16 @@ export class AccountQueryController {
         WHERE account_id = ?
         ORDER BY currency ASC`;
 
-        return this.dbConn.query(sql, [req.params['id']])
+        return this.dbConn
+            .query(sql, [req.params['id']])
             .then((ret) => {
-                if (!ret.fields.length) {
-                    return NotFoundError();
-                }
-                
-                const responseData = formatAccountBalance(ret.fields);
-                return success(responseData, 200);
+                return ret.fields
+                    ? new MicroserviceApiResponse(formatAccountBalance(ret.fields))
+                    : new NotFoundApiResponse();
             });
     }
 
-    public listAccounts(req: Request): any {
+    public listAccounts(req: Request): Promise<ApiResponse> {
         const pageNumber = this.getPageNumber(req);
         const pageSize = this.getPageSize(req);
 
@@ -117,7 +119,7 @@ export class AccountQueryController {
             .query(sql)
             .then((ret) => ret.fields.map((f) => f.id))
             .then((ids) => this.loadAccounts(ids))
-            .then((data) => success(data));
+            .then((data) => new MicroserviceApiResponse(data));
     }
 
 }
