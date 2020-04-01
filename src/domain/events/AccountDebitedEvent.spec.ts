@@ -11,10 +11,8 @@ describe('AccountDebitedEvent', () => {
         expect(event.getName()).toBe(AccountDebitedEvent.EventName);
         expect(event.getPayload()).toEqual({
             id: fakeAccountId.asString(),
-            debit: {
-                amount: 3.12,
-                currency: 'USD'
-            }
+            amount: 3.12,
+            currency: 'USD',
         });
     });
 

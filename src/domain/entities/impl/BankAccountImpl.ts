@@ -7,7 +7,7 @@ import { AccountCreatedEvent } from "../../events/AccountCreatedEvent";
 import { AccountDebitedEvent } from "../../events/AccountDebitedEvent";
 import { AccountCreditedEvent } from "../../events/AccountCreditedEvent";
 import { InsufficientFundsException } from "../../exceptions/InsufficientFundsException";
-import { Snapshot, SnapshotState } from "../../../tech/Snapshot";
+import { SnapshotState } from "../../../tech/Snapshot";
 
 export class BankAccountImpl extends AbstractEntity implements BankAccount {
     private accountId?: AccountID;
@@ -23,16 +23,16 @@ export class BankAccountImpl extends AbstractEntity implements BankAccount {
     }
 
     private applyDebitEvent(event: Event) {
-        const debitCurrency = event.getPayload()['debit']['currency'];
+        const debitCurrency = event.getPayload()['currency'];
         const currentBalance = this.getBalance(debitCurrency);
-        const newBalance = currentBalance - event.getPayload()['debit']['amount'];
+        const newBalance = currentBalance - event.getPayload()['amount'];
         this.setBalance(newBalance, debitCurrency);
     }
 
     private applyCreditEvent(event: Event) {
-        const creditCurrency = event.getPayload()['credit']['currency'];
+        const creditCurrency = event.getPayload()['currency'];
         const currentBalance = this.getBalance(creditCurrency);
-        const newBalance = currentBalance + event.getPayload()['credit']['amount'];
+        const newBalance = currentBalance + event.getPayload()['amount'];
         this.setBalance(newBalance, creditCurrency);
     }
 
@@ -89,11 +89,11 @@ export class BankAccountImpl extends AbstractEntity implements BankAccount {
     }
     
     debit(amount: Money): void {
-        if (this.hasEnoughBalance(amount)) {
-            this.appendUncommittedEvent(new AccountDebitedEvent(this.getId(), amount));
-        } else {
+        if (!this.hasEnoughBalance(amount)) {
             throw new InsufficientFundsException();
         }
+        
+        this.appendUncommittedEvent(new AccountDebitedEvent(this.getId(), amount));
     }
 
     credit(amount: Money): void {

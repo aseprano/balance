@@ -41,14 +41,14 @@ export class BalancesProjector extends DBAbstractProjector
         const payload = event.getPayload();
         
         return this.projection
-            .updateBalance(connection, payload['id'], payload['credit']['currency'], this.roundService.toCents(payload['credit']['amount']));
+            .updateBalance(connection, payload['id'], payload['currency'], this.roundService.toCents(payload['amount']));
     }
 
     private async handleAccountDebited(event: IncomingEvent, connection: Queryable): Promise<void> {
         const payload = event.getPayload();
 
         return this.projection
-            .updateBalance(connection, payload['id'], payload['debit']['currency'], -this.roundService.toCents(payload['debit']['amount']));
+            .updateBalance(connection, payload['id'], payload['currency'], -this.roundService.toCents(payload['amount']));
     }
 
     async handleIncomingEvent(event: IncomingEvent, connection: Queryable): Promise<void> {

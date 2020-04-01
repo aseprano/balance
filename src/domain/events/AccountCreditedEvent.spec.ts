@@ -10,10 +10,8 @@ describe('AccountCreditedEvent', () => {
         expect(event.getName()).toEqual(AccountCreditedEvent.EventName);
         expect(event.getPayload()).toEqual({
             id: fakeAccountId.asString(),
-            credit: {
-                amount: 3,
-                currency: 'EUR'
-            }
+            amount: 3,
+            currency: 'EUR',
         })
     });
     

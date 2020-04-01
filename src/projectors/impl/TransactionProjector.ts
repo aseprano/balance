@@ -36,32 +36,21 @@ export class TransactionProjector extends DBAbstractProjector {
         return event.getName() === AccountDebitedEvent.EventName;
     }
 
-    private createDebitTransaction(event: IncomingEvent): Transaction {
+    private createTransactionOfType(type: TransactionType, event: IncomingEvent): Transaction {
         const eventPayload = event.getPayload();
 
         return {
             accountId: eventPayload['id'],
-            type: TransactionType.DEBIT,
+            type: type,
             date: event.getDateFired(),
-            amountInCents: this.roundService.toCents(eventPayload['debit']['amount']),
-            currency: eventPayload['debit']['currency']
-        }
-    }
-
-    private createCreditTransaction(event: IncomingEvent): Transaction {
-        const eventPayload = event.getPayload();
-
-        return {
-            accountId: eventPayload['id'],
-            type: TransactionType.CREDIT,
-            date: event.getDateFired(),
-            amountInCents: this.roundService.toCents(eventPayload['credit']['amount']),
-            currency: eventPayload['credit']['currency']
-        }
+            amountInCents: this.roundService.toCents(eventPayload['amount']),
+            currency: eventPayload['currency']
+        };
     }
 
     public handleIncomingEvent(event: IncomingEvent, connection: Queryable): Promise<void> {
-        const transaction = this.isDebit(event) ? this.createDebitTransaction(event) : this.createCreditTransaction(event);
+        const transactionType = this.isDebit(event) ? TransactionType.DEBIT : TransactionType.CREDIT;
+        const transaction = this.createTransactionOfType(transactionType, event);
         return this.projection.addNew(transaction, connection);
     }
 

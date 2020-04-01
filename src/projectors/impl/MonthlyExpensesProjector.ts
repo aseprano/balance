@@ -23,14 +23,15 @@ export class MonthlyExpensesProjector extends DBAbstractProjector {
     private async handleAccountDebitedEvent(event: IncomingEvent, connection: Queryable): Promise<void> {
         const payload = event.getPayload();
         const eventDate = event.getDateFired();
+        const relevantMonth = eventDate.substr(0, 7); // YYYY-mm
 
         return this.projection
             .addMonthlyExpense(
                 connection,
                 payload['id'],
-                eventDate.substr(0, 7),
-                payload['debit']['amount'],
-                payload['debit']['currency']
+                relevantMonth,
+                payload['amount'],
+                payload['currency']
             );
     }
 

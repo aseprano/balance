@@ -10,10 +10,8 @@ export class AccountDebitedEvent extends DomainEvent {
         
         this.setPayload({
             id: accountId.asString(),
-            debit: {
-                amount: debit.getAmount(),
-                currency: debit.getCurrency()
-            }
+            amount: debit.getAmount(),
+            currency: debit.getCurrency(),
         });
     }
 

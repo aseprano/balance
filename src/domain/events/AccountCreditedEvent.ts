@@ -10,10 +10,8 @@ export class AccountCreditedEvent extends DomainEvent {
 
         this.setPayload({
             id: accountId.asString(),
-            credit: {
-                amount: amount.getAmount(),
-                currency: amount.getCurrency()
-            }
+            amount: amount.getAmount(),
+            currency: amount.getCurrency(),
         });
     }
 
