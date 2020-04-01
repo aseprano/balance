@@ -10,6 +10,7 @@ import { v4 } from "uuid/interfaces";
 import { CustomEvent } from "./CustomEvent";
 import { Pool } from "../../Pool";
 import { StreamConcurrencyException } from "../../exceptions/StreamConcurrencyException";
+import { StreamNotFoundException } from "../../exceptions/StreamNotFoundException";
 
 export class EventStoreImpl implements EventStore {
 
@@ -57,6 +58,8 @@ export class EventStoreImpl implements EventStore {
                 (completed) => {
                     if (completed.result === ReadStreamResult.Success) {
                         resolve(events)
+                    } else if (completed.result === ReadStreamResult.NoStream) {
+                        reject(new StreamNotFoundException(`Stream not found: ${streamId}`));
                     } else {
                         reject(completed.error)
                     }
