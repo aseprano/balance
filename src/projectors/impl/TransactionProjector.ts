@@ -14,7 +14,10 @@ export class TransactionProjector extends DBAbstractProjector {
         return projectorId;
     }
 
-    constructor(private projection: TransactionsProjection, private roundService: MoneyRoundService) {
+    constructor(
+        private projection: TransactionsProjection,
+        private roundService: MoneyRoundService
+    ) {
         super();
     }
 

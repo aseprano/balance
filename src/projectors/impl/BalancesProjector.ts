@@ -5,11 +5,13 @@ import { AccountCreditedEvent } from "../../domain/events/AccountCreditedEvent";
 import { BalancesProjection } from "../BalancesProjection";
 import { IncomingEvent } from "../../tech/impl/events/IncomingEvent";
 import { Queryable } from "../../tech/db/Queryable";
+import { MoneyRoundService } from "../../domain/domain-services/MoneyRoundService";
 
 export class BalancesProjector extends DBAbstractProjector
 {
     constructor(
-        private projection: BalancesProjection
+        private projection: BalancesProjection,
+        private roundService: MoneyRoundService
     ) {
         super();
     }
@@ -39,14 +41,14 @@ export class BalancesProjector extends DBAbstractProjector
         const payload = event.getPayload();
         
         return this.projection
-            .updateBalance(connection, payload['id'], payload['credit']['currency'], payload['credit']['amount']);
+            .updateBalance(connection, payload['id'], payload['credit']['currency'], this.roundService.toCents(payload['credit']['amount']));
     }
 
     private async handleAccountDebited(event: IncomingEvent, connection: Queryable): Promise<void> {
         const payload = event.getPayload();
 
         return this.projection
-            .updateBalance(connection, payload['id'], payload['debit']['currency'], -payload['debit']['amount']);
+            .updateBalance(connection, payload['id'], payload['debit']['currency'], -this.roundService.toCents(payload['debit']['amount']));
     }
 
     async handleIncomingEvent(event: IncomingEvent, connection: Queryable): Promise<void> {

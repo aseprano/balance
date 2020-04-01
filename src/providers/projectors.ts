@@ -12,7 +12,7 @@ module.exports = async (serviceContainer: ServiceContainer): Promise<Projector[]
     const roundService = new MoneyRoundService();
 
     return [
-        new BalancesProjector(new DBBalancesProjection(roundService)),
+        new BalancesProjector(new DBBalancesProjection(), roundService),
         new MonthlyExpensesProjector(new DBMonthlyExpensesProjection()),
         new TransactionProjector(new DBTransactionProjection(), roundService),
     ];

@@ -4,16 +4,14 @@ import { MoneyRoundService } from "../../domain/domain-services/MoneyRoundServic
 
 export class DBBalancesProjection implements BalancesProjection {
 
-    constructor(private roundService: MoneyRoundService) {}
+    constructor() {}
 
     private createAccount(connection: Queryable, accountId: string): Promise<void> {
         return connection.query('INSERT IGNORE INTO accounts VALUES (?)', [accountId])
             .then(() => undefined);
     }
 
-    async createBalance(connection: Queryable, accountId: string, currency: string, balance: number): Promise<void> {
-        balance = fixBalance(balance);
-
+    async createBalance(connection: Queryable, accountId: string, currency: string, balanceInCents: number): Promise<void> {
         const sql = '' + 
         'INSERT INTO balances (account_id, currency, balance) ' +
         'VALUES (?, ?, ?) ' +
@@ -22,14 +20,14 @@ export class DBBalancesProjection implements BalancesProjection {
         return this.createAccount(connection, accountId)
             .then(() => connection.query(
                 sql,
-                [accountId, currency, balance, balance]
+                [accountId, currency, balanceInCents, balanceInCents]
             ))
             .then(() => undefined);
     }
     
-    async updateBalance(connection: Queryable, accountId: string, currency: string, delta: number): Promise<void> {
-        delta = this.roundService.toCents(delta);
-        
+    async updateBalance(connection: Queryable, accountId: string, currency: string, deltaInCents: number): Promise<void> {
+        console.debug(`* Updating balance by ${deltaInCents} ${currency}/cents`);
+
         const sql = '' +
         'UPDATE balances ' +
         'SET balance = balance + ? ' +
@@ -38,10 +36,10 @@ export class DBBalancesProjection implements BalancesProjection {
 
         return connection.query(
             sql,
-            [delta, accountId, currency]
+            [deltaInCents, accountId, currency]
         ).then((res: QueryResult) => {
             if (!res.numberOfAffectedRows) {
-                return this.createBalance(connection, accountId, currency, delta);
+                return this.createBalance(connection, accountId, currency, deltaInCents);
             }
         });
 
