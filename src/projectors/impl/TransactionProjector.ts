@@ -4,7 +4,7 @@ import { AccountDebitedEvent } from "../../domain/events/AccountDebitedEvent";
 import { IncomingEvent } from "../../tech/impl/events/IncomingEvent";
 import { Queryable } from "../../tech/db/Queryable";
 import { TransactionsProjection, TransactionType, Transaction } from "../TransactionsProjection";
-import { MoneyRoundService } from "../../domain/domain-services/MoneyRoundService";
+import { MoneyRoundingService } from "../../domain/domain-services/MoneyRoundingService";
 
 const projectorId = 'com.herrdoktor.projections.transactions';
 
@@ -16,7 +16,7 @@ export class TransactionProjector extends DBAbstractProjector {
 
     constructor(
         private projection: TransactionsProjection,
-        private roundService: MoneyRoundService
+        private roundService: MoneyRoundingService
     ) {
         super();
     }

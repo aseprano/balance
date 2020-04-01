@@ -1,6 +1,6 @@
 import { TransactionsProjection, Transaction, TransactionType} from "../TransactionsProjection";
 import { Queryable } from "../../tech/db/Queryable";
-import { MoneyRoundService } from "../../domain/domain-services/MoneyRoundService";
+import { MoneyRoundingService } from "../../domain/domain-services/MoneyRoundingService";
 
 export class DBTransactionProjection implements TransactionsProjection {
 

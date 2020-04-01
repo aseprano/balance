@@ -1,6 +1,6 @@
 import { BalancesProjection } from "../BalancesProjection";
 import { Queryable, QueryResult } from "../../tech/db/Queryable";
-import { MoneyRoundService } from "../../domain/domain-services/MoneyRoundService";
+import { MoneyRoundingService } from "../../domain/domain-services/MoneyRoundingService";
 
 export class DBBalancesProjection implements BalancesProjection {
 

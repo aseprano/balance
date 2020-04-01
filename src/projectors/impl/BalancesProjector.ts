@@ -5,13 +5,13 @@ import { AccountCreditedEvent } from "../../domain/events/AccountCreditedEvent";
 import { BalancesProjection } from "../BalancesProjection";
 import { IncomingEvent } from "../../tech/impl/events/IncomingEvent";
 import { Queryable } from "../../tech/db/Queryable";
-import { MoneyRoundService } from "../../domain/domain-services/MoneyRoundService";
+import { MoneyRoundingService } from "../../domain/domain-services/MoneyRoundingService";
 
 export class BalancesProjector extends DBAbstractProjector
 {
     constructor(
         private projection: BalancesProjection,
-        private roundService: MoneyRoundService
+        private roundService: MoneyRoundingService
     ) {
         super();
     }
