@@ -4,6 +4,7 @@ import { Money } from "../../values/Money";
 import { BankAccountsRepository } from "../../repositories/BankAccountsRepository";
 import { BankAccountFactory } from "../../factories/BankAccountFactory";
 import { RetryPolicy } from "../../../tech/RetryPolicy";
+import { Transaction } from "../../values/Transaction";
 
 export class AccountServiceImpl implements AccountService {
 

@@ -1,19 +1,20 @@
 import { Router } from "../tech/Router";
 
 module.exports = (router: Router) => {
-    router.post(
+    router
+    .post(
         '/accounts',
         'AccountController', 'create'
-    ).post(
-        '/accounts/:id/debits',
-        'AccountController', 'debit'
-    ).post(
-        '/accounts/:id/credits',
-        'AccountController', 'credit'
-    ).get(
+    )
+    .post(
+        '/accounts/:id/transactions',
+        'AccountController', 'addTransaction'
+    )
+    .get(
         '/accounts/:id',
         'AccountQueryController', 'getAccount'
-    ).get(
+    )
+    .get(
         '/accounts',
         'AccountQueryController', 'listAccounts'
     );

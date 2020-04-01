@@ -10,6 +10,9 @@ import { ApiResponse } from "../tech/api/ApiResponse";
 import { MicroserviceApiResponse } from "./MicroserviceApiResponse";
 import { MicroserviceApiError } from "./MicroserviceApiError";
 import { NotFoundApiResponse } from "../tech/api/NotFoundApiResponse";
+import { Transaction } from "../domain/values/Transaction";
+import { inspect } from "util";
+import { InvalidTransactionTypeException } from "../domain/exceptions/InvalidTransactionTypeException";
 
 export class AccountController {
 
@@ -25,40 +28,27 @@ export class AccountController {
             });
     }
 
-    async debit(req: Request): Promise<ApiResponse> {
+    async addTransaction(req: Request): Promise<ApiResponse> {
         try {
             const accountId = new AccountID(req.params.id);
-            const amount = new Money(req.body.amount, req.body.currency);
-            await this.accountService.debit(amount, accountId);
+            const transaction = new Transaction(req.body.type, new Money(req.body.amount, req.body.currency));
+
+            if (transaction.isDebit()) {
+                await this.accountService.debit(transaction.getAmount(), accountId);
+            } else {
+                await this.accountService.credit(transaction.getAmount(), accountId);
+            }
+
             return new MicroserviceApiResponse();
-        } catch(e) {
-            if (e instanceof InvalidAccountIDException) {
-                return new MicroserviceApiError(400, 1001, 'Invalid account id');
+        } catch (e) {
+            if (e instanceof InvalidTransactionTypeException) {
+                return new MicroserviceApiError(400, 1001, 'Invalid transaction type');
             } else if (e instanceof BadMoneyException) {
-                return new MicroserviceApiError(400, 1004, 'Invalid amount');
+                return new MicroserviceApiError(400, 1002, 'Invalid amount');
             } else if (e instanceof BankAccountNotFoundException) {
                 return new NotFoundApiResponse();
             } else if (e instanceof InsufficientFundsException) {
                 return new MicroserviceApiError(409, 1003, 'Insufficient funds');
-            } else {
-                throw e;
-            }
-        }
-    }
-
-    async credit(req: Request): Promise<ApiResponse> {
-        try {
-            const accountId = new AccountID(req.params.id);
-            const amount = new Money(req.body.amount, req.body.currency);
-            await this.accountService.credit(amount, accountId);
-            return new MicroserviceApiResponse();
-        } catch(e) {
-            if (e instanceof InvalidAccountIDException) {
-                return new MicroserviceApiError(400, 1001, 'Invalid account id');
-            } else if (e instanceof BadMoneyException) {
-                return new MicroserviceApiError(400, 1003, 'Invalid amount');
-            } else if (e instanceof BankAccountNotFoundException) {
-                return new NotFoundApiResponse();
             } else {
                 throw e;
             }

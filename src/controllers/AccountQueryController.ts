@@ -99,7 +99,7 @@ export class AccountQueryController {
         return this.dbConn
             .query(sql, [req.params['id']])
             .then((ret) => {
-                return ret.fields
+                return ret.fields.length
                     ? new MicroserviceApiResponse(formatAccountBalance(ret.fields))
                     : new NotFoundApiResponse();
             });
