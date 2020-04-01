@@ -9,7 +9,7 @@ export type Transaction = {
     accountId: string,
     type: TransactionType,
     date: string,
-    amount: number,
+    amountInCents: number,
     currency: string
 }
 

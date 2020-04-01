@@ -6,11 +6,14 @@ import { MonthlyExpensesProjector } from "../projectors/impl/MonthlyExpensesProj
 import { DBMonthlyExpensesProjection } from "../projectors/impl/DBMonthlyExpensesProjection";
 import { TransactionProjector } from "../projectors/impl/TransactionProjector";
 import { DBTransactionProjection } from "../projectors/impl/DBTransactionsProjection";
+import { MoneyRoundService } from "../domain/domain-services/MoneyRoundService";
 
 module.exports = async (serviceContainer: ServiceContainer): Promise<Projector[]> => {
+    const roundService = new MoneyRoundService();
+
     return [
-        new BalancesProjector(new DBBalancesProjection()),
+        new BalancesProjector(new DBBalancesProjection(roundService)),
         new MonthlyExpensesProjector(new DBMonthlyExpensesProjection()),
-        new TransactionProjector(new DBTransactionProjection()),
+        new TransactionProjector(new DBTransactionProjection(), roundService),
     ];
 }

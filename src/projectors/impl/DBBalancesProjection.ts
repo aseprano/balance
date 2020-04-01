@@ -1,10 +1,10 @@
 import { BalancesProjection } from "../BalancesProjection";
 import { Queryable, QueryResult } from "../../tech/db/Queryable";
+import { MoneyRoundService } from "../../domain/domain-services/MoneyRoundService";
 
-function fixBalance(balance: number): number {
-    return Math.floor(balance*100);
-}
 export class DBBalancesProjection implements BalancesProjection {
+
+    constructor(private roundService: MoneyRoundService) {}
 
     private createAccount(connection: Queryable, accountId: string): Promise<void> {
         return connection.query('INSERT IGNORE INTO accounts VALUES (?)', [accountId])
@@ -28,7 +28,7 @@ export class DBBalancesProjection implements BalancesProjection {
     }
     
     async updateBalance(connection: Queryable, accountId: string, currency: string, delta: number): Promise<void> {
-        delta = fixBalance(delta);
+        delta = this.roundService.toCents(delta);
         
         const sql = '' +
         'UPDATE balances ' +

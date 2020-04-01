@@ -4,6 +4,7 @@ import { AccountDebitedEvent } from "../../domain/events/AccountDebitedEvent";
 import { IncomingEvent } from "../../tech/impl/events/IncomingEvent";
 import { Queryable } from "../../tech/db/Queryable";
 import { TransactionsProjection, TransactionType, Transaction } from "../TransactionsProjection";
+import { MoneyRoundService } from "../../domain/domain-services/MoneyRoundService";
 
 const projectorId = 'com.herrdoktor.projections.transactions';
 
@@ -13,7 +14,7 @@ export class TransactionProjector extends DBAbstractProjector {
         return projectorId;
     }
 
-    constructor(private projection: TransactionsProjection) {
+    constructor(private projection: TransactionsProjection, private roundService: MoneyRoundService) {
         super();
     }
 
@@ -32,14 +33,14 @@ export class TransactionProjector extends DBAbstractProjector {
         return event.getName() === AccountDebitedEvent.EventName;
     }
 
-    private createDebitTransaction(event: IncomingEvent, ): Transaction {
+    private createDebitTransaction(event: IncomingEvent): Transaction {
         const eventPayload = event.getPayload();
 
         return {
             accountId: eventPayload['id'],
             type: TransactionType.DEBIT,
             date: event.getDateFired(),
-            amount: eventPayload['debit']['amount'],
+            amountInCents: this.roundService.toCents(eventPayload['debit']['amount']),
             currency: eventPayload['debit']['currency']
         }
     }
@@ -51,7 +52,7 @@ export class TransactionProjector extends DBAbstractProjector {
             accountId: eventPayload['id'],
             type: TransactionType.CREDIT,
             date: event.getDateFired(),
-            amount: eventPayload['credit']['amount'],
+            amountInCents: this.roundService.toCents(eventPayload['credit']['amount']),
             currency: eventPayload['credit']['currency']
         }
     }
