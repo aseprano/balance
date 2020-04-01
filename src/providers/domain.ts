@@ -23,6 +23,7 @@ import { ProjectionistLogger } from "../tech/impl/projections/ProjectionistLogge
 import { ProjectionistProxy } from "../tech/impl/projections/ProjectionistProxy";
 import { AMQPMessagingSystem } from "@darkbyte/messaging";
 import { ProjectorRegistrationService } from "../domain/app-services/ProjectorRegistrationService";
+import { BankServiceImpl } from "../domain/app-services/impl/BankServiceImpl";
 
 const mysql = require('mysql');
 
@@ -71,6 +72,13 @@ module.exports = (container: ServiceContainer) => {
                     () => uuid()
                 );
             });
+        }
+    ).declare(
+        'BankService',
+        async () => {
+            const bank = new BankServiceImpl();
+            bank.setAllowedCurrencies(['EUR', 'USD']);
+            return bank;
         }
     ).declare(
         'NewAccountFactory',

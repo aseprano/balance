@@ -1,13 +1,18 @@
 import { ServiceContainer } from "../tech/impl/ServiceContainer";
 import { AccountController } from "../controllers/AccountController";
 import { AccountQueryController } from "../controllers/AccountQueryController";
+import { AccountService } from "../domain/app-services/AccountService";
+import { BankService } from "../domain/app-services/BankService";
 
 module.exports = (container: ServiceContainer) => {
     
     container.declare(
         'AccountController',
-        (container) => container.get('AccountService')
-            .then((accountService) => new AccountController(accountService))
+        async (container) => {
+            const accountService: AccountService = await container.get('AccountService');
+            const bank: BankService = await container.get('BankService');
+            return new AccountController(accountService, bank);
+        }
     ).declare(
         'AccountQueryController',
         (container) => {

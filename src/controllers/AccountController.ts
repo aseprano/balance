@@ -13,10 +13,15 @@ import { NotFoundApiResponse } from "../tech/api/NotFoundApiResponse";
 import { Transaction } from "../domain/values/Transaction";
 import { inspect } from "util";
 import { InvalidTransactionTypeException } from "../domain/exceptions/InvalidTransactionTypeException";
+import { BankService } from "../domain/app-services/BankService";
+import { CurrencyNotAllowedException } from "../domain/exceptions/CurrencyNotAllowedException";
 
 export class AccountController {
 
-    constructor(private accountService: AccountService) {}
+    constructor(
+        private accountService: AccountService,
+        private bank: BankService
+    ) {}
 
     async create(): Promise<ApiResponse> {
         return this.accountService
@@ -31,7 +36,8 @@ export class AccountController {
     async addTransaction(req: Request): Promise<ApiResponse> {
         try {
             const accountId = new AccountID(req.params.id);
-            const transaction = new Transaction(req.body.type, new Money(req.body.amount, req.body.currency));
+            const amountRequested = this.bank.emitMoney(req.body.amount, req.body.currency);
+            const transaction = new Transaction(req.body.type, amountRequested);
 
             if (transaction.isDebit()) {
                 await this.accountService.debit(transaction.getAmount(), accountId);
@@ -43,6 +49,8 @@ export class AccountController {
         } catch (e) {
             if (e instanceof InvalidTransactionTypeException) {
                 return new MicroserviceApiError(400, 1001, 'Invalid transaction type');
+            } else if (e instanceof CurrencyNotAllowedException) {
+                return new MicroserviceApiError(400, 1004, 'Currency not allowed');
             } else if (e instanceof BadMoneyException) {
                 return new MicroserviceApiError(400, 1002, 'Invalid amount');
             } else if (e instanceof BankAccountNotFoundException) {
