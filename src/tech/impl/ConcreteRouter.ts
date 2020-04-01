@@ -3,6 +3,7 @@ import { Express, Request, Response } from "express";
 import { ServiceContainer } from "./ServiceContainer";
 import { NextFunction } from "connect";
 import { ControllerResult } from "../ControllerResult";
+import { ApiResponse } from "../api/ApiResponse";
 
 interface RouterMapping {
     serviceName: string;
@@ -21,12 +22,16 @@ export class ConcreteRouter implements Router {
 
         try {
             const service: any = await this.serviceContainer.get(mapping.serviceName);
-            const ret: ControllerResult = await service[methodName](req);
+            const ret: ApiResponse = await service[methodName](req);
             res.status(ret.getStatusCode());
-            
-            const responseBody = ret.getData();
 
-            if (responseBody) {
+            if (ret.getStatusMessage()) {
+                res.statusMessage = ret.getStatusMessage();
+            }
+            
+            const responseBody = ret.getBody();
+
+            if (typeof responseBody === "object") {
                 res.json(responseBody);
             } else {
                 res.end();
