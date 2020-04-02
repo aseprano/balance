@@ -26,9 +26,14 @@ export class AccountController {
     async create(): Promise<ApiResponse> {
         return this.accountService
             .newAccount()
-            .then((id) => new MicroserviceApiResponse({
-                id: id.asString()
-            })).catch((err) => {
+            .then((id) => {
+                console.log(`Got new account id: ${id}`);
+                
+                return new MicroserviceApiResponse({
+                    id: id.asString()
+                })
+            }).catch((err) => {
+                console.debug(`Got error creating new account: ${err.message}`);
                 return err;
             });
     }
