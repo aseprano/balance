@@ -12,6 +12,7 @@ import { AccountDebitedEvent } from "../../events/AccountDebitedEvent";
 import { StreamConcurrencyException } from "../../../tech/exceptions/StreamConcurrencyException";
 import { SnapshotRepositoryImpl } from "../../../tech/impl/SnapshotRepositoryImpl";
 import { StreamNotFoundException } from "../../../tech/exceptions/StreamNotFoundException";
+import { StreamAlreadyExistingException } from "../../../tech/exceptions/StreamAlreadyExistingException";
 
 function mockSnapshot() {
     return mock(SnapshotRepositoryImpl);
@@ -33,8 +34,9 @@ describe('BankAccountsRepositoryImpl', () => {
 
         const repo = new BankAccountsRepositoryImpl(
             fakeStore,
-            () => new BankAccountImpl(),
             instance(emptySnapshotRepo),
+            () => new BankAccountImpl(),
+            0
         );
 
         repo.getById(new AccountID('12312312312'))
@@ -67,7 +69,7 @@ describe('BankAccountsRepositoryImpl', () => {
         spyOn(concreteAccount, 'restoreFromEventStream');
 
         const accountFactory = () => concreteAccount;
-        const repo = new BankAccountsRepositoryImpl(fakeStore, accountFactory, instance(emptySnapshotRepo));
+        const repo = new BankAccountsRepositoryImpl(fakeStore, instance(emptySnapshotRepo), accountFactory, 0);
         const account = await repo.getById(fakeAccountId);
 
         expect(account.restoreFromEventStream).toHaveBeenCalledWith(accountEventStream, undefined);
@@ -82,13 +84,14 @@ describe('BankAccountsRepositoryImpl', () => {
         ];
 
         const mockedAccount = mock(BankAccountImpl);
+        when(mockedAccount.getVersion()).thenReturn(-1);
         when(mockedAccount.commitEvents()).thenReturn(entityEvents);
         when(mockedAccount.getId()).thenReturn(accountId);
 
         const fakeStore = new FakeEventStore();
-        const repo = new BankAccountsRepositoryImpl(fakeStore, () => new BankAccountImpl(), instance(emptySnapshotRepo));
+        const repo = new BankAccountsRepositoryImpl(fakeStore, instance(emptySnapshotRepo),() => new BankAccountImpl(), 0);
 
-        await repo.add(instance(mockedAccount));
+        await repo.save(instance(mockedAccount));
 
         const eventsStream = await fakeStore.readStream('bank-account-12312312312');
         expect(eventsStream).toEqual({
@@ -118,35 +121,35 @@ describe('BankAccountsRepositoryImpl', () => {
 
         const repo = new BankAccountsRepositoryImpl(
             instance(fakeStore),
+            instance(emptySnapshotRepo),
             () => new BankAccountImpl(),
-            instance(emptySnapshotRepo)
+            0
         );
 
-        repo.update(instance(mockedAccount))
+        repo.save(instance(mockedAccount))
             .then(done);
     });
 
     it('throws the DuplicatedBankAccountException when adding an account with an already used id', (done) => {
         const accountId = '12312312312';
-        const fakeStore = new FakeEventStore();
-        fakeStore.setStream('bank-account-' + accountId, {
-            version: 1,
-            events: []
-        });
+        const fakeStore = mock(FakeEventStore);
+        when (fakeStore.createStream(`bank-account-${accountId}`, anything()))
+            .thenReject(new StreamAlreadyExistingException());
 
         const repo = new BankAccountsRepositoryImpl(
-            fakeStore,
+            instance(fakeStore),
+            instance(emptySnapshotRepo),
             () => new BankAccountImpl(),
-            instance(emptySnapshotRepo)
+            0
         );
 
         const newAccount = mock(BankAccountImpl);
         when(newAccount.getId()).thenReturn(new AccountID(accountId));
         when(newAccount.commitEvents()).thenReturn([]);
-        when(newAccount.getVersion()).thenReturn(1);
+        when(newAccount.getVersion()).thenReturn(-1);
         
-        repo.add(instance(newAccount))
-            .catch(error => {
+        repo.save(instance(newAccount))
+            .catch((error) => {
                 expect(error instanceof DuplicatedBankAccountException).toBeTruthy();
                 done();
             });
@@ -164,11 +167,12 @@ describe('BankAccountsRepositoryImpl', () => {
 
         const repo = new BankAccountsRepositoryImpl(
             instance(eventStore),
+            instance(emptySnapshotRepo),
             () => new BankAccountImpl(),
-            instance(emptySnapshotRepo)
+            0
         );
 
-        repo.update(instance(fakeAccount))
+        repo.save(instance(fakeAccount))
             .catch(error => {
                 expect(error instanceof BankAccountNotFoundException).toBeTruthy();
                 done();
@@ -182,8 +186,9 @@ describe('BankAccountsRepositoryImpl', () => {
 
         const repo = new BankAccountsRepositoryImpl(
             instance(eventStore),
+            instance(emptySnapshotRepo),
             () => new BankAccountImpl(),
-            instance(emptySnapshotRepo)
+            0
         );
 
         repo.getById(new AccountID('12312312312'))
@@ -205,11 +210,12 @@ describe('BankAccountsRepositoryImpl', () => {
 
         const repo = new BankAccountsRepositoryImpl(
             instance(eventStore),
+            instance(emptySnapshotRepo),
             () => new BankAccountImpl(),
-            instance(emptySnapshotRepo)
+            0
         );
 
-        repo.update(instance(fakeAccount))
+        repo.save(instance(fakeAccount))
             .catch((error) => {
                 expect(error instanceof StreamConcurrencyException).toBeTruthy();
                 done();
@@ -223,17 +229,18 @@ describe('BankAccountsRepositoryImpl', () => {
 
         const repo = new BankAccountsRepositoryImpl(
             instance(eventStore),
+            instance(emptySnapshotRepo),
             () => new BankAccountImpl(),
-            instance(emptySnapshotRepo)
+            0
         );
 
         const fakeAccount = mock(BankAccountImpl);
         when(fakeAccount.getId()).thenReturn(new AccountID('12312312312'));
-        when(fakeAccount.getVersion()).thenReturn(1);
+        when(fakeAccount.getVersion()).thenReturn(-1);
         when(fakeAccount.commitEvents()).thenReturn([]);
 
-        repo.add(instance(fakeAccount))
-            .catch(error => {
+        repo.save(instance(fakeAccount))
+            .catch((error) => {
                 expect(error instanceof RangeError).toBeTruthy();
                 done();
             });
@@ -243,9 +250,9 @@ describe('BankAccountsRepositoryImpl', () => {
         const eventStore = new FakeEventStore();
 
         const repo = new BankAccountsRepositoryImpl(
-            eventStore,
-            () => new BankAccountImpl(),
+            instance(eventStore),
             instance(emptySnapshotRepo),
+            () => new BankAccountImpl(),
             7
         );
 
