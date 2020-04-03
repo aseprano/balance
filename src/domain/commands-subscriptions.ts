@@ -1,5 +1,5 @@
 import { ServiceContainer } from "../tech/impl/ServiceContainer";
-import { MessageReceiver } from "../tech/messaging/MessageReceiver";
+import { MessageReceiver } from "@darkbyte/messaging";
 
 module.exports = async (
     serviceContainer: ServiceContainer,
