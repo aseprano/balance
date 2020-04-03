@@ -92,6 +92,26 @@ async function loadProjectors(
     return projectors;
 }
 
+async function bindEventBusToMessagingSystem(serviceContainer: ServiceContainer): Promise<void> {
+    const eventsMessagingSystem: MessagingSystem = await serviceContainer.get('EventsMessagingSystem');
+    const eventBus: EventBusImpl = await createEventSubscriptions(serviceContainer);
+    await loadProjectors(serviceContainer, eventBus, eventsMessagingSystem);
+
+    // Register all the event handlers to the messaging system
+    const messageToEventBus = new MessageToEventHandler(async (e) => {
+        eventBus.handle(e);
+    });
+
+    eventBus.getListOfEventNames()
+        .forEach((eventName) => {
+            eventsMessagingSystem.on(
+                eventName,
+                (incomingMessage) => messageToEventBus.handle(incomingMessage),
+                ""
+            );
+        });
+}
+
 function doAskReplay(serviceContainer: ServiceContainer) {
     setTimeout(() => {
         serviceContainer.get('Projectionist')
@@ -110,33 +130,14 @@ app.use(bodyParser.json());
 
 const serviceContainer = createServiceContainer();
 createRoutes(app, serviceContainer);
+bindEventBusToMessagingSystem(serviceContainer);
 
-serviceContainer.get('EventsMessagingSystem')
-    .then(async (messagingSystem: MessagingSystem) => {
-        const eventBus = await createEventSubscriptions(serviceContainer);
-        await loadProjectors(serviceContainer, eventBus, messagingSystem);
-
-        // Register all the event handlers to the messaging system
-        const messageToEventBus = new MessageToEventHandler(async (e) => {
-            eventBus.handle(e);
-        });
-
-        eventBus.getListOfEventNames()
-            .forEach((eventName) => {
-                messagingSystem.on(
-                    eventName,
-                    (incomingMessage) => messageToEventBus.handle(incomingMessage),
-                    ''
-                );
-            });
-
-        const port = process.env['PORT'] || 8000;
-        
-        app.listen(
-            port,
-            () => {
-                console.log(`» Listening on port ${port}`);
-                doAskReplay(serviceContainer);
-            }
-        );        
-    });
+const port = process.env['PORT'] || 8000;
+    
+app.listen(
+    port,
+    () => {
+        console.log(`» Listening on port ${port}`);
+        doAskReplay(serviceContainer);
+    }
+);        
