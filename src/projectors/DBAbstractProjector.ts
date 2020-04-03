@@ -1,8 +1,8 @@
-import { Projector } from "../../tech/projections/Projector";
-import { IncomingEvent } from "../../tech/impl/events/IncomingEvent";
-import { Queryable } from "../../tech/db/Queryable";
-import { DB } from "../../tech/db/DB";
-import { Function } from "../../lib/Function";
+import { Projector } from "../tech/projections/Projector";
+import { IncomingEvent } from "../tech/impl/events/IncomingEvent";
+import { Queryable } from "../tech/db/Queryable";
+import { DB } from "../tech/db/DB";
+import { Function } from "../lib/Function";
 
 export abstract class DBAbstractProjector implements Projector
 {

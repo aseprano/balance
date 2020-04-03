@@ -1,4 +1,4 @@
-import { Queryable } from "../tech/db/Queryable";
+import { Queryable } from "../../tech/db/Queryable";
 
 export interface MonthlyExpensesProjection {
 

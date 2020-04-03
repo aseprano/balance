@@ -1,8 +1,8 @@
 import { DBAbstractProjector } from "./DBAbstractProjector";
-import { IncomingEvent } from "../../tech/impl/events/IncomingEvent";
-import { Queryable } from "../../tech/db/Queryable";
-import { AccountDebitedEvent } from "../../domain/events/AccountDebitedEvent";
-import { MonthlyExpensesProjection } from "../MonthlyExpensesProjection";
+import { IncomingEvent } from "../tech/impl/events/IncomingEvent";
+import { Queryable } from "../tech/db/Queryable";
+import { AccountDebitedEvent } from "../domain/events/AccountDebitedEvent";
+import { MonthlyExpensesProjection } from "./projections/MonthlyExpensesProjection";
 
 export class MonthlyExpensesProjector extends DBAbstractProjector {
 
@@ -42,6 +42,5 @@ export class MonthlyExpensesProjector extends DBAbstractProjector {
     public async handleClear(connection: Queryable): Promise<void> {
         return this.projection.clear(connection);
     }
-
 
 }

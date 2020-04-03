@@ -1,14 +1,14 @@
 import { DBAbstractProjector } from "./DBAbstractProjector";
-import { AccountCreditedEvent } from "../../domain/events/AccountCreditedEvent";
-import { AccountDebitedEvent } from "../../domain/events/AccountDebitedEvent";
-import { IncomingEvent } from "../../tech/impl/events/IncomingEvent";
-import { Queryable } from "../../tech/db/Queryable";
-import { TransactionsProjection, TransactionType, Transaction } from "../TransactionsProjection";
-import { MoneyRoundingService } from "../../domain/domain-services/MoneyRoundingService";
+import { AccountCreditedEvent } from "../domain/events/AccountCreditedEvent";
+import { AccountDebitedEvent } from "../domain/events/AccountDebitedEvent";
+import { IncomingEvent } from "../tech/impl/events/IncomingEvent";
+import { Queryable } from "../tech/db/Queryable";
+import { TransactionsProjection, TransactionType, Transaction } from "./projections/TransactionsProjection";
+import { MoneyRoundingService } from "../domain/domain-services/MoneyRoundingService";
 
 const projectorId = 'com.herrdoktor.projections.transactions';
 
-export class TransactionProjector extends DBAbstractProjector {
+export class TransactionsProjector extends DBAbstractProjector {
 
     static get ID() {
         return projectorId;

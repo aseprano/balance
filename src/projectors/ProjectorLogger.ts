@@ -1,6 +1,5 @@
-import { Projector } from "../../tech/projections/Projector";
-import { IncomingEvent } from "../../tech/impl/events/IncomingEvent";
-import { Queryable } from "../../tech/db/Queryable";
+import { Projector } from "../tech/projections/Projector";
+import { IncomingEvent } from "../tech/impl/events/IncomingEvent";
 
 export class ProjectorLogger implements Projector {
 
@@ -21,7 +20,8 @@ export class ProjectorLogger implements Projector {
     async project(event: IncomingEvent): Promise<void> {
         this.doLog(`Projecting event ${event.getName()}`);
 
-        return this.innerProjector.project(event)
+        return this.innerProjector
+            .project(event)
             .then(() => {
                 this.doLog(`Event ${event.getName()} projected`);
             }).catch((error) => {
@@ -33,7 +33,8 @@ export class ProjectorLogger implements Projector {
     async clear(): Promise<void> {
         this.doLog(`Clearing projection`);
 
-        return this.innerProjector.clear()
+        return this.innerProjector
+            .clear()
             .then(() => {
                 this.doLog('Projection cleared');
             }).catch((error) => {

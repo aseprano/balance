@@ -1,5 +1,5 @@
-import { IncomingEvent } from "../../tech/impl/events/IncomingEvent";
-import { Projector } from "../../tech/projections/Projector";
+import { IncomingEvent } from "../tech/impl/events/IncomingEvent";
+import { Projector } from "../tech/projections/Projector";
 import { Queue, QueueConsumer } from "@darkbyte/aqueue";
 
 export class QueuedProjector implements Projector {

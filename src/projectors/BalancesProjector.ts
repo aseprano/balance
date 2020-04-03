@@ -1,11 +1,11 @@
 import { DBAbstractProjector } from "./DBAbstractProjector";
-import { AccountCreatedEvent } from "../../domain/events/AccountCreatedEvent";
-import { AccountDebitedEvent } from "../../domain/events/AccountDebitedEvent";
-import { AccountCreditedEvent } from "../../domain/events/AccountCreditedEvent";
-import { BalancesProjection } from "../BalancesProjection";
-import { IncomingEvent } from "../../tech/impl/events/IncomingEvent";
-import { Queryable } from "../../tech/db/Queryable";
-import { MoneyRoundingService } from "../../domain/domain-services/MoneyRoundingService";
+import { AccountCreatedEvent } from "../domain/events/AccountCreatedEvent";
+import { AccountDebitedEvent } from "../domain/events/AccountDebitedEvent";
+import { AccountCreditedEvent } from "../domain/events/AccountCreditedEvent";
+import { BalancesProjection } from "./projections/BalancesProjection";
+import { IncomingEvent } from "../tech/impl/events/IncomingEvent";
+import { Queryable } from "../tech/db/Queryable";
+import { MoneyRoundingService } from "../domain/domain-services/MoneyRoundingService";
 
 export class BalancesProjector extends DBAbstractProjector
 {

@@ -1,5 +1,5 @@
 import { MonthlyExpensesProjection } from "../MonthlyExpensesProjection";
-import { Queryable } from "../../tech/db/Queryable";
+import { Queryable } from "../../../tech/db/Queryable";
 
 export class DBMonthlyExpensesProjection implements MonthlyExpensesProjection
 {

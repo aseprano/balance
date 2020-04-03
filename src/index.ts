@@ -11,10 +11,10 @@ import { EventBus } from "./tech/events/EventBus";
 import { ProjectorRegistrationService } from "./domain/app-services/ProjectorRegistrationService";
 import { ProjectionService } from "./domain/app-services/ProjectionService";
 import { Projectionist } from "./tech/projections/Projectionist";
-import { ProjectorLogger } from "./projectors/impl/ProjectorLogger";
-import { QueuedProjector } from "./projectors/impl/QueuedProjector";
+import { ProjectorLogger } from "./projectors/ProjectorLogger";
+import { QueuedProjector } from "./projectors/QueuedProjector";
 import { DB } from "./tech/db/DB";
-import { DBAbstractProjector } from "./projectors/impl/DBAbstractProjector";
+import { DBAbstractProjector } from "./projectors/DBAbstractProjector";
 
 function createServiceContainer(): ServiceContainer {
     const serviceContainer = new ServiceContainer();
