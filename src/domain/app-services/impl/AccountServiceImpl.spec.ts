@@ -9,7 +9,6 @@ import { BankAccountFactory } from "../../factories/BankAccountFactory";
 import { BankAccount } from "../../entities/BankAccount";
 import { Money } from "../../values/Money";
 import { InsufficientFundsException } from "../../exceptions/InsufficientFundsException";
-import { BankAccountNotFoundException } from "../../exceptions/BankAccountNotFoundException";
 import { RetryPolicy } from "../../../tech/RetryPolicy";
 
 describe('AccountServiceImpl', () => {
@@ -66,7 +65,7 @@ describe('AccountServiceImpl', () => {
         spyOn(accountFactory, 'createInitialized').and.returnValue(account);
 
         const fakeRepo = mock(BankAccountsRepositoryImpl);
-        when(fakeRepo.add(account))
+        when(fakeRepo.save(account))
             .thenResolve();
 
         const repo = instance(fakeRepo);
@@ -138,7 +137,7 @@ describe('AccountServiceImpl', () => {
         when(fakeRepo.getById(anything()))
             .thenResolve(instance(fakeAccount));
 
-        when(fakeRepo.update(anything()))
+        when(fakeRepo.save(anything()))
             .thenCall(() => {
                 return new Promise<void>((resolve, reject) => {
                     setTimeout(() => {
@@ -175,7 +174,7 @@ describe('AccountServiceImpl', () => {
         when(fakeRepo.getById(anything()))
             .thenResolve(instance(fakeAccount));
         
-        when(fakeRepo.update(instance(fakeAccount)))
+        when(fakeRepo.save(instance(fakeAccount)))
             .thenCall(() => {
                 expect(accountDebited).toEqual(true);
                 done();
@@ -208,7 +207,7 @@ describe('AccountServiceImpl', () => {
         when(fakeRepo.getById(accountId))
             .thenResolve(instance(fakeAccount));
 
-        when(fakeRepo.update(instance(fakeAccount)))
+        when(fakeRepo.save(instance(fakeAccount)))
             .thenReturn(new Promise((resolve, reject) => {
                 setTimeout(() => {
                     accountUpdated = true;

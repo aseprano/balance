@@ -12,4 +12,6 @@ export interface Entity {
 
     getSnapshot(): Snapshot;
 
+    getId(): any;
+    
 }

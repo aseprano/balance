@@ -4,7 +4,6 @@ import { Money } from "../../values/Money";
 import { BankAccountsRepository } from "../../repositories/BankAccountsRepository";
 import { BankAccountFactory } from "../../factories/BankAccountFactory";
 import { RetryPolicy } from "../../../tech/RetryPolicy";
-import { Transaction } from "../../values/Transaction";
 
 export class AccountServiceImpl implements AccountService {
 
@@ -23,7 +22,7 @@ export class AccountServiceImpl implements AccountService {
             const newAccount = this.accountFactory.createInitialized();
         
             return this.accountsRepository
-                .add(newAccount)
+                .save(newAccount)
                 .then(() => newAccount.getId());
         });
     }
@@ -32,7 +31,7 @@ export class AccountServiceImpl implements AccountService {
         return this.doRepeat(async () => {
             const account = await this.accountsRepository.getById(accountId);
             account.credit(amount);
-            return this.accountsRepository.update(account);
+            return this.accountsRepository.save(account);
         });
     }
 
@@ -40,7 +39,7 @@ export class AccountServiceImpl implements AccountService {
         return this.doRepeat(async () => {
             const account = await this.accountsRepository.getById(accountId);
             account.debit(amount);
-            return this.accountsRepository.update(account);
+            return this.accountsRepository.save(account);
         });
     }
 

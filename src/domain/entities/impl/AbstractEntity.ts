@@ -5,7 +5,7 @@ import { DomainEvent } from "../../events/DomainEvent";
 import { Snapshot, SnapshotState } from "../../../tech/Snapshot";
 
 export abstract class AbstractEntity implements Entity {
-    private currentStreamVersion: number = 0;
+    private currentStreamVersion: number = -1;
     private uncommittedEvents: DomainEvent[] = [];
 
     protected appendUncommittedEvent(event: DomainEvent): void {
@@ -53,5 +53,7 @@ export abstract class AbstractEntity implements Entity {
     protected abstract applySnapshot(snapshot: SnapshotState): void;
 
     protected abstract applyEvent(event: Event): void;
+    
+    public abstract getId(): any;
     
 }
