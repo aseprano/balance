@@ -27,8 +27,6 @@ export class AccountController {
         return this.accountService
             .newAccount()
             .then((id) => {
-                console.log(`Got new account id: ${id}`);
-                
                 return new MicroserviceApiResponse({
                     id: id.asString()
                 })

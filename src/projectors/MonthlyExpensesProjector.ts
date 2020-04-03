@@ -3,10 +3,11 @@ import { IncomingEvent } from "../tech/impl/events/IncomingEvent";
 import { Queryable } from "../tech/db/Queryable";
 import { AccountDebitedEvent } from "../domain/events/AccountDebitedEvent";
 import { MonthlyExpensesProjection } from "./projections/MonthlyExpensesProjection";
+import { MoneyRoundingService } from "../domain/domain-services/MoneyRoundingService";
 
 export class MonthlyExpensesProjector extends DBAbstractProjector {
 
-    constructor(private projection: MonthlyExpensesProjection) {
+    constructor(private projection: MonthlyExpensesProjection, private roundingService: MoneyRoundingService) {
         super();
     }
 
@@ -30,7 +31,7 @@ export class MonthlyExpensesProjector extends DBAbstractProjector {
                 connection,
                 payload['id'],
                 relevantMonth,
-                payload['amount'],
+                this.roundingService.toCents(payload['amount']),
                 payload['currency']
             );
     }

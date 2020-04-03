@@ -29,7 +29,7 @@ export class MySQLDB implements DB {
         return this.getConnection()
             .then((conn) => {
                 const connectionWrapper = new DBConnectionLogger(conn);
-                connectionWrapper.disableLogs();
+                //connectionWrapper.disableLogs();
                 
                 return connectionWrapper
                     .query('START TRANSACTION')
@@ -41,7 +41,7 @@ export class MySQLDB implements DB {
             });
     }
     
-    query(query: string, params?: any[] | undefined, transactionId?: string): Promise<QueryResult> {
+    query(query: string, params?: any[] | {[key: string]: any}, transactionId?: string): Promise<QueryResult> {
         return this.getConnection()
             .then((conn) => {
                 return conn.query(query, params)

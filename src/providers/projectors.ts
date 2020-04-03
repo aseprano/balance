@@ -13,7 +13,7 @@ module.exports = async (serviceContainer: ServiceContainer): Promise<Projector[]
 
     return [
         new BalancesProjector(new DBBalancesProjection(), roundService),
-        new MonthlyExpensesProjector(new DBMonthlyExpensesProjection()),
+        new MonthlyExpensesProjector(new DBMonthlyExpensesProjection(), roundService),
         new TransactionsProjector(new DBTransactionProjection(), roundService),
     ];
 }

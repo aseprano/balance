@@ -11,16 +11,24 @@ export class DBMonthlyExpensesProjection implements MonthlyExpensesProjection
         amount: number,
         currency: string
     ): Promise<void> {
-        amount = Math.floor(amount*100);
-
         return connection.query(
-            `UPDATE monthly_expenses SET amount = amount + ? where account_id = ? and month = ? and currency = ?`,
-            [amount, accountId, month, currency]
+            `UPDATE monthly_expenses SET amount = amount + :amount WHERE account_id = :accountId AND currency = :currency AND month = :month`,
+            {
+                amount,
+                accountId,
+                currency,
+                month
+            }
         ).then((ret) => {
             if (!ret.numberOfAffectedRows) {
                 return connection.query(
-                    `INSERT INTO monthly_expenses (account_id, month, currency, amount) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE amount = amount + ?`,
-                    [accountId, month, currency, amount, amount]
+                    `INSERT INTO monthly_expenses (account_id, month, currency, amount) VALUES (:accountId, :month, :currency, :amount) ON DUPLICATE KEY UPDATE amount = amount + VALUES(amount)`,
+                    {
+                        accountId,
+                        month,
+                        currency,
+                        amount
+                    }
                 ).then(() => undefined);
             }
         });

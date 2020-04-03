@@ -6,36 +6,39 @@ export class DBBalancesProjection implements BalancesProjection {
     constructor() {}
 
     private createAccount(connection: Queryable, accountId: string): Promise<void> {
-        return connection.query('INSERT IGNORE INTO accounts VALUES (?)', [accountId])
+        const sql = `INSERT IGNORE INTO accounts VALUES (:accountId)`;
+
+        return connection.query(sql, {accountId})
             .then(() => undefined);
     }
 
     async createBalance(connection: Queryable, accountId: string, currency: string, balanceInCents: number): Promise<void> {
-        const sql = '' + 
-        'INSERT INTO balances (account_id, currency, balance) ' +
-        'VALUES (?, ?, ?) ' +
-        'ON DUPLICATE KEY UPDATE balance = balance + ?';
+        const sql = `INSERT INTO balances (account_id, currency, balance)
+        VALUES (:accountId, :currency, :balance)
+        ON DUPLICATE KEY UPDATE balance = balance + VALUES(balance)`;
 
         return this.createAccount(connection, accountId)
             .then(() => connection.query(
                 sql,
-                [accountId, currency, balanceInCents, balanceInCents]
+                {
+                    accountId,
+                    currency,
+                    balance: balanceInCents
+                }
             ))
             .then(() => undefined);
     }
     
     async updateBalance(connection: Queryable, accountId: string, currency: string, deltaInCents: number): Promise<void> {
-        console.debug(`* Updating balance by ${deltaInCents} ${currency}/cents`);
-
-        const sql = '' +
-        'UPDATE balances ' +
-        'SET balance = balance + ? ' +
-        'WHERE account_id = ? ' +
-        'AND currency = ?';
+        const sql = `UPDATE balances SET balance = balance + :amount WHERE account_id = :accountId AND currency = :currency`;
 
         return connection.query(
             sql,
-            [deltaInCents, accountId, currency]
+            {
+                amount: deltaInCents,
+                accountId,
+                currency
+            }
         ).then((res: QueryResult) => {
             if (!res.numberOfAffectedRows) {
                 return this.createBalance(connection, accountId, currency, deltaInCents);
