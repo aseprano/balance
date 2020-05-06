@@ -132,7 +132,7 @@ const serviceContainer = createServiceContainer();
 createRoutes(app, serviceContainer);
 bindEventBusToMessagingSystem(serviceContainer);
 
-const port = process.env['PORT'] || 8000;
+const port = process.env['PORT'] || 80;
     
 app.listen(
     port,

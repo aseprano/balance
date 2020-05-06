@@ -151,8 +151,15 @@ module.exports = (container: ServiceContainer) => {
     ).declare(
         'CommandsMessagingSystem',
         async (container: ServiceContainer) => {
+            const config: Config = await container.get('Config');
+            const host = await config.get('RABBITMQ_HOST');
+            const port = await config.get('RABBITMQ_PORT', 5672);
+            const user = await config.get('RABBITMQ_USER');
+            const pass = await config.get('RABBITMQ_PASS');
+            const vhost = await config.get('RABBITMQ_VHOST');
+
             const msg = new AMQPMessagingSystem(
-                "amqp://eventbus:eventbus@localhost:5672/banking",
+                `amqp://${user}:${pass}@${host}:${port}/${vhost}`,
                 uuid,
                 ["xcommands"],
                 "xcommands"
@@ -165,8 +172,15 @@ module.exports = (container: ServiceContainer) => {
     ).declare(
         'EventsMessagingSystem',
         async (container: ServiceContainer) => {
+            const config: Config = await container.get('Config');
+            const host = await config.get('RABBITMQ_HOST');
+            const port = await config.get('RABBITMQ_PORT', 5672);
+            const user = await config.get('RABBITMQ_USER');
+            const pass = await config.get('RABBITMQ_PASS');
+            const vhost = await config.get('RABBITMQ_VHOST');
+
             const msg = new AMQPMessagingSystem(
-                "amqp://eventbus:eventbus@localhost:5672/banking",
+                `amqp://${user}:${pass}@${host}:${port}/${vhost}`,
                 uuid,
                 ["all-events"],
                 "all-events",
