@@ -64,12 +64,12 @@ export class AccountQueryController {
         return parseInt(paramValue);
     }
 
-    private getPageNumber(req: Request): number {
-        return this.getNumericParam(req, 'page', 0);
+    private getPageNumber(req: Request, defaultValue = 0): number {
+        return this.getNumericParam(req, 'page', defaultValue);
     }
 
-    private getPageSize(req: Request): number {
-        return this.getNumericParam(req, 'pageSize', 10);
+    private getPageSize(req: Request, defaultValue = 5): number {
+        return this.getNumericParam(req, 'pageSize', defaultValue);
     }
 
     private loadAccounts(ids: string[]): any {
@@ -87,7 +87,7 @@ export class AccountQueryController {
 
     /** PUBLIC APIs **/
 
-    public getAccount(req: Request): Promise<ApiResponse> {
+    public async getAccount(req: Request): Promise<ApiResponse> {
         const sql = `
         SELECT  account_id AS id,
                 currency,
@@ -105,7 +105,7 @@ export class AccountQueryController {
             });
     }
 
-    public listAccounts(req: Request): Promise<ApiResponse> {
+    public async listAccounts(req: Request): Promise<ApiResponse> {
         const pageNumber = this.getPageNumber(req);
         const pageSize = this.getPageSize(req);
 
@@ -119,6 +119,40 @@ export class AccountQueryController {
             .query(sql)
             .then((ret) => ret.fields.map((f) => f.id))
             .then((ids) => this.loadAccounts(ids))
+            .then((data) => new MicroserviceApiResponse(data));
+    }
+
+    public async listAccountTransactions(req: Request): Promise<ApiResponse> {
+        const pageNumber = this.getPageNumber(req);
+        const pageSize = this.getPageSize(req);
+
+        const sql = `
+        SELECT type, amount/100 AS amount, currency, date
+        FROM transactions
+        WHERE account_id = :accountId
+        ORDER BY id DESC
+        LIMIT ${pageSize*pageNumber}, ${pageSize}`;
+
+        return this.dbConn
+            .query(sql, { accountId: req.params['id']})
+            .then((ret) => ret.fields)
+            .then((data) => new MicroserviceApiResponse(data));
+    }
+    
+    public async listAccountMonthlyExpenses(req: Request): Promise<ApiResponse> {
+        const accountId = req.params['id'];
+        const year = req.params['year'];
+
+        const sql = `
+        SELECT month, amount/100 AS amount, currency
+        FROM monthly_expenses
+        WHERE account_id = :accountId
+        AND month BETWEEN :fromMonth AND :toMonth
+        ORDER BY month ASC`;
+
+        return this.dbConn
+            .query(sql, { accountId: accountId, fromMonth: `${year}-01`, toMonth: `${year}-12`})
+            .then((ret) => ret.fields)
             .then((data) => new MicroserviceApiResponse(data));
     }
 

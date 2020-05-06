@@ -11,11 +11,19 @@ module.exports = (router: Router) => {
         'AccountController', 'addTransaction'
     )
     .get(
+        '/accounts',
+        'AccountQueryController', 'listAccounts'
+    )
+    .get(
         '/accounts/:id',
         'AccountQueryController', 'getAccount'
     )
     .get(
-        '/accounts',
-        'AccountQueryController', 'listAccounts'
+        '/accounts/:id/transactions',
+        'AccountQueryController', 'listAccountTransactions'
+    )
+    .get(
+        '/accounts/:id/monthly_expenses/:year(\\d{4})',
+        'AccountQueryController', 'listAccountMonthlyExpenses'
     );
 }
