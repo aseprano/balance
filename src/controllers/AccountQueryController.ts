@@ -72,7 +72,11 @@ export class AccountQueryController {
         return this.getNumericParam(req, 'pageSize', defaultValue);
     }
 
-    private loadAccounts(ids: string[]): any {
+    private async loadAccounts(ids: string[]): Promise<any[]> {
+        if (!ids.length) {
+            return [];
+        }
+        
         const sql = `
         SELECT account_id AS id,
                currency,

@@ -29,7 +29,7 @@ export class AccountController {
             .then((id) => {
                 return new MicroserviceApiResponse({
                     id: id.asString()
-                })
+                });
             }).catch((err) => {
                 console.debug(`Got error creating new account: ${err.message}`);
                 return err;
