@@ -34,16 +34,17 @@ module.exports = (container: ServiceContainer) => {
     container.declare(
         'Config',
         async () => {
-            const redisCli = redis.createClient({
-                host: process.env.REDIS_HOST,
-                port: process.env.REDIS_PORT,
-                db: process.env.REDIS_DB
-            });
+            return new EnvVariablesConfig(process.env);
+            // const redisCli = redis.createClient({
+            //     host: process.env.REDIS_HOST,
+            //     port: process.env.REDIS_PORT,
+            //     db: process.env.REDIS_DB
+            // });
 
-            const redisConfig = new RedisConfig(redisCli, 'banking');
-            const envConfig = new EnvVariablesConfig(process.env);
-            const compositeCfg = new CompositeConfig(redisConfig).addConfigAtEnd(envConfig);
-            return new CacheConfigDecorator(compositeCfg, 600);
+            // const redisConfig = new RedisConfig(redisCli, 'banking');
+            // const envConfig = new EnvVariablesConfig(process.env);
+            // const compositeCfg = new CompositeConfig(redisConfig).addConfigAtEnd(envConfig);
+            // return new CacheConfigDecorator(compositeCfg, 600);
         }
     ).declare(
         'EventStore',
@@ -151,23 +152,30 @@ module.exports = (container: ServiceContainer) => {
     ).declare(
         'CommandsMessagingSystem',
         async (container: ServiceContainer) => {
-            const config: Config = await container.get('Config');
-            const host = await config.get('RABBITMQ_HOST');
-            const port = await config.get('RABBITMQ_PORT', 5672);
-            const user = await config.get('RABBITMQ_USER');
-            const pass = await config.get('RABBITMQ_PASS');
-            const vhost = await config.get('RABBITMQ_VHOST');
+            const wait = 0; // seconds
+            console.debug(`*** Waiting ${wait} seconds before building the CommandMessagingSystem`);
 
-            const msg = new AMQPMessagingSystem(
-                `amqp://${user}:${pass}@${host}:${port}/${vhost}`,
-                uuid,
-                ["xcommands"],
-                "xcommands"
-            );
+            return new Promise((resolve) => {
+                setTimeout(async () => {
+                    const config: Config = await container.get('Config');
+                    const host = await config.get('RABBITMQ_HOST');
+                    const port = await config.get('RABBITMQ_PORT', 5672);
+                    const user = encodeURIComponent(await config.get('RABBITMQ_USER'));
+                    const pass = encodeURIComponent(await config.get('RABBITMQ_PASS'));
+                    const vhost = await config.get('RABBITMQ_VHOST');
         
-            msg.startAcceptingMessages();
-        
-            return msg;
+                    const msg = new AMQPMessagingSystem(
+                        `amqp://${user}:${pass}@${host}:${port}/${vhost}`,
+                        uuid,
+                        ["xcommands"],
+                        "xcommands"
+                    );
+                
+                    msg.startAcceptingMessages();
+                
+                    resolve(msg);
+                }, wait*1000);
+            });
         }
     ).declare(
         'EventsMessagingSystem',
@@ -175,12 +183,14 @@ module.exports = (container: ServiceContainer) => {
             const config: Config = await container.get('Config');
             const host = await config.get('RABBITMQ_HOST');
             const port = await config.get('RABBITMQ_PORT', 5672);
-            const user = await config.get('RABBITMQ_USER');
-            const pass = await config.get('RABBITMQ_PASS');
+            const user = encodeURIComponent(await config.get('RABBITMQ_USER'));
+            const pass = encodeURIComponent(await config.get('RABBITMQ_PASS'));
             const vhost = await config.get('RABBITMQ_VHOST');
-
+            const connectionString = `amqp://${user}:${pass}@${host}:${port}/${vhost}`;
+            console.debug(`*** Connection string: ${connectionString}`);
+            
             const msg = new AMQPMessagingSystem(
-                `amqp://${user}:${pass}@${host}:${port}/${vhost}`,
+                connectionString,
                 uuid,
                 ["all-events"],
                 "all-events",
