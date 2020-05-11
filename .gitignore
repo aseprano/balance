@@ -3,3 +3,4 @@ build/
 .nyc_output/
 amount.json
 test.ts
+.idea
