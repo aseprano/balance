@@ -35,4 +35,11 @@ describe('MoneyRoundingService', () => {
         expect(roundingService.toCents(-2.22)).toBeCloseTo(-222, 0);
     });
 
+    it('rounds 19.99', () => {
+        expect(roundingService.toCents(19.99)).toBeCloseTo(1999, 0);
+    });
+
+    it('rounds -19.99', () => {
+        expect(roundingService.toCents(-19.99)).toBeCloseTo(-1999, 0);
+    });
 });

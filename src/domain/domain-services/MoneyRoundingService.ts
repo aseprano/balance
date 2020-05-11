@@ -5,7 +5,7 @@ export class MoneyRoundingService {
             return -this.toCents(-amount);
         }
         
-        return Math.floor(amount*100);
+        return Math.round(amount*100);
     }
     
 }
