@@ -2,7 +2,6 @@ import { Router } from "../Router";
 import { Express, Request, Response } from "express";
 import { ServiceContainer } from "./ServiceContainer";
 import { NextFunction } from "connect";
-import { ControllerResult } from "../ControllerResult";
 import { ApiResponse } from "../api/ApiResponse";
 
 interface RouterMapping {
@@ -31,8 +30,10 @@ export class ConcreteRouter implements Router {
             
             const responseBody = ret.getBody();
 
-            if (typeof responseBody === "object") {
+            if (Array.isArray(responseBody) || typeof responseBody === "object") {
                 res.json(responseBody);
+            } else if (typeof responseBody === "string") {
+                res.send(responseBody);
             } else {
                 res.end();
             }
