@@ -1,6 +1,5 @@
 import { AccountID } from "../values/AccountID";
 import { Money } from "../values/Money";
-import { Transaction } from "../values/Transaction";
 
 export interface AccountService {
 

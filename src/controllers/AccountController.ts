@@ -11,7 +11,6 @@ import { MicroserviceApiResponse } from "./MicroserviceApiResponse";
 import { MicroserviceApiError } from "./MicroserviceApiError";
 import { NotFoundApiResponse } from "../tech/api/NotFoundApiResponse";
 import { Transaction } from "../domain/values/Transaction";
-import { inspect } from "util";
 import { InvalidTransactionTypeException } from "../domain/exceptions/InvalidTransactionTypeException";
 import { BankService } from "../domain/app-services/BankService";
 import { CurrencyNotAllowedException } from "../domain/exceptions/CurrencyNotAllowedException";
