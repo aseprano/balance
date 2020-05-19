@@ -8,6 +8,7 @@ import { AccountDebitedEvent } from "../../events/AccountDebitedEvent";
 import { AccountCreditedEvent } from "../../events/AccountCreditedEvent";
 import { InsufficientFundsException } from "../../exceptions/InsufficientFundsException";
 import { SnapshotState } from "../../../tech/Snapshot";
+import { AccountHolderName } from "../../values/AccountHolderName";
 
 export class BankAccountImpl extends AbstractEntity implements BankAccount {
     private accountId?: AccountID;
@@ -80,8 +81,8 @@ export class BankAccountImpl extends AbstractEntity implements BankAccount {
         return this.getBalance(requestedAmount.getCurrency()) >= requestedAmount.getAmount();
     }
 
-    public initialize(id: AccountID): void {
-        this.appendUncommittedEvent(new AccountCreatedEvent(id));
+    public initialize(id: AccountID, owner: AccountHolderName): void {
+        this.appendUncommittedEvent(new AccountCreatedEvent(id, owner));
     }
     
     getId(): AccountID {

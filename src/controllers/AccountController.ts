@@ -1,5 +1,5 @@
 import { AccountService } from "../domain/app-services/AccountService";
-import { Request } from "express";
+import e, { Request } from "express";
 import { Money } from "../domain/values/Money";
 import { AccountID } from "../domain/values/AccountID";
 import { InvalidAccountIDException } from "../domain/exceptions/InvalidAccountIDException";
@@ -14,6 +14,8 @@ import { Transaction } from "../domain/values/Transaction";
 import { InvalidTransactionTypeException } from "../domain/exceptions/InvalidTransactionTypeException";
 import { BankService } from "../domain/app-services/BankService";
 import { CurrencyNotAllowedException } from "../domain/exceptions/CurrencyNotAllowedException";
+import { AccountHolderName } from "../domain/values/AccountHolderName";
+import { InvalidAccountHolderNameException } from "../domain/exceptions/InvalidAccountHolderNameException";
 
 export class AccountController {
 
@@ -22,17 +24,20 @@ export class AccountController {
         private bank: BankService
     ) {}
 
-    async create(): Promise<ApiResponse> {
-        return this.accountService
-            .newAccount()
-            .then((id) => {
-                return new MicroserviceApiResponse({
-                    id: id.asString()
-                });
-            }).catch((err) => {
-                console.debug(`Got error creating new account: ${err.message}`);
-                return err;
+    async create(req: Request): Promise<ApiResponse> {
+        try {
+            const accountId = await this.accountService.newAccount(new AccountHolderName(req.body.owner));
+
+            return new MicroserviceApiResponse({
+                id: accountId.asString()
             });
+        } catch (e) {
+            if (e instanceof InvalidAccountHolderNameException) {
+                return new MicroserviceApiError(400, 1001, "Invalid owner name");
+            } else {
+                throw e;
+            }
+        }
     }
 
     async addTransaction(req: Request): Promise<ApiResponse> {

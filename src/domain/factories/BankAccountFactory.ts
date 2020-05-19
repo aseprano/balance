@@ -2,6 +2,7 @@ import { BankAccount } from "../entities/BankAccount";
 import { BankAccountImpl } from "../entities/impl/BankAccountImpl";
 import { Provider } from "../../lib/Provider";
 import { AccountID } from "../values/AccountID";
+import { AccountHolderName } from "../values/AccountHolderName";
 
 export class BankAccountFactory {
 
@@ -11,9 +12,9 @@ export class BankAccountFactory {
         return this.idGenerator();
     }
 
-    createInitialized(): BankAccount {
+    createInitialized(owner: AccountHolderName): BankAccount {
         const newAccount = new BankAccountImpl();
-        newAccount.initialize(this.generateAccountId());
+        newAccount.initialize(this.generateAccountId(), owner);
         return newAccount;
     }
 

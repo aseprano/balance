@@ -32,8 +32,8 @@ export class BalancesProjector extends DBAbstractProjector
         const payload = event.getPayload();
 
         return Promise.all([
-            this.projection.createBalance(connection, payload['id'], 'EUR', 0),
-            this.projection.createBalance(connection, payload['id'], 'USD', 0)
+            this.projection.createBalance(connection, payload['id'], payload['owner'], 'EUR', 0),
+            this.projection.createBalance(connection, payload['id'], payload['owner'], 'USD', 0)
         ]).then(() => undefined);
     }
 

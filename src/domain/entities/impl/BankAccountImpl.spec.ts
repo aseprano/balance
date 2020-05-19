@@ -6,21 +6,22 @@ import { AccountCreditedEvent } from "../../events/AccountCreditedEvent";
 import { AccountDebitedEvent } from "../../events/AccountDebitedEvent";
 import { EventStream } from "../../../tech/events/EventStream";
 import { Snapshot } from "../../../tech/Snapshot";
+import { AccountHolderName } from "../../values/AccountHolderName";
 
 describe('BankAccountImpl', () => {
 
     const testId = new AccountID('12332100012');
 
-    it('can be initalized with an account id', () => {
+    it('can be initalized with an account id and an owner', () => {
         const account = new BankAccountImpl();
-        account.initialize(testId);
+        account.initialize(testId, new AccountHolderName("Emmet, Dr. Brown"));
 
         expect(account.getId())
             .toEqual(testId);
 
         expect(account.commitEvents())
             .toEqual([
-                new AccountCreatedEvent(testId)
+                new AccountCreatedEvent(testId, new AccountHolderName("Emmet, Dr. Brown"))
             ]);
     });
 
@@ -29,7 +30,7 @@ describe('BankAccountImpl', () => {
         account.restoreFromEventStream({
             version: 10,
             events: [
-                new AccountCreatedEvent(testId),
+                new AccountCreatedEvent(testId, new AccountHolderName("Marty McFly")),
                 new AccountCreditedEvent(testId, new Money(10, 'EUR')),
                 new AccountDebitedEvent(testId,  new Money(3.14, 'EUR')),
                 new AccountDebitedEvent(testId,  new Money(5.87, 'EUR')),
@@ -47,13 +48,13 @@ describe('BankAccountImpl', () => {
         account.restoreFromEventStream({
             version: 10,
             events: [
-                new AccountCreatedEvent(testId),
+                new AccountCreatedEvent(testId, new AccountHolderName("George McFly")),
                 new AccountCreditedEvent(testId, new Money(10, 'EUR')),
                 new AccountDebitedEvent(testId,  new Money(3.14, 'EUR')),
                 new AccountDebitedEvent(testId,  new Money(5.87, 'EUR')),
             ]
         });
-
+        
         account.debit(new Money(0.95, 'EUR'));
         account.commitEvents();
 
@@ -72,7 +73,7 @@ describe('BankAccountImpl', () => {
         account.restoreFromEventStream({
             version: 10,
             events: [
-                new AccountCreatedEvent(testId)
+                new AccountCreatedEvent(testId, new AccountHolderName("Biff Tannem"))
             ]
         });
 
@@ -90,7 +91,7 @@ describe('BankAccountImpl', () => {
         account.restoreFromEventStream({
             version: 10,
             events: [
-                new AccountCreatedEvent(testId),
+                new AccountCreatedEvent(testId, new AccountHolderName("Stanford S. Strickland")),
                 new AccountCreditedEvent(testId, new Money(1000, 'EUR'))
             ]
         });
@@ -107,7 +108,7 @@ describe('BankAccountImpl', () => {
         account.restoreFromEventStream({
             version: 10,
             events: [
-                new AccountCreatedEvent(testId),
+                new AccountCreatedEvent(testId, new AccountHolderName("Lorraine")),
                 new AccountCreditedEvent(testId, new Money(1000, 'EUR')),
             ]
         });
@@ -122,7 +123,7 @@ describe('BankAccountImpl', () => {
 
     it('clears the uncommitted events when commitEvents() is invoked', () => {
         const account = new BankAccountImpl();
-        account.initialize(testId);
+        account.initialize(testId, new AccountHolderName("Calvin Klein"));
         account.credit(new Money(100, 'EUR'));
 
         account.commitEvents();
@@ -133,7 +134,7 @@ describe('BankAccountImpl', () => {
         const accountId = new AccountID('12312312312');
 
         const events = [
-            new AccountCreatedEvent(accountId),
+            new AccountCreatedEvent(accountId, new AccountHolderName("Clint Eastwood")),
             new AccountCreditedEvent(accountId, new Money(10, 'EUR')),
             new AccountCreditedEvent(accountId, new Money(3.14, 'EUR')),
             new AccountDebitedEvent(accountId, new Money(1, 'EUR')),

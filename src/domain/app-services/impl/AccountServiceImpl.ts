@@ -4,6 +4,7 @@ import { Money } from "../../values/Money";
 import { BankAccountsRepository } from "../../repositories/BankAccountsRepository";
 import { BankAccountFactory } from "../../factories/BankAccountFactory";
 import { RetryPolicy } from "../../../tech/RetryPolicy";
+import { AccountHolderName } from "../../values/AccountHolderName";
 
 export class AccountServiceImpl implements AccountService {
 
@@ -17,9 +18,9 @@ export class AccountServiceImpl implements AccountService {
         return this.retryPolicy.retry(f);
     }
 
-    async newAccount(): Promise<AccountID> { 
+    async newAccount(owner: AccountHolderName): Promise<AccountID> { 
         return this.doRepeat(() => {
-            const newAccount = this.accountFactory.createInitialized();
+            const newAccount = this.accountFactory.createInitialized(owner);
         
             return this.accountsRepository
                 .save(newAccount)

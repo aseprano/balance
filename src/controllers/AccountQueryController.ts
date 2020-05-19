@@ -20,7 +20,7 @@ function formatAccountBalance(rows: any[]): any {
  * Expects an array of balances
  * @param fields 
  */
-function formatMultipleRows(rows: any[]): any[] {
+function formatMultipleRows(rows: any[]): any {
     const result: any[] = [];
     let currentAccountRows: any[] = [];
     let currentBalanceId = '';
@@ -38,11 +38,13 @@ function formatMultipleRows(rows: any[]): any[] {
         currentAccountRows.push(currentRow);
     });
 
-    if (currentAccountRows) {
+    if (currentAccountRows.length) {
         result.push(formatAccountBalance(currentAccountRows));
     }
 
-    return result;
+    return {
+        accounts: result
+    }
 }
 
 export class AccountQueryController {
@@ -85,8 +87,7 @@ export class AccountQueryController {
         WHERE account_id IN (?)
         ORDER BY account_id, currency`;
 
-        return this.dbConn.query(sql, [ids])
-            .then((ret) => formatMultipleRows(ret.fields));
+        return (await this.dbConn.query(sql, [ids])).fields;
     }
 
     /** PUBLIC APIs **/
@@ -123,6 +124,7 @@ export class AccountQueryController {
             .query(sql)
             .then((ret) => ret.fields.map((f) => f.id))
             .then((ids) => this.loadAccounts(ids))
+            .then(formatMultipleRows)
             .then((data) => new MicroserviceApiResponse(data));
     }
 

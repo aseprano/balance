@@ -13,6 +13,7 @@ import { StreamConcurrencyException } from "../../../tech/exceptions/StreamConcu
 import { SnapshotRepositoryImpl } from "../../../tech/impl/SnapshotRepositoryImpl";
 import { StreamNotFoundException } from "../../../tech/exceptions/StreamNotFoundException";
 import { StreamAlreadyExistingException } from "../../../tech/exceptions/StreamAlreadyExistingException";
+import { AccountHolderName } from "../../values/AccountHolderName";
 
 function mockSnapshot() {
     return mock(SnapshotRepositoryImpl);
@@ -52,7 +53,7 @@ describe('BankAccountsRepositoryImpl', () => {
         const accountEventStream = {
             version: 7,
             events: [
-                new AccountCreatedEvent(fakeAccountId),
+                new AccountCreatedEvent(fakeAccountId, new AccountHolderName("Robocop")),
                 new AccountCreditedEvent(fakeAccountId, new Money(300, 'EUR')),
             ]
         };
@@ -79,7 +80,7 @@ describe('BankAccountsRepositoryImpl', () => {
         const accountId = new AccountID('12312312312');
 
         const entityEvents = [
-            new AccountCreatedEvent(accountId),
+            new AccountCreatedEvent(accountId, new AccountHolderName("Murphy")),
             new AccountCreditedEvent(accountId, new Money(27, 'USD')),
         ];
 

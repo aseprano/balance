@@ -10,9 +10,11 @@ import { BankAccount } from "../../entities/BankAccount";
 import { Money } from "../../values/Money";
 import { InsufficientFundsException } from "../../exceptions/InsufficientFundsException";
 import { RetryPolicy } from "../../../tech/RetryPolicy";
+import { AccountHolderName } from "../../values/AccountHolderName";
 
 describe('AccountServiceImpl', () => {
     const noRetryPolicy = new NoRetryPolicy<any>();
+    const accountHolder = new AccountHolderName("Brown, Dr. Emmet");
 
     function createAccountWithId(accountId: AccountID): BankAccount {
         const fakeAccount = mock(BankAccountImpl);
@@ -44,7 +46,7 @@ describe('AccountServiceImpl', () => {
     function createFactoryThatReturns(bankAccount: BankAccount): BankAccountFactory {
         const fakeFactory = mock(BankAccountFactory);
 
-        when(fakeFactory.createInitialized())
+        when(fakeFactory.createInitialized(new AccountHolderName("George Lucas")))
             .thenReturn(bankAccount);
 
         return fakeFactory;
@@ -55,7 +57,7 @@ describe('AccountServiceImpl', () => {
         
         when(fakeAccount.commitEvents())
             .thenReturn([
-                new AccountCreatedEvent(new AccountID('12312312312')),
+                new AccountCreatedEvent(new AccountID('12312312312'), new AccountHolderName("George Lucas")),
             ]);
 
         const account = instance(fakeAccount);
@@ -76,8 +78,8 @@ describe('AccountServiceImpl', () => {
             noRetryPolicy
         );
 
-        service.newAccount()
-            .then(newId => {
+        service.newAccount(accountHolder)
+            .then((newId) => {
                 expect(accountFactory.createInitialized).toHaveBeenCalledTimes(1);
                 expect(newId).toEqual(new AccountID('12312312312'));
                 done();

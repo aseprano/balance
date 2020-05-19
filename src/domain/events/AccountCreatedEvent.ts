@@ -1,14 +1,16 @@
 import { DomainEvent } from "./DomainEvent";
 import { AccountID } from "../values/AccountID";
+import { AccountHolderName } from "../values/AccountHolderName";
 
 export class AccountCreatedEvent extends DomainEvent {
     public static get EventName(): string { return 'herrdoktor.microservices.balance.events.accountCreated' };
 
-    constructor(id: AccountID) {
+    constructor(id: AccountID, owner: AccountHolderName) {
         super();
 
         this.setPayload({
-            id: id.asString()
+            id: id.asString(),
+            owner: owner.asString(),
         });
     }
 
