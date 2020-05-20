@@ -5,29 +5,20 @@ export class DBBalancesProjection implements BalancesProjection {
 
     constructor() {}
 
-    private createAccount(connection: Queryable, accountId: string, owner: string): Promise<void> {
-        const sql = `INSERT INTO accounts VALUES (:accountId, :owner) ON DUPLICATE KEY UPDATE owner = VALUES(owner)`;
-
-        return connection.query(sql, { accountId, owner })
-            .then(() => undefined);
-    }
-
-    async createBalance(connection: Queryable, accountId: string, accountOwner: string, currency: string, balanceAsCents: number): Promise<void> {
+    async createBalance(connection: Queryable, accountId: string, currency: string, balanceAsCents = 0): Promise<void> {
         const sql = `INSERT INTO balances (account_id, currency, balance)
         VALUES (:accountId, :currency, :balance)
         ON DUPLICATE KEY UPDATE
             balance = balance + VALUES(balance)`;
 
-        return this.createAccount(connection, accountId, accountOwner)
-            .then(() => connection.query(
-                sql,
-                {
-                    accountId,
-                    currency,
-                    balance: balanceAsCents
-                }
-            ))
-            .then(() => undefined);
+        return connection.query(
+            sql,
+            {
+                accountId,
+                currency,
+                balance: balanceAsCents
+            }
+        ).then(() => undefined);
     }
     
     async updateBalance(connection: Queryable, accountId: string, currency: string, deltaAsCents: number): Promise<void> {
@@ -42,7 +33,7 @@ export class DBBalancesProjection implements BalancesProjection {
             }
         ).then((res: QueryResult) => {
             if (!res.numberOfAffectedRows) {
-                return this.createBalance(connection, accountId, '', currency, deltaAsCents);
+                return this.createBalance(connection, accountId, currency, deltaAsCents);
             }
         });
 

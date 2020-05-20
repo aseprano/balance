@@ -14,7 +14,7 @@ import { Projectionist } from "./tech/projections/Projectionist";
 import { ProjectorLogger } from "./projectors/ProjectorLogger";
 import { QueuedProjector } from "./projectors/QueuedProjector";
 import { DB } from "./tech/db/DB";
-import { DBAbstractProjector } from "./projectors/DBAbstractProjector";
+import { AbstractDBProjector } from "./projectors/AbstractDBProjector";
 
 function createServiceContainer(): ServiceContainer {
     const serviceContainer = new ServiceContainer();
@@ -40,7 +40,7 @@ async function createEventSubscriptions(serviceContainer: ServiceContainer): Pro
 }
 
 function wrapProjector(projector: Projector, db: DB): Projector {
-    if (projector instanceof DBAbstractProjector) {
+    if (projector instanceof AbstractDBProjector) {
         projector.setDB(db);
         projector.setHandledEventsTableName('handled_events');
     }

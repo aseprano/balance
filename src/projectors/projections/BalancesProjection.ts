@@ -5,7 +5,6 @@ export interface BalancesProjection {
     createBalance(
         connection: Queryable,
         accountId: string,
-        accountOwner: string,
         currency: string,
         balance?: number
     ): Promise<void>;

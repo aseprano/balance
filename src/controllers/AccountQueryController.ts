@@ -7,44 +7,15 @@ import { MicroserviceApiResponse } from "./MicroserviceApiResponse";
 function formatAccountBalance(rows: any[]): any {
     return {
         id: rows[0].id,
+        owner: rows[0].owner,
+        created_at: rows[0].created_at,
         balance: rows.map((row: any) => {
             return {
                 amount: row.balance / 100,
                 currency: row.currency
             }
-        })
+        }),
     };
-}
-
-/**
- * Expects an array of balances
- * @param fields 
- */
-function formatMultipleRows(rows: any[]): any {
-    const result: any[] = [];
-    let currentAccountRows: any[] = [];
-    let currentBalanceId = '';
-
-    rows.forEach((currentRow) => {
-        if (currentBalanceId !== currentRow.id) {
-            if (currentAccountRows.length) {
-                result.push(formatAccountBalance(currentAccountRows));
-                currentAccountRows = [];
-            }
-
-            currentBalanceId = currentRow.id;
-        }
-
-        currentAccountRows.push(currentRow);
-    });
-
-    if (currentAccountRows.length) {
-        result.push(formatAccountBalance(currentAccountRows));
-    }
-
-    return {
-        accounts: result
-    }
 }
 
 export class AccountQueryController {
@@ -70,39 +41,26 @@ export class AccountQueryController {
         return this.getNumericParam(req, 'page', defaultValue);
     }
 
-    private getPageSize(req: Request, defaultValue = 5): number {
-        return this.getNumericParam(req, 'pageSize', defaultValue);
-    }
-
-    private async loadAccounts(ids: string[]): Promise<any[]> {
-        if (!ids.length) {
-            return [];
-        }
-        
-        const sql = `
-        SELECT account_id AS id,
-               currency,
-               balance
-        FROM balances
-        WHERE account_id IN (?)
-        ORDER BY account_id, currency`;
-
-        return (await this.dbConn.query(sql, [ids])).fields;
+    private getPageSize(req: Request, defaultValue = 10): number {
+        return this.getNumericParam(req, 'page_size', defaultValue);
     }
 
     /** PUBLIC APIs **/
 
     public async getAccount(req: Request): Promise<ApiResponse> {
         const sql = `
-        SELECT  account_id AS id,
+        SELECT  id,
+                owner,
+                created_at,
                 currency,
                 balance
-        FROM balances
-        WHERE account_id = ?
+        FROM balances INNER JOIN accounts
+        ON balances.account_id = accounts.id
+        WHERE id = :id
         ORDER BY currency ASC`;
 
         return this.dbConn
-            .query(sql, [req.params['id']])
+            .query(sql, { id: req.params['id'] })
             .then((ret) => {
                 return ret.fields.length
                     ? new MicroserviceApiResponse(formatAccountBalance(ret.fields))
@@ -115,17 +73,15 @@ export class AccountQueryController {
         const pageSize = this.getPageSize(req);
 
         const sql = `
-        SELECT id
+        SELECT id, owner, created_at
         FROM accounts
         ORDER BY id
         LIMIT ${pageSize*pageNumber}, ${pageSize}`;
 
         return this.dbConn
             .query(sql)
-            .then((ret) => ret.fields.map((f) => f.id))
-            .then((ids) => this.loadAccounts(ids))
-            .then(formatMultipleRows)
-            .then((data) => new MicroserviceApiResponse(data));
+            .then((ret) => ret.fields)
+            .then((rows) => new MicroserviceApiResponse(rows));
     }
 
     public async listAccountTransactions(req: Request): Promise<ApiResponse> {

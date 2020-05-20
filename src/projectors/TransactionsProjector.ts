@@ -1,4 +1,4 @@
-import { DBAbstractProjector } from "./DBAbstractProjector";
+import { AbstractDBProjector } from "./AbstractDBProjector";
 import { AccountCreditedEvent } from "../domain/events/AccountCreditedEvent";
 import { AccountDebitedEvent } from "../domain/events/AccountDebitedEvent";
 import { IncomingEvent } from "../tech/impl/events/IncomingEvent";
@@ -8,7 +8,7 @@ import { MoneyRoundingService } from "../domain/domain-services/MoneyRoundingSer
 
 const projectorId = 'com.herrdoktor.projections.transactions';
 
-export class TransactionsProjector extends DBAbstractProjector {
+export class TransactionsProjector extends AbstractDBProjector {
 
     static get ID() {
         return projectorId;

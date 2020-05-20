@@ -1,13 +1,13 @@
-import { DBAbstractProjector } from "./DBAbstractProjector";
-import { AccountCreatedEvent } from "../domain/events/AccountCreatedEvent";
+import { AbstractDBProjector } from "./AbstractDBProjector";
 import { AccountDebitedEvent } from "../domain/events/AccountDebitedEvent";
 import { AccountCreditedEvent } from "../domain/events/AccountCreditedEvent";
 import { BalancesProjection } from "./projections/BalancesProjection";
 import { IncomingEvent } from "../tech/impl/events/IncomingEvent";
 import { Queryable } from "../tech/db/Queryable";
 import { MoneyRoundingService } from "../domain/domain-services/MoneyRoundingService";
+import { AccountCreatedEvent } from "../domain/events/AccountCreatedEvent";
 
-export class BalancesProjector extends DBAbstractProjector
+export class BalancesProjector extends AbstractDBProjector
 {
     constructor(
         private projection: BalancesProjection,
@@ -30,10 +30,10 @@ export class BalancesProjector extends DBAbstractProjector
 
     private async handleAccountCreated(event: IncomingEvent, connection: Queryable): Promise<void> {
         const payload = event.getPayload();
-
+        
         return Promise.all([
-            this.projection.createBalance(connection, payload['id'], payload['owner'], 'EUR', 0),
-            this.projection.createBalance(connection, payload['id'], payload['owner'], 'USD', 0)
+            this.projection.createBalance(connection, payload['id'], "EUR"),
+            this.projection.createBalance(connection, payload['id'], "USD"),
         ]).then(() => undefined);
     }
 
